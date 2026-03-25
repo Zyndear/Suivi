@@ -293,155 +293,159 @@
   /* ==============================
      MOBILE FIRST — BARRE DU BAS
      ============================== */
-
-  /* Cache la nav du haut sur mobile */
   nav.desktop-nav { display: flex; gap: 4px; margin-bottom: 28px; flex-wrap: wrap; }
 
-  /* Barre de navigation fixe en bas sur mobile */
   .mobile-nav {
     display: none;
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
     background: var(--surface);
     border-top: 2px solid var(--border);
     padding: 0; margin: 0;
+    padding-bottom: env(safe-area-inset-bottom);
     box-shadow: 0 -4px 24px rgba(0,0,0,.5);
   }
   .mobile-nav-inner {
-    display: flex; justify-content: space-around; align-items: stretch;
+    display: flex; justify-content: space-around; align-items: center;
     max-width: 600px; margin: 0 auto;
+    height: 72px;
   }
   .mob-tab {
     flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 4px; padding: 10px 4px 12px;
+    gap: 5px; padding: 8px 4px;
     background: none; border: none; color: var(--muted);
     font-family: 'OpenDyslexic', 'Arial', sans-serif;
-    font-size: 9px; cursor: pointer; transition: color .2s;
+    cursor: pointer; transition: color .2s;
     -webkit-tap-highlight-color: transparent;
-    min-height: 60px;
+    min-height: 72px; min-width: 56px;
   }
-  .mob-tab .mob-icon { font-size: 22px; line-height: 1; }
-  .mob-tab .mob-label { font-size: 9px; letter-spacing: 0; line-height: 1.2; text-align: center; }
+  .mob-tab .mob-icon { font-size: 26px; line-height: 1; }
+  .mob-tab .mob-label { font-size: 10px; line-height: 1.2; text-align: center; }
   .mob-tab.active { color: var(--accent); }
   .mob-tab.active .mob-icon { filter: drop-shadow(0 0 6px var(--accent)); }
 
-  /* Bouton flottant "Ajouter" au centre */
   .mob-add-btn {
-    position: relative; top: -18px;
-    width: 56px; height: 56px; border-radius: 50%;
+    position: relative; top: -14px;
+    width: 64px; height: 64px; border-radius: 50%;
     background: var(--accent); border: none;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,229,160,.4);
+    gap: 2px; cursor: pointer; box-shadow: 0 4px 24px rgba(0,229,160,.5);
     font-family: 'OpenDyslexic', 'Arial', sans-serif;
-    font-size: 9px; color: #000; font-weight: 700;
+    font-size: 10px; color: #000; font-weight: 700;
     -webkit-tap-highlight-color: transparent;
     transition: transform .15s;
     flex-shrink: 0;
   }
-  .mob-add-btn:active { transform: scale(.93); }
-  .mob-add-btn .mob-icon { font-size: 24px; line-height: 1; }
+  .mob-add-btn:active { transform: scale(.91); }
+  .mob-add-btn .mob-icon { font-size: 28px; line-height: 1; }
+
+  /* ---- HISTORY CARDS (mobile) ---- */
+  .hist-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px; margin-bottom: 12px;
+  }
+  .hist-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .hist-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; flex: 1; line-height: 1.3; }
+  .hist-card-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .hist-card-train { font-size: 12px; color: var(--accent2); font-weight: 700; margin-bottom: 6px; }
+  .hist-card-desc { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
+  .hist-card-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .hist-card-footer { display: flex; justify-content: space-between; align-items: center; }
+
+  /* ---- BOTTOM SHEET (modal tickets) ---- */
+  .bottom-sheet-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.6); z-index: 300;
+  }
+  .bottom-sheet-overlay.open { display: block; }
+  .bottom-sheet {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 301;
+    background: var(--surface); border-radius: 22px 22px 0 0;
+    padding: 0 0 env(safe-area-inset-bottom);
+    max-height: 90vh; overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+  }
+  .bottom-sheet.open { transform: translateY(0); }
+  .bottom-sheet-handle {
+    width: 40px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 14px auto 0;
+  }
+  .bottom-sheet-inner { padding: 16px 18px 32px; }
 
   @media (max-width: 700px) {
-    /* Viewport correct pour éviter le zoom iOS */
     html { -webkit-text-size-adjust: 100%; }
-
     body { font-size: 16px; }
 
-    /* App padding : espace pour la barre du bas */
-    .app { padding: 16px 14px 90px; }
+    /* Padding app : compte la barre du bas 72px + safe area */
+    .app { padding: 10px 14px 90px; }
 
-    /* Header compact */
+    /* Header COMPACT : juste une ligne fine */
     header {
-      flex-direction: row; align-items: center;
-      padding-bottom: 14px; margin-bottom: 18px; gap: 8px;
+      flex-direction: row; align-items: center; justify-content: space-between;
+      padding-bottom: 10px; margin-bottom: 14px; gap: 8px;
     }
-    .logo-title { font-size: 20px; }
-    .logo-tag { font-size: 9px; }
-    .date-pill { font-size: 10px; padding: 5px 10px; white-space: nowrap; }
+    .logo-tag { display: none; }
+    .logo-title { font-size: 17px; }
+    .date-pill { font-size: 10px; padding: 4px 9px; white-space: nowrap; flex-shrink: 0; }
 
-    /* Cache nav desktop, affiche nav mobile */
     nav.desktop-nav { display: none; }
     .mobile-nav { display: block; }
 
-    /* Sync bar compacte */
-    .sync-bar { padding: 8px 12px; gap: 8px; }
+    .sync-bar { padding: 7px 12px; gap: 6px; }
     .sync-bar-label { display: none; }
-    .sync-status { font-size: 10px; }
+    .sync-status { font-size: 10px; margin-left: 0; }
 
-    /* KPI : 2 colonnes sur mobile */
-    .kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-    .kpi { padding: 14px 12px; border-radius: 10px; }
-    .kpi-val { font-size: 26px; }
+    .kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .kpi { padding: 12px 10px; border-radius: 10px; }
+    .kpi-val { font-size: 24px; }
     .kpi-label { font-size: 9px; }
     .kpi-sub { font-size: 9px; }
 
-    /* Cards */
-    .card { padding: 16px 14px; border-radius: 12px; margin-bottom: 14px; }
-    .card-title { font-size: 12px; margin-bottom: 14px; }
+    .card { padding: 14px 12px; border-radius: 12px; margin-bottom: 12px; }
+    .card-title { font-size: 12px; margin-bottom: 12px; }
 
-    /* Formulaire : 1 colonne, grands champs tactiles */
     .form-grid { grid-template-columns: 1fr; gap: 12px; }
     .form-full { grid-column: 1; }
     label { font-size: 12px; margin-bottom: 6px; }
     input, select, textarea {
-      font-size: 16px; /* évite le zoom iOS */
-      padding: 14px 14px;
+      font-size: 16px;
+      padding: 14px;
       border-radius: 10px;
       min-height: 52px;
     }
     textarea { min-height: 90px; }
 
-    /* Boutons pleine largeur sur mobile */
     .btn-row { flex-direction: column; gap: 10px; margin-top: 16px; }
     .btn-row .btn { width: 100%; padding: 16px; font-size: 15px; border-radius: 12px; text-align: center; }
 
-    /* Tableaux : scroll horizontal + texte réduit */
-    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table { font-size: 12px; min-width: 520px; }
-    td, th { padding: 10px 10px; }
+    /* Historique : cache le tableau, montre les cartes */
+    .history-table-desktop { display: none !important; }
+    .history-cards-mobile { display: block !important; }
 
-    /* TD cards */
     .td-card { padding: 14px; border-radius: 10px; }
     .td-card-header { flex-wrap: wrap; gap: 6px; }
 
-    /* Charts */
-    .bar-label { width: 90px; font-size: 10px; }
+    .bar-label { width: 80px; font-size: 10px; }
     .bar-val { font-size: 10px; }
+    .ring-wrap { gap: 12px; padding: 8px; }
 
-    /* Ring chart */
-    .ring-wrap { gap: 16px; padding: 10px; }
-
-    /* Insight blocks */
-    .insight-block { padding: 14px; }
+    .insight-block { padding: 12px; }
     .insight-text { font-size: 13px; }
 
-    /* Grille dashboard 2 colonnes */
     #chartsGrid { grid-template-columns: 1fr !important; }
-
-    /* Checkbox reprise */
     #repriseColleagueWrap { padding: 12px; }
 
-    /* Filtres historique */
-    #view-history .card:first-child > div { flex-direction: column; align-items: stretch; }
+    /* Filtres historique en colonne */
+    #view-history .card:first-child > div { flex-direction: column; align-items: stretch; gap: 10px; }
     #view-history select { min-height: 48px; font-size: 16px; }
 
-    /* Modal tickets */
-    #tdModal { padding: 0; align-items: flex-end; display: flex !important; }
-    #tdModal > div {
-      margin: 0; border-radius: 20px 20px 0 0;
-      max-height: 88vh; overflow-y: auto;
-      width: 100%; max-width: 100%;
-      padding: 22px 18px 32px;
-    }
+    /* Cache l'ancien modal, montre le bottom sheet */
+    #tdModal { display: none !important; }
 
-    /* Statut boutons en colonne dans modal */
-    #tdModalContent .btn { min-height: 48px; font-size: 14px; }
+    .empty { padding: 36px 14px; }
+    .empty-icon { font-size: 36px; }
 
-    /* Empty states */
-    .empty { padding: 40px 16px; }
-    .empty-icon { font-size: 40px; }
-
-    /* Sync bar boutons */
-    #gAuthArea { gap: 6px; }
+    #gAuthArea { gap: 6px; flex-wrap: wrap; }
     #gAuthArea .btn { padding: 10px 12px; font-size: 12px; }
   }
 </style>
@@ -674,7 +678,8 @@
       </div>
     </div>
     <div class="card">
-      <div class="table-wrap" id="historyTable"></div>
+      <div class="table-wrap history-table-desktop" id="historyTable"></div>
+      <div class="history-cards-mobile" id="historyCards" style="display:none"></div>
     </div>
   </div>
 
@@ -788,11 +793,21 @@
       <div id="tdList"></div>
     </div>
 
-    <!-- Modal suivi ticket -->
+    <!-- Modal suivi ticket (desktop) -->
     <div id="tdModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;overflow-y:auto;padding:20px;">
       <div style="max-width:640px;margin:40px auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;">
-        <button onclick="closeTDModal()" style="position:absolute;top:16px;right:16px;background:var(--border);border:none;color:var(--text);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;">✕</button>
+        <button onclick="closeTDModal()" style="position:absolute;top:16px;right:16px;background:var(--border);border:none;color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;">✕</button>
         <div id="tdModalContent"></div>
+      </div>
+    </div>
+
+    <!-- Bottom sheet ticket (mobile) -->
+    <div class="bottom-sheet-overlay" id="tdSheetOverlay" onclick="closeTDModal()"></div>
+    <div class="bottom-sheet" id="tdSheet">
+      <div class="bottom-sheet-handle"></div>
+      <div class="bottom-sheet-inner">
+        <button onclick="closeTDModal()" style="position:absolute;top:18px;right:18px;background:var(--border);border:none;color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;">✕</button>
+        <div id="tdSheetContent"></div>
       </div>
     </div>
 
@@ -1053,6 +1068,43 @@ function renderHistory() {
       </tbody>
     </table>
   `;
+
+  // ---- VERSION MOBILE EN CARTES ----
+  const isMobile = window.innerWidth <= 700;
+  const cardsEl = document.getElementById('historyCards');
+  const tableEl = document.getElementById('historyTable');
+  if (isMobile) {
+    tableEl.style.display = 'none';
+    cardsEl.style.display = 'block';
+    if (!data.length) {
+      cardsEl.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Aucune intervention.</div></div>';
+    } else {
+      cardsEl.innerHTML = data.map(d => `
+        <div class="hist-card">
+          <div class="hist-card-top">
+            <div class="hist-card-title">${d.title}</div>
+            <div class="hist-card-date">${new Date(d.date).toLocaleDateString('fr-FR')}</div>
+          </div>
+          ${d.train ? `<div class="hist-card-train">🚆 ${d.train}</div>` : ''}
+          ${d.desc ? `<div class="hist-card-desc">${d.desc.slice(0,100)}${d.desc.length>100?'…':''}</div>` : ''}
+          <div class="hist-card-badges">
+            ${resultBadge(d.result)}
+            <span class="badge badge-info">${d.cat}</span>
+            ${d.colleague ? `<span class="badge" style="background:rgba(124,111,255,.15);color:var(--accent3);border:1px solid rgba(124,111,255,.3)">👥 ${d.colleague}</span>` : ''}
+            ${d.reprise ? `<span class="badge" style="background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)">🔁 Reprise${d.repriseColleague?' — '+d.repriseColleague:''}</span>` : ''}
+            ${d.recidive ? `<span class="badge badge-danger">⚠️ Récidive</span>` : ''}
+          </div>
+          <div class="hist-card-footer">
+            <span style="font-size:11px;color:var(--muted)">${d.duration ? '⏱ '+d.duration+'min' : ''}</span>
+            <button class="btn btn-danger" onclick="deleteItem(${d.id})" style="padding:8px 16px;font-size:12px">Supprimer</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  } else {
+    tableEl.style.display = 'block';
+    cardsEl.style.display = 'none';
+  }
 }
 
 // ---- ENTRETIEN ----
@@ -1362,52 +1414,49 @@ function renderTD() {
   `).join('');
 }
 
-// ---- MODAL TICKET DETAIL ----
-function openTDModal(id) {
-  const tds = getTDs();
-  const t = tds.find(x => x.id === id);
-  if (!t) return;
-
+// ---- MODAL / BOTTOM SHEET TICKET DETAIL ----
+function buildTDContent(t) {
+  const id = t.id;
   const statusOptions = ['Ouvert','En cours','En attente','Résolu','Fermé'];
-  document.getElementById('tdModalContent').innerHTML = `
-    <div style="margin-bottom:20px">
-      <div style="font-size:10px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px">${t.num} · ${t.type}</div>
-      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:12px">${t.title}</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+  return `
+    <div style="margin-bottom:20px;padding-right:40px">
+      <div style="font-size:11px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">${t.num} · ${t.type}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:12px;line-height:1.3">${t.title}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
         <span class="badge prio-${t.priority}">${priorityIcon(t.priority)} ${t.priority}</span>
         <span class="badge ${statusClass(t.status)}">${t.status}</span>
         ${t.requester ? `<span class="badge badge-info">👤 ${t.requester}</span>` : ''}
         ${deadlineLabel(t.deadline, t.status)}
       </div>
-      ${t.desc ? `<div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px">${t.desc}</div>` : ''}
-      ${t.skills.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">${t.skills.map(s=>`<span class="badge badge-info">${s}</span>`).join('')}</div>` : ''}
+      ${t.desc ? `<div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:14px">${t.desc}</div>` : ''}
+      ${t.skills.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${t.skills.map(s=>`<span class="badge badge-info">${s}</span>`).join('')}</div>` : ''}
     </div>
 
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px">
-      <div style="font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">⚡ Mettre à jour le statut</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">⚡ Changer le statut</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
         ${statusOptions.map(s => `
           <button class="btn ${t.status===s?'btn-primary':'btn-ghost'}"
             onclick="updateTDStatus(${id}, '${s}')"
-            style="padding:6px 14px;font-size:11px">
+            style="padding:10px 14px;font-size:13px;min-height:44px">
             ${s}
           </button>
         `).join('')}
       </div>
       <div>
-        <label>Ajouter une note / action</label>
-        <textarea id="td-note-${id}" placeholder="Décrivez l'action effectuée, la cause identifiée, la solution apportée..." style="min-height:70px"></textarea>
+        <label>Ajouter une note</label>
+        <textarea id="td-note-${id}" placeholder="Action effectuée, cause identifiée, solution..." style="min-height:80px;font-size:15px"></textarea>
       </div>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="addTDNote(${id})">Ajouter la note</button>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn btn-primary" onclick="addTDNote(${id})" style="min-height:50px">Ajouter la note</button>
         ${t.status !== 'Résolu' && t.status !== 'Fermé' ? `
-        <button class="btn btn-ghost" style="color:var(--success);border-color:var(--success)" onclick="resolveTD(${id})">✅ Marquer résolu</button>` : ''}
-        <button class="btn btn-danger" onclick="deleteTD(${id})" style="margin-left:auto">Supprimer</button>
+        <button class="btn btn-ghost" style="color:var(--success);border-color:var(--success);min-height:50px" onclick="resolveTD(${id})">✅ Marquer résolu</button>` : ''}
+        <button class="btn btn-danger" onclick="deleteTD(${id})" style="min-height:50px">Supprimer</button>
       </div>
     </div>
 
     <div>
-      <div style="font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">📋 Historique du ticket</div>
+      <div style="font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">📋 Historique</div>
       <div class="timeline">
         ${[...t.timeline].reverse().map(e => `
           <div class="tl-item">
@@ -1421,11 +1470,34 @@ function openTDModal(id) {
       </div>
     </div>
   `;
-  document.getElementById('tdModal').style.display = 'block';
+}
+
+function openTDModal(id) {
+  const tds = getTDs();
+  const t = tds.find(x => x.id === id);
+  if (!t) return;
+  const html = buildTDContent(t);
+  const isMobile = window.innerWidth <= 700;
+  if (isMobile) {
+    document.getElementById('tdSheetContent').innerHTML = html;
+    document.getElementById('tdSheetOverlay').classList.add('open');
+    requestAnimationFrame(() => document.getElementById('tdSheet').classList.add('open'));
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.getElementById('tdModalContent').innerHTML = html;
+    document.getElementById('tdModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
 }
 
 function closeTDModal() {
   document.getElementById('tdModal').style.display = 'none';
+  const sheet = document.getElementById('tdSheet');
+  const overlay = document.getElementById('tdSheetOverlay');
+  sheet.classList.remove('open');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
 }
 document.getElementById('tdModal').addEventListener('click', function(e) {
   if (e.target === this) closeTDModal();
@@ -1441,7 +1513,9 @@ function updateTDStatus(id, newStatus) {
   if (newStatus === 'Résolu' || newStatus === 'Fermé') t.closedDate = new Date().toISOString();
   saveTDs(tds);
   renderTD(); renderTDKpis();
-  openTDModal(id);
+  const html = buildTDContent(t);
+  if (window.innerWidth <= 700) document.getElementById('tdSheetContent').innerHTML = html;
+  else document.getElementById('tdModalContent').innerHTML = html;
 }
 
 function addTDNote(id) {
@@ -1454,7 +1528,9 @@ function addTDNote(id) {
   t.timeline.push({ date: new Date().toISOString(), text: note, type: 'note' });
   saveTDs(tds);
   renderTD();
-  openTDModal(id);
+  const html = buildTDContent(t);
+  if (window.innerWidth <= 700) document.getElementById('tdSheetContent').innerHTML = html;
+  else document.getElementById('tdModalContent').innerHTML = html;
 }
 
 function resolveTD(id) {
