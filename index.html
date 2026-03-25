@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mes Interventions</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00e5a0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Interventions">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'OpenDyslexic';
+    src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'OpenDyslexic';
+    src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0b0f1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1f2d45;
+    --accent: #00e5a0;
+    --accent2: #ff6b35;
+    --accent3: #7c6fff;
+    --text: #e8f0fe;
+    --muted: #6b7fa3;
+    --success: #00e5a0;
+    --danger: #ff4d6a;
+    --warn: #ffc107;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'OpenDyslexic', 'Arial', sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+    word-spacing: 0.1em;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ---- GRID BG ---- */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,160,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,160,.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  /* ---- HEADER ---- */
+  header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px; margin-bottom: 32px;
+  }
+  .logo { display: flex; flex-direction: column; gap: 2px; }
+  .logo-tag { font-size: 10px; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; }
+  .logo-title {
+    font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .date-pill {
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 20px; font-size: 11px; color: var(--muted);
+  }
+
+  /* ---- NAV ---- */
+  nav { display: flex; gap: 4px; margin-bottom: 28px; flex-wrap: wrap; }
+  .tab {
+    padding: 8px 18px; border-radius: 8px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); font-family: 'OpenDyslexic', 'Arial', sans-serif;
+    font-size: 12px; cursor: pointer; transition: all .2s; letter-spacing: 1px;
+  }
+  .tab:hover { color: var(--text); border-color: var(--accent); }
+  .tab.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 500; }
+
+  /* ---- VIEWS ---- */
+  .view { display: none; }
+  .view.active { display: block; animation: fadeIn .3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ---- KPI ROW ---- */
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .kpi {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 16px;
+    position: relative; overflow: hidden;
+    transition: border-color .2s;
+  }
+  .kpi:hover { border-color: var(--accent); }
+  .kpi-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .kpi-val {
+    font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800;
+    line-height: 1;
+  }
+  .kpi-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
+  .kpi-accent { position: absolute; top: 0; right: 0; width: 4px; height: 100%; }
+
+  /* ---- FORM ---- */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; margin-bottom: 20px;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-full { grid-column: 1 / -1; }
+  label { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 7px; line-height: 1.6; }
+  input, select, textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 11px 14px; color: var(--text);
+    font-family: 'OpenDyslexic', 'Arial', sans-serif; font-size: 14px;
+    line-height: 1.7; letter-spacing: 0.03em;
+    transition: border-color .2s; outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 80px; }
+  select option { background: var(--surface2); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .btn {
+    padding: 11px 22px; border-radius: 8px; border: none; cursor: pointer;
+    font-family: 'OpenDyslexic', 'Arial', sans-serif; font-size: 13px; letter-spacing: 0.5px;
+    font-weight: 700; transition: all .2s;
+  }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { background: #00ffb3; transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--text); color: var(--text); }
+  .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+  .btn-danger:hover { background: var(--danger); color: #fff; }
+
+  /* ---- RESULT BADGE ---- */
+  .badge {
+    display: inline-block; padding: 4px 11px; border-radius: 20px;
+    font-size: 11px; letter-spacing: 0.3px; font-weight: 700;
+  }
+  .badge-success { background: rgba(0,229,160,.15); color: var(--success); border: 1px solid rgba(0,229,160,.3); }
+  .badge-danger { background: rgba(255,77,106,.15); color: var(--danger); border: 1px solid rgba(255,77,106,.3); }
+  .badge-warn { background: rgba(255,193,7,.15); color: var(--warn); border: 1px solid rgba(255,193,7,.3); }
+  .badge-info { background: rgba(124,111,255,.15); color: var(--accent3); border: 1px solid rgba(124,111,255,.3); }
+
+  /* ---- TABLE ---- */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.7; }
+  th {
+    text-align: left; padding: 10px 14px;
+    font-size: 11px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 13px 14px; border-bottom: 1px solid rgba(31,45,69,.5); vertical-align: top; line-height: 1.7; }
+  tr:hover td { background: rgba(0,229,160,.03); }
+  .td-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 13px; }
+  .td-sub { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+  /* ---- CHART BARS ---- */
+  .chart-row { display: flex; flex-direction: column; gap: 10px; }
+  .bar-item { display: flex; align-items: center; gap: 12px; }
+  .bar-label { width: 120px; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+  .bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+  .bar-val { width: 40px; text-align: right; font-size: 11px; color: var(--text); flex-shrink: 0; }
+
+  /* ---- ENTRETIEN ---- */
+  .insight-block {
+    background: var(--surface2); border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 14px;
+  }
+  .insight-label { font-size: 10px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+  .insight-text { font-size: 14px; line-height: 1.9; color: var(--text); }
+
+  .stat-highlight {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(0,229,160,.2), rgba(0,229,160,.05));
+    border: 1px solid rgba(0,229,160,.3); border-radius: 8px;
+    padding: 2px 10px; color: var(--accent); font-weight: 500;
+  }
+
+  /* ---- EMPTY ---- */
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .5; }
+  .empty-text { font-size: 13px; }
+
+  /* ---- PROGRESS RING ---- */
+  .ring-wrap { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; justify-content: center; padding: 20px; }
+  .ring-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .ring-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  svg.ring { transform: rotate(-90deg); }
+  circle.track { fill: none; stroke: var(--border); stroke-width: 8; }
+  circle.prog { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); }
+  .ring-center { position: relative; }
+  .ring-num {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+  }
+
+  /* ---- SYNC BAR ---- */
+  .sync-bar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px; margin-bottom: 20px;
+    font-size: 12px;
+  }
+  .sync-bar-label { color: var(--muted); letter-spacing: 1px; font-size: 10px; text-transform: uppercase; margin-right: 4px; }
+  .sync-status { font-size: 11px; color: var(--muted); margin-left: auto; }
+  .sync-status.ok { color: var(--success); }
+
+  /* ---- COLLEAGUE SELECT ---- */
+  .colleague-select-wrap { position: relative; }
+  .colleague-avatar {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent3); color: #fff; font-size: 9px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .td-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px; margin-bottom: 12px;
+    transition: border-color .2s; cursor: pointer;
+  }
+  .td-card:hover { border-color: var(--accent3); }
+  .td-card-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .td-id { font-size: 10px; color: var(--muted); font-family: 'OpenDyslexic', 'Arial', sans-serif; }
+  .td-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; flex: 1; }
+  .td-card-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .td-card-desc { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
+  .td-card-footer { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+  .td-deadline { font-size: 10px; color: var(--muted); }
+  .td-deadline.overdue { color: var(--danger); }
+  .td-deadline.soon { color: var(--warn); }
+
+  /* priority colors */
+  .prio-Critique { background: rgba(255,77,106,.15); color: var(--danger); border: 1px solid rgba(255,77,106,.3); }
+  .prio-Haute { background: rgba(255,107,53,.15); color: var(--accent2); border: 1px solid rgba(255,107,53,.3); }
+  .prio-Moyenne { background: rgba(255,193,7,.15); color: var(--warn); border: 1px solid rgba(255,193,7,.3); }
+  .prio-Basse { background: rgba(0,229,160,.15); color: var(--success); border: 1px solid rgba(0,229,160,.3); }
+
+  /* status colors */
+  .status-Ouvert { background: rgba(124,111,255,.15); color: var(--accent3); border: 1px solid rgba(124,111,255,.3); }
+  .status-En-cours { background: rgba(255,193,7,.15); color: var(--warn); border: 1px solid rgba(255,193,7,.3); }
+  .status-En-attente { background: rgba(107,127,163,.15); color: var(--muted); border: 1px solid rgba(107,127,163,.3); }
+  .status-Résolu { background: rgba(0,229,160,.15); color: var(--success); border: 1px solid rgba(0,229,160,.3); }
+  .status-Fermé { background: rgba(31,45,69,.5); color: var(--muted); border: 1px solid var(--border); }
+
+  /* timeline */
+  .timeline { display: flex; flex-direction: column; gap: 0; margin-top: 12px; }
+  .tl-item { display: flex; gap: 14px; position: relative; }
+  .tl-item:not(:last-child)::before {
+    content: ''; position: absolute; left: 7px; top: 18px;
+    width: 2px; bottom: -8px; background: var(--border);
+  }
+  .tl-dot {
+    width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid var(--accent); background: var(--bg); margin-top: 2px;
+  }
+  .tl-body { flex: 1; padding-bottom: 16px; }
+  .tl-date { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+  .tl-text { font-size: 13px; line-height: 1.7; }
+
+  /* ==============================
+     MOBILE FIRST — BARRE DU BAS
+     ============================== */
+
+  /* Cache la nav du haut sur mobile */
+  nav.desktop-nav { display: flex; gap: 4px; margin-bottom: 28px; flex-wrap: wrap; }
+
+  /* Barre de navigation fixe en bas sur mobile */
+  .mobile-nav {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+    background: var(--surface);
+    border-top: 2px solid var(--border);
+    padding: 0; margin: 0;
+    box-shadow: 0 -4px 24px rgba(0,0,0,.5);
+  }
+  .mobile-nav-inner {
+    display: flex; justify-content: space-around; align-items: stretch;
+    max-width: 600px; margin: 0 auto;
+  }
+  .mob-tab {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; padding: 10px 4px 12px;
+    background: none; border: none; color: var(--muted);
+    font-family: 'OpenDyslexic', 'Arial', sans-serif;
+    font-size: 9px; cursor: pointer; transition: color .2s;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 60px;
+  }
+  .mob-tab .mob-icon { font-size: 22px; line-height: 1; }
+  .mob-tab .mob-label { font-size: 9px; letter-spacing: 0; line-height: 1.2; text-align: center; }
+  .mob-tab.active { color: var(--accent); }
+  .mob-tab.active .mob-icon { filter: drop-shadow(0 0 6px var(--accent)); }
+
+  /* Bouton flottant "Ajouter" au centre */
+  .mob-add-btn {
+    position: relative; top: -18px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--accent); border: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,229,160,.4);
+    font-family: 'OpenDyslexic', 'Arial', sans-serif;
+    font-size: 9px; color: #000; font-weight: 700;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .15s;
+    flex-shrink: 0;
+  }
+  .mob-add-btn:active { transform: scale(.93); }
+  .mob-add-btn .mob-icon { font-size: 24px; line-height: 1; }
+
+  @media (max-width: 700px) {
+    /* Viewport correct pour éviter le zoom iOS */
+    html { -webkit-text-size-adjust: 100%; }
+
+    body { font-size: 16px; }
+
+    /* App padding : espace pour la barre du bas */
+    .app { padding: 16px 14px 90px; }
+
+    /* Header compact */
+    header {
+      flex-direction: row; align-items: center;
+      padding-bottom: 14px; margin-bottom: 18px; gap: 8px;
+    }
+    .logo-title { font-size: 20px; }
+    .logo-tag { font-size: 9px; }
+    .date-pill { font-size: 10px; padding: 5px 10px; white-space: nowrap; }
+
+    /* Cache nav desktop, affiche nav mobile */
+    nav.desktop-nav { display: none; }
+    .mobile-nav { display: block; }
+
+    /* Sync bar compacte */
+    .sync-bar { padding: 8px 12px; gap: 8px; }
+    .sync-bar-label { display: none; }
+    .sync-status { font-size: 10px; }
+
+    /* KPI : 2 colonnes sur mobile */
+    .kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+    .kpi { padding: 14px 12px; border-radius: 10px; }
+    .kpi-val { font-size: 26px; }
+    .kpi-label { font-size: 9px; }
+    .kpi-sub { font-size: 9px; }
+
+    /* Cards */
+    .card { padding: 16px 14px; border-radius: 12px; margin-bottom: 14px; }
+    .card-title { font-size: 12px; margin-bottom: 14px; }
+
+    /* Formulaire : 1 colonne, grands champs tactiles */
+    .form-grid { grid-template-columns: 1fr; gap: 12px; }
+    .form-full { grid-column: 1; }
+    label { font-size: 12px; margin-bottom: 6px; }
+    input, select, textarea {
+      font-size: 16px; /* évite le zoom iOS */
+      padding: 14px 14px;
+      border-radius: 10px;
+      min-height: 52px;
+    }
+    textarea { min-height: 90px; }
+
+    /* Boutons pleine largeur sur mobile */
+    .btn-row { flex-direction: column; gap: 10px; margin-top: 16px; }
+    .btn-row .btn { width: 100%; padding: 16px; font-size: 15px; border-radius: 12px; text-align: center; }
+
+    /* Tableaux : scroll horizontal + texte réduit */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { font-size: 12px; min-width: 520px; }
+    td, th { padding: 10px 10px; }
+
+    /* TD cards */
+    .td-card { padding: 14px; border-radius: 10px; }
+    .td-card-header { flex-wrap: wrap; gap: 6px; }
+
+    /* Charts */
+    .bar-label { width: 90px; font-size: 10px; }
+    .bar-val { font-size: 10px; }
+
+    /* Ring chart */
+    .ring-wrap { gap: 16px; padding: 10px; }
+
+    /* Insight blocks */
+    .insight-block { padding: 14px; }
+    .insight-text { font-size: 13px; }
+
+    /* Grille dashboard 2 colonnes */
+    #chartsGrid { grid-template-columns: 1fr !important; }
+
+    /* Checkbox reprise */
+    #repriseColleagueWrap { padding: 12px; }
+
+    /* Filtres historique */
+    #view-history .card:first-child > div { flex-direction: column; align-items: stretch; }
+    #view-history select { min-height: 48px; font-size: 16px; }
+
+    /* Modal tickets */
+    #tdModal { padding: 0; align-items: flex-end; display: flex !important; }
+    #tdModal > div {
+      margin: 0; border-radius: 20px 20px 0 0;
+      max-height: 88vh; overflow-y: auto;
+      width: 100%; max-width: 100%;
+      padding: 22px 18px 32px;
+    }
+
+    /* Statut boutons en colonne dans modal */
+    #tdModalContent .btn { min-height: 48px; font-size: 14px; }
+
+    /* Empty states */
+    .empty { padding: 40px 16px; }
+    .empty-icon { font-size: 40px; }
+
+    /* Sync bar boutons */
+    #gAuthArea { gap: 6px; }
+    #gAuthArea .btn { padding: 10px 12px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="logo">
+      <span class="logo-tag">// Tracker Pro</span>
+      <span class="logo-title">MES INTERVENTIONS</span>
+    </div>
+    <div class="date-pill" id="currentDate"></div>
+  </header>
+
+  <nav class="desktop-nav">
+    <button class="tab active" onclick="showTab('dashboard', this)">📊 Tableau de bord</button>
+    <button class="tab" onclick="showTab('add', this)">➕ Ajouter</button>
+    <button class="tab" onclick="showTab('history', this)">📋 Historique</button>
+    <button class="tab" onclick="showTab('td', this)">🎫 Tickets / TD</button>
+    <button class="tab" onclick="showTab('entretien', this)">🎯 Entretien</button>
+  </nav>
+
+  <!-- BARRE MOBILE BAS -->
+  <nav class="mobile-nav">
+    <div class="mobile-nav-inner">
+      <button class="mob-tab active" id="mob-dashboard" onclick="showTab('dashboard', this)">
+        <span class="mob-icon">📊</span>
+        <span class="mob-label">Bilan</span>
+      </button>
+      <button class="mob-tab" id="mob-history" onclick="showTab('history', this)">
+        <span class="mob-icon">📋</span>
+        <span class="mob-label">Historique</span>
+      </button>
+      <button class="mob-add-btn" id="mob-add" onclick="showTab('add', this)">
+        <span class="mob-icon">➕</span>
+        <span class="mob-label">Ajouter</span>
+      </button>
+      <button class="mob-tab" id="mob-td" onclick="showTab('td', this)">
+        <span class="mob-icon">🎫</span>
+        <span class="mob-label">Tickets</span>
+      </button>
+      <button class="mob-tab" id="mob-entretien" onclick="showTab('entretien', this)">
+        <span class="mob-icon">🎯</span>
+        <span class="mob-label">Entretien</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- SYNC BAR Google -->
+  <div class="sync-bar" id="syncBar">
+    <span class="sync-bar-label">☁️ Google Drive</span>
+    <div id="gAuthArea" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost" id="btnSignIn" onclick="gSignIn()" style="padding:6px 14px;font-size:11px;display:flex;align-items:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.3-8.16 2.3-6.26 0-11.57-3.58-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Connecter Google
+      </button>
+      <button class="btn btn-ghost" id="btnSignOut" onclick="gSignOut()" style="padding:6px 14px;font-size:11px;display:none">Déconnecter</button>
+      <button class="btn btn-primary" id="btnSave" onclick="gSaveData()" style="padding:6px 14px;font-size:11px;display:none">☁️ Sauvegarder</button>
+      <button class="btn btn-ghost" id="btnLoad" onclick="gLoadData()" style="padding:6px 14px;font-size:11px;display:none">⬇ Charger</button>
+    </div>
+    <span class="sync-status" id="syncStatus">Non connecté</span>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap;" id="chartsGrid">
+      <div class="card" style="grid-column:1/-1">
+        <div class="card-title">Taux de réussite — Visuels</div>
+        <div class="ring-wrap" id="ringWrap"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Par catégorie</div>
+        <div class="chart-row" id="catChart"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Ce mois-ci</div>
+        <div id="monthStats"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD -->
+  <div class="view" id="view-add">
+    <div class="card">
+      <div class="card-title">Nouvelle intervention</div>
+      <div class="form-grid">
+        <div>
+          <label>Date</label>
+          <input type="date" id="f-date">
+        </div>
+        <div>
+          <label>Catégorie</label>
+          <select id="f-cat">
+            <option value="Technique">Technique</option>
+            <option value="Conseil">Conseil / Accompagnement</option>
+            <option value="Formation">Formation</option>
+            <option value="Urgence">Urgence</option>
+            <option value="Projet">Projet</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div class="form-full">
+          <label>Titre de l'intervention</label>
+          <input type="text" id="f-title" placeholder="Ex : Freins bloqués, prise de courant HS...">
+        </div>
+        <div>
+          <label>🚆 Numéro de train</label>
+          <input type="text" id="f-train" placeholder="Ex : TER 830042, TGV 6201...">
+        </div>
+        <div>
+          <label>👥 Collègue(s) présent(s)</label>
+          <select id="f-colleague" style="width:100%">
+            <option value="">— Seul sur l'intervention —</option>
+            <option value="Niels Josse">Niels Josse</option>
+            <option value="Sébastien Charnole">Sébastien Charnole</option>
+            <option value="Guillaume Bazin">Guillaume Bazin</option>
+            <option value="Vincent Sevestre">Vincent Sevestre</option>
+            <option value="Mathis Elleouet">Mathis Elleouet</option>
+            <option value="Antoine Mallard">Antoine Mallard</option>
+            <option value="Nathan Bouthemy">Nathan Bouthemy</option>
+            <option value="Benjamin Besnard">Benjamin Besnard</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;justify-content:flex-end;">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;transition:border-color .2s;" id="repriseBox" onclick="toggleReprise()">
+              <input type="checkbox" id="f-reprise" style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent2);" onclick="event.stopPropagation();toggleReprise()">
+              <div>
+                <div style="font-size:12px;color:var(--text);font-weight:500;">🔁 Reprise de dépannage</div>
+                <div style="font-size:10px;color:var(--muted);">Intervention déjà effectuée auparavant</div>
+              </div>
+            </div>
+            <div id="repriseColleagueWrap" style="display:none;margin-top:8px;padding:12px 14px;background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.3);border-radius:8px;">
+              <label style="color:var(--accent2);">👤 Collègue qui était sur la rame avant</label>
+              <select id="f-reprise-colleague" style="width:100%;margin-top:6px;">
+                <option value="">— Non renseigné —</option>
+                <option value="Niels Josse">Niels Josse</option>
+                <option value="Sébastien Charnole">Sébastien Charnole</option>
+                <option value="Guillaume Bazin">Guillaume Bazin</option>
+                <option value="Vincent Sevestre">Vincent Sevestre</option>
+                <option value="Mathis Elleouet">Mathis Elleouet</option>
+                <option value="Antoine Mallard">Antoine Mallard</option>
+                <option value="Nathan Bouthemy">Nathan Bouthemy</option>
+                <option value="Benjamin Besnard">Benjamin Besnard</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;" onclick="toggleCheck('f-recidive')">
+            <input type="checkbox" id="f-recidive" style="width:16px;height:16px;cursor:pointer;accent-color:var(--danger);">
+            <div>
+              <div style="font-size:12px;color:var(--text);font-weight:500;">⚠️ Récidive constatée</div>
+              <div style="font-size:10px;color:var(--muted);">La panne est réapparue après une réparation</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-full">
+          <label>Description / Contexte</label>
+          <textarea id="f-desc" placeholder="Détails, outils utilisés, difficultés rencontrées..."></textarea>
+        </div>
+        <div>
+          <label>Résultat</label>
+          <select id="f-result">
+            <option value="Réussi">✅ Réussi</option>
+            <option value="Partiel">⚠️ Partiel</option>
+            <option value="Échoué">❌ Échoué</option>
+            <option value="En cours">🔄 En cours</option>
+          </select>
+        </div>
+        <div>
+          <label>Durée (minutes)</label>
+          <input type="number" id="f-duration" placeholder="Ex : 90" min="1">
+        </div>
+        <div class="form-full">
+          <label>Compétences mobilisées</label>
+          <input type="text" id="f-skills" placeholder="Ex : diagnostic, freinage, électrique (séparées par des virgules)">
+        </div>
+        <div class="form-full">
+          <label>Impact / Ce que j'ai appris</label>
+          <textarea id="f-impact" placeholder="Impact mesurable, satisfaction, apprentissage..."></textarea>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveIntervention()">Enregistrer</button>
+        <button class="btn btn-ghost" onclick="clearForm()">Effacer</button>
+      </div>
+    </div>
+    <div id="formMsg" style="font-size:12px;color:var(--accent);margin-top:8px;padding-left:4px;"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="view" id="view-history">
+    <div class="card">
+      <div class="card-title">Filtres</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+        <div>
+          <label>Période</label>
+          <select id="h-period" onchange="renderHistory()">
+            <option value="all">Tout</option>
+            <option value="week">7 derniers jours</option>
+            <option value="month">Ce mois</option>
+            <option value="3months">3 derniers mois</option>
+          </select>
+        </div>
+        <div>
+          <label>Résultat</label>
+          <select id="h-result" onchange="renderHistory()">
+            <option value="all">Tous</option>
+            <option value="Réussi">Réussi</option>
+            <option value="Partiel">Partiel</option>
+            <option value="Échoué">Échoué</option>
+            <option value="En cours">En cours</option>
+          </select>
+        </div>
+        <div>
+          <label>Catégorie</label>
+          <select id="h-cat" onchange="renderHistory()">
+            <option value="all">Toutes</option>
+            <option value="Technique">Technique</option>
+            <option value="Conseil">Conseil</option>
+            <option value="Formation">Formation</option>
+            <option value="Urgence">Urgence</option>
+            <option value="Projet">Projet</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost" onclick="exportCSV()" style="margin-left:auto">⬇ Export CSV</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap" id="historyTable"></div>
+    </div>
+  </div>
+
+  <!-- TICKETS / TD -->
+  <div class="view" id="view-td">
+
+    <!-- KPI TD -->
+    <div class="kpi-row" id="tdKpiRow"></div>
+
+    <!-- Formulaire création TD -->
+    <div class="card" id="tdFormCard">
+      <div class="card-title">🎫 Nouveau ticket / TD</div>
+      <div class="form-grid">
+        <div>
+          <label>Date d'ouverture</label>
+          <input type="date" id="td-date">
+        </div>
+        <div>
+          <label>Priorité</label>
+          <select id="td-priority">
+            <option value="Critique">🔴 Critique</option>
+            <option value="Haute">🟠 Haute</option>
+            <option value="Moyenne" selected>🟡 Moyenne</option>
+            <option value="Basse">🟢 Basse</option>
+          </select>
+        </div>
+        <div class="form-full">
+          <label>Titre du ticket</label>
+          <input type="text" id="td-title" placeholder="Ex : Panne serveur prod, Demande installation logiciel...">
+        </div>
+        <div>
+          <label>Type</label>
+          <select id="td-type">
+            <option value="Incident">Incident</option>
+            <option value="Demande">Demande</option>
+            <option value="Changement">Changement</option>
+            <option value="Problème">Problème</option>
+            <option value="Tâche">Tâche</option>
+          </select>
+        </div>
+        <div>
+          <label>Demandeur / Info</label>
+          <input type="text" id="td-requester" placeholder="Nom, service, contexte...">
+        </div>
+        <div class="form-full">
+          <label>Description du problème / demande</label>
+          <textarea id="td-desc" placeholder="Contexte, symptômes, informations utiles..."></textarea>
+        </div>
+        <div>
+          <label>Statut initial</label>
+          <select id="td-status">
+            <option value="Ouvert">🔵 Ouvert</option>
+            <option value="En cours">🟡 En cours</option>
+            <option value="En attente">⏸ En attente</option>
+          </select>
+        </div>
+        <div>
+          <label>Délai souhaité (date)</label>
+          <input type="date" id="td-deadline">
+        </div>
+        <div class="form-full">
+          <label>Compétences / Domaine technique</label>
+          <input type="text" id="td-skills" placeholder="Ex : réseau, windows, imprimante (séparées par virgules)">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveTD()">Créer le ticket</button>
+        <button class="btn btn-ghost" onclick="clearTDForm()">Effacer</button>
+      </div>
+      <div id="tdFormMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
+    </div>
+
+    <!-- Filtres + liste -->
+    <div class="card">
+      <div class="card-title">Mes tickets</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;align-items:flex-end;">
+        <div>
+          <label>Statut</label>
+          <select id="td-filter-status" onchange="renderTD()">
+            <option value="all">Tous</option>
+            <option value="Ouvert">Ouvert</option>
+            <option value="En cours">En cours</option>
+            <option value="En attente">En attente</option>
+            <option value="Résolu">Résolu</option>
+            <option value="Fermé">Fermé</option>
+          </select>
+        </div>
+        <div>
+          <label>Priorité</label>
+          <select id="td-filter-priority" onchange="renderTD()">
+            <option value="all">Toutes</option>
+            <option value="Critique">Critique</option>
+            <option value="Haute">Haute</option>
+            <option value="Moyenne">Moyenne</option>
+            <option value="Basse">Basse</option>
+          </select>
+        </div>
+        <div>
+          <label>Type</label>
+          <select id="td-filter-type" onchange="renderTD()">
+            <option value="all">Tous</option>
+            <option value="Incident">Incident</option>
+            <option value="Demande">Demande</option>
+            <option value="Changement">Changement</option>
+            <option value="Problème">Problème</option>
+            <option value="Tâche">Tâche</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost" onclick="exportTDCSV()" style="margin-left:auto">⬇ Export CSV</button>
+      </div>
+      <div id="tdList"></div>
+    </div>
+
+    <!-- Modal suivi ticket -->
+    <div id="tdModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;overflow-y:auto;padding:20px;">
+      <div style="max-width:640px;margin:40px auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;">
+        <button onclick="closeTDModal()" style="position:absolute;top:16px;right:16px;background:var(--border);border:none;color:var(--text);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;">✕</button>
+        <div id="tdModalContent"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ENTRETIEN -->
+  <div class="view" id="view-entretien">
+    <div class="card">
+      <div class="card-title">🎯 Mon pitch chiffré — Prêt pour l'entretien</div>
+      <div id="entretienContent"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---- DATA ----
+function getData() {
+  return JSON.parse(localStorage.getItem('interventions') || '[]');
+}
+function saveData(d) {
+  localStorage.setItem('interventions', JSON.stringify(d));
+}
+
+// ---- INIT ----
+document.getElementById('currentDate').textContent = new Date().toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+
+function showTab(id, triggerEl) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.mob-tab, .mob-add-btn').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+
+  // Sync desktop nav
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.getAttribute('onclick') && t.getAttribute('onclick').includes("'" + id + "'")) t.classList.add('active');
+  });
+  // Sync mobile nav
+  const mobEl = document.getElementById('mob-' + id);
+  if (mobEl) mobEl.classList.add('active');
+
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'history') renderHistory();
+  if (id === 'td') { renderTDKpis(); renderTD(); }
+  if (id === 'entretien') renderEntretien();
+}
+
+// ---- SAVE ----
+function saveIntervention() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { document.getElementById('formMsg').textContent = '⚠ Veuillez renseigner un titre.'; return; }
+  const data = getData();
+  const item = {
+    id: Date.now(),
+    date: document.getElementById('f-date').value,
+    cat: document.getElementById('f-cat').value,
+    train: document.getElementById('f-train').value.trim(),
+    colleague: document.getElementById('f-colleague').value,
+    reprise: document.getElementById('f-reprise').checked,
+    repriseColleague: document.getElementById('f-reprise').checked ? document.getElementById('f-reprise-colleague').value : '',
+    recidive: document.getElementById('f-recidive').checked,
+    title,
+    desc: document.getElementById('f-desc').value.trim(),
+    result: document.getElementById('f-result').value,
+    duration: parseInt(document.getElementById('f-duration').value) || 0,
+    skills: document.getElementById('f-skills').value.split(',').map(s=>s.trim()).filter(Boolean),
+    impact: document.getElementById('f-impact').value.trim(),
+  };
+  data.unshift(item);
+  saveData(data);
+  document.getElementById('formMsg').textContent = '✅ Intervention enregistrée !';
+  setTimeout(() => document.getElementById('formMsg').textContent = '', 2500);
+  clearForm();
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+}
+
+function clearForm() {
+  ['f-title','f-desc','f-skills','f-impact','f-duration','f-train'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-result').value = 'Réussi';
+  document.getElementById('f-cat').value = 'Technique';
+  document.getElementById('f-colleague').value = '';
+  document.getElementById('f-reprise').checked = false;
+  document.getElementById('f-reprise-colleague').value = '';
+  document.getElementById('repriseColleagueWrap').style.display = 'none';
+  document.getElementById('repriseBox').style.borderColor = '';
+  document.getElementById('f-recidive').checked = false;
+}
+
+function toggleReprise() {
+  const cb = document.getElementById('f-reprise');
+  cb.checked = !cb.checked;
+  const wrap = document.getElementById('repriseColleagueWrap');
+  const box = document.getElementById('repriseBox');
+  wrap.style.display = cb.checked ? 'block' : 'none';
+  box.style.borderColor = cb.checked ? 'var(--accent2)' : '';
+}
+
+function toggleCheck(id) {
+  const el = document.getElementById(id);
+  el.checked = !el.checked;
+}
+
+function deleteItem(id) {
+  if (!confirm('Supprimer cette intervention ?')) return;
+  saveData(getData().filter(d => d.id !== id));
+  renderHistory();
+  renderDashboard();
+}
+
+// ---- DASHBOARD ----
+function renderDashboard() {
+  const data = getData();
+  const total = data.length;
+  const reussi = data.filter(d => d.result === 'Réussi').length;
+  const partiel = data.filter(d => d.result === 'Partiel').length;
+  const echoue = data.filter(d => d.result === 'Échoué').length;
+  const enCours = data.filter(d => d.result === 'En cours').length;
+  const totalMin = data.reduce((a,d) => a + (d.duration||0), 0);
+  const txReussite = total ? Math.round((reussi / total) * 100) : 0;
+  const txPartiel = total ? Math.round(((reussi+partiel) / total) * 100) : 0;
+
+  // KPI
+  const kpis = [
+    { label: 'Total interventions', val: total, sub: 'depuis le début', color: 'var(--accent3)' },
+    { label: 'Réussies', val: reussi, sub: txReussite + '% du total', color: 'var(--success)' },
+    { label: 'Taux réussite', val: txReussite + '%', sub: 'succès complets', color: 'var(--accent)' },
+    { label: 'Temps total', val: totalMin >= 60 ? Math.round(totalMin/60) + 'h' : totalMin + 'min', sub: 'investi', color: 'var(--accent2)' },
+    { label: 'Reprises', val: data.filter(d=>d.reprise).length, sub: 'dépannages repris', color: 'var(--accent2)' },
+    { label: 'Récidives', val: data.filter(d=>d.recidive).length, sub: 'pannes réapparues', color: 'var(--danger)' },
+    { label: 'En cours', val: enCours, sub: 'à finaliser', color: 'var(--warn)' },
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k => `
+    <div class="kpi">
+      <div class="kpi-accent" style="background:${k.color}"></div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-val" style="color:${k.color}">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+
+  // Rings
+  const rings = [
+    { label: 'Réussi', pct: txReussite, color: 'var(--success)' },
+    { label: 'Partiel ou +', pct: txPartiel, color: 'var(--warn)' },
+    { label: 'En cours', pct: total ? Math.round((enCours/total)*100) : 0, color: 'var(--accent3)' },
+  ];
+  const r = 40, circ = 2 * Math.PI * r;
+  document.getElementById('ringWrap').innerHTML = rings.map(rg => `
+    <div class="ring-item">
+      <div class="ring-center" style="position:relative;width:100px;height:100px">
+        <svg class="ring" width="100" height="100" viewBox="0 0 100 100">
+          <circle class="track" cx="50" cy="50" r="${r}"/>
+          <circle class="prog" cx="50" cy="50" r="${r}"
+            stroke="${rg.color}"
+            stroke-dasharray="${circ}"
+            stroke-dashoffset="${circ - (rg.pct/100)*circ}"/>
+        </svg>
+        <div class="ring-num" style="color:${rg.color}">${rg.pct}%</div>
+      </div>
+      <div class="ring-label">${rg.label}</div>
+    </div>
+  `).join('');
+
+  // Cat chart
+  const cats = {};
+  data.forEach(d => { cats[d.cat] = (cats[d.cat]||0)+1; });
+  const maxC = Math.max(...Object.values(cats), 1);
+  const catColors = ['var(--accent)','var(--accent2)','var(--accent3)','var(--warn)','var(--success)','var(--danger)'];
+  document.getElementById('catChart').innerHTML = Object.entries(cats).length ? Object.entries(cats).map(([k,v],i) => `
+    <div class="bar-item">
+      <div class="bar-label">${k}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round((v/maxC)*100)}%;background:${catColors[i%catColors.length]}"></div></div>
+      <div class="bar-val">${v}</div>
+    </div>
+  `).join('') : '<div class="empty"><div class="empty-text">Aucune donnée</div></div>';
+
+  // Month stats
+  const now = new Date();
+  const thisMonth = data.filter(d => {
+    const dd = new Date(d.date);
+    return dd.getMonth() === now.getMonth() && dd.getFullYear() === now.getFullYear();
+  });
+  const mReussi = thisMonth.filter(d=>d.result==='Réussi').length;
+  document.getElementById('monthStats').innerHTML = thisMonth.length ? `
+    <div style="display:flex;flex-direction:column;gap:14px;padding-top:4px">
+      <div><div class="kpi-label">Interventions ce mois</div><div class="kpi-val" style="color:var(--accent3);font-family:'Syne',sans-serif;font-size:28px;font-weight:800">${thisMonth.length}</div></div>
+      <div><div class="kpi-label">Réussies ce mois</div><div class="kpi-val" style="color:var(--success);font-family:'Syne',sans-serif;font-size:28px;font-weight:800">${mReussi}</div></div>
+      <div><div class="kpi-label">Taux réussite mois</div><div class="kpi-val" style="color:var(--accent);font-family:'Syne',sans-serif;font-size:28px;font-weight:800">${thisMonth.length?Math.round((mReussi/thisMonth.length)*100):0}%</div></div>
+    </div>
+  ` : '<div class="empty"><div class="empty-text">Aucune intervention ce mois</div></div>';
+}
+
+// ---- HISTORY ----
+function filterData() {
+  let data = getData();
+  const period = document.getElementById('h-period').value;
+  const result = document.getElementById('h-result').value;
+  const cat = document.getElementById('h-cat').value;
+  const now = new Date();
+  if (period === 'week') {
+    const d7 = new Date(now - 7*86400000);
+    data = data.filter(d => new Date(d.date) >= d7);
+  } else if (period === 'month') {
+    data = data.filter(d => { const dd=new Date(d.date); return dd.getMonth()===now.getMonth()&&dd.getFullYear()===now.getFullYear(); });
+  } else if (period === '3months') {
+    const d90 = new Date(now - 90*86400000);
+    data = data.filter(d => new Date(d.date) >= d90);
+  }
+  if (result !== 'all') data = data.filter(d => d.result === result);
+  if (cat !== 'all') data = data.filter(d => d.cat === cat);
+  return data;
+}
+
+function resultBadge(r) {
+  if (r === 'Réussi') return '<span class="badge badge-success">Réussi</span>';
+  if (r === 'Partiel') return '<span class="badge badge-warn">Partiel</span>';
+  if (r === 'Échoué') return '<span class="badge badge-danger">Échoué</span>';
+  return '<span class="badge badge-info">En cours</span>';
+}
+
+function renderHistory() {
+  const data = filterData();
+  if (!data.length) {
+    document.getElementById('historyTable').innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Aucune intervention pour ces filtres.</div></div>';
+    return;
+  }
+  document.getElementById('historyTable').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th><th>Train</th><th>Intervention</th><th>Catégorie</th><th>Résultat</th><th>Durée</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(d => `
+          <tr>
+            <td style="color:var(--muted);white-space:nowrap">${new Date(d.date).toLocaleDateString('fr-FR')}</td>
+            <td style="white-space:nowrap">
+              ${d.train ? `<span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2)">🚆 ${d.train}</span>` : '<span style="color:var(--border)">—</span>'}
+            </td>
+            <td>
+              <div class="td-title">${d.title}</div>
+              ${d.desc ? `<div class="td-sub">${d.desc.slice(0,80)}${d.desc.length>80?'…':''}</div>` : ''}
+              <div style="margin-top:5px;display:flex;gap:4px;flex-wrap:wrap">
+                ${d.colleague ? `<span class="badge" style="background:rgba(124,111,255,.15);color:var(--accent3);border:1px solid rgba(124,111,255,.3)">👥 ${d.colleague}</span>` : ''}
+                ${d.reprise ? `<span class="badge" style="background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)">🔁 Reprise${d.repriseColleague ? ' — après ' + d.repriseColleague : ''}</span>` : ''}
+                ${d.recidive ? `<span class="badge badge-danger">⚠️ Récidive</span>` : ''}
+                ${d.skills && d.skills.length ? d.skills.map(s=>`<span class="badge badge-info">${s}</span>`).join('') : ''}
+              </div>
+            </td>
+            <td><span class="badge badge-info">${d.cat}</span></td>
+            <td>${resultBadge(d.result)}</td>
+            <td style="color:var(--muted)">${d.duration ? d.duration+'min' : '—'}</td>
+            <td><button class="btn btn-danger" onclick="deleteItem(${d.id})" style="padding:4px 10px;font-size:10px">✕</button></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ---- ENTRETIEN ----
+function renderEntretien() {
+  const data = getData();
+  if (!data.length) {
+    document.getElementById('entretienContent').innerHTML = '<div class="empty"><div class="empty-icon">🎯</div><div class="empty-text">Enregistrez des interventions pour générer votre pitch entretien.</div></div>';
+    return;
+  }
+  const total = data.length;
+  const reussi = data.filter(d=>d.result==='Réussi').length;
+  const partiel = data.filter(d=>d.result==='Partiel').length;
+  const echoue = data.filter(d=>d.result==='Échoué').length;
+  const txReussite = Math.round((reussi/total)*100);
+  const txPositif = Math.round(((reussi+partiel)/total)*100);
+  const totalMin = data.reduce((a,d)=>a+(d.duration||0),0);
+  const totalH = Math.round(totalMin/60);
+
+  // Skills
+  const skillsCount = {};
+  data.forEach(d=>d.skills.forEach(s=>{ skillsCount[s]=(skillsCount[s]||0)+1; }));
+  const topSkills = Object.entries(skillsCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+
+  // Cats
+  const cats = {};
+  data.forEach(d=>{ cats[d.cat]=(cats[d.cat]||0)+1; });
+  const topCat = Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
+
+  // Month evolution
+  const months = {};
+  data.forEach(d => {
+    const key = d.date.slice(0,7);
+    if (!months[key]) months[key] = { total:0, reussi:0 };
+    months[key].total++;
+    if (d.result==='Réussi') months[key].reussi++;
+  });
+  const sortedMonths = Object.entries(months).sort((a,b)=>a[0].localeCompare(b[0]));
+
+  // Best intervention
+  const bestItems = data.filter(d=>d.result==='Réussi'&&d.impact).slice(0,3);
+
+  const reprises = data.filter(d=>d.reprise).length;
+  const recidives = data.filter(d=>d.recidive).length;
+  const trainsUniques = [...new Set(data.filter(d=>d.train).map(d=>d.train))].length;
+  const txReprise = total ? Math.round((reprises/total)*100) : 0;
+  const txRecidive = total ? Math.round((recidives/total)*100) : 0;
+
+  document.getElementById('entretienContent').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:16px">
+
+      <div class="insight-block">
+        <div class="insight-label">📌 Mon bilan chiffré</div>
+        <div class="insight-text">
+          Sur <span class="stat-highlight">${total} interventions</span> enregistrées,
+          j'ai obtenu un taux de réussite de <span class="stat-highlight">${txReussite}%</span>
+          (${reussi} réussites complètes).
+          En incluant les résultats partiels, mon taux de résolution atteint <span class="stat-highlight">${txPositif}%</span>.
+          ${totalH > 0 ? `J'ai investi <span class="stat-highlight">${totalH}h</span> d'interventions tracées.` : ''}
+          ${trainsUniques > 0 ? `J'ai intervenu sur <span class="stat-highlight">${trainsUniques} trains distincts</span>.` : ''}
+        </div>
+      </div>
+
+      ${reprises > 0 || recidives > 0 ? `
+      <div class="insight-block" style="border-left-color:var(--accent2)">
+        <div class="insight-label" style="color:var(--accent2)">🔁 Reprises & récidives</div>
+        <div class="insight-text">
+          ${reprises > 0 ? `<span class="stat-highlight">${reprises} reprises de dépannage</span> (${txReprise}% de mes interventions) — capacité à prendre en charge des situations déjà traitées par d'autres.<br><br>` : ''}
+          ${reprises > 0 ? (() => {
+            const items = data.filter(d=>d.reprise && d.repriseColleague);
+            if (!items.length) return '';
+            const byCol = {};
+            items.forEach(d=>{ byCol[d.repriseColleague]=(byCol[d.repriseColleague]||0)+1; });
+            return '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">' +
+              Object.entries(byCol).sort((a,b)=>b[1]-a[1]).map(([c,n])=>
+                `<span class="badge" style="background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)">🔁 Après ${c} × ${n}</span>`
+              ).join('') + '</div>';
+          })() : ''}
+          ${recidives > 0 ? `<span class="stat-highlight" style="background:rgba(255,77,106,.15);border-color:rgba(255,77,106,.4);color:var(--danger)">${recidives} récidives</span> identifiées et tracées (${txRecidive}%) — démarche de suivi qualité et d'analyse des causes racines.` : `<span style="color:var(--success)">✅ Aucune récidive enregistrée</span> — fiabilité des réparations effectuées.`}
+        </div>
+      </div>` : ''}
+
+      ${topCat ? `
+      <div class="insight-block" style="border-left-color:var(--accent2)">
+        <div class="insight-label" style="color:var(--accent2)">💼 Ma spécialité principale</div>
+        <div class="insight-text">
+          Mon domaine le plus actif est <span class="stat-highlight">${topCat[0]}</span>
+          avec <span class="stat-highlight">${topCat[1]} interventions</span>.
+        </div>
+      </div>` : ''}
+
+      ${topSkills.length ? `
+      <div class="insight-block" style="border-left-color:var(--accent3)">
+        <div class="insight-label" style="color:var(--accent3)">🧠 Mes compétences mobilisées</div>
+        <div class="insight-text" style="margin-bottom:10px">Les compétences les plus souvent utilisées :</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          ${topSkills.map(([s,c])=>`<span class="badge badge-info">${s} <strong style="color:#fff">(×${c})</strong></span>`).join('')}
+        </div>
+      </div>` : ''}
+
+      ${sortedMonths.length > 1 ? `
+      <div class="insight-block" style="border-left-color:var(--warn)">
+        <div class="insight-label" style="color:var(--warn)">📈 Mon évolution mois par mois</div>
+        <div class="chart-row" style="margin-top:8px">
+          ${sortedMonths.map(([m,v])=>{
+            const pct = Math.round((v.reussi/v.total)*100);
+            const label = new Date(m+'-01').toLocaleDateString('fr-FR',{month:'short',year:'numeric'});
+            return `<div class="bar-item">
+              <div class="bar-label">${label}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--warn)"></div></div>
+              <div class="bar-val">${pct}%</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>` : ''}
+
+      ${bestItems.length ? `
+      <div class="insight-block" style="border-left-color:var(--success)">
+        <div class="insight-label" style="color:var(--success)">🏆 Mes impacts concrets (à citer en entretien)</div>
+        ${bestItems.map(d=>`
+          <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <div style="font-family:'Syne',sans-serif;font-weight:600;margin-bottom:4px">
+              ${d.train ? `<span style="color:var(--accent2)">🚆 ${d.train}</span> — ` : ''}${d.title}
+            </div>
+            <div class="insight-text">${d.impact}</div>
+            <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+              <span style="font-size:10px;color:var(--muted)">${new Date(d.date).toLocaleDateString('fr-FR')}</span>
+              ${d.skills.map(s=>`<span class="badge badge-info">${s}</span>`).join('')}
+              ${d.reprise ? `<span class="badge" style="background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)">🔁 Reprise${d.repriseColleague ? ' — après ' + d.repriseColleague : ''}</span>` : ''}
+              ${d.recidive ? `<span class="badge badge-danger">⚠️ Récidive</span>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>` : ''}
+
+      <div class="insight-block" style="border-left-color:var(--accent)">
+        <div class="insight-label">💬 Formulation suggérée pour l'entretien</div>
+        <div class="insight-text" style="font-style:italic;color:var(--muted)">
+          "J'ai effectué <strong style="color:var(--text)">${total} interventions</strong> sur la période,
+          ${trainsUniques > 0 ? `sur <strong style="color:var(--accent2)">${trainsUniques} trains différents</strong>,` : ''}
+          avec un taux de réussite de <strong style="color:var(--accent)">${txReussite}%</strong>.
+          ${reprises > 0 ? `J'ai pris en charge <strong style="color:var(--text)">${reprises} reprises de dépannage</strong>.` : ''}
+          ${recidives === 0 ? `<strong style="color:var(--success)">Aucune récidive enregistrée</strong>, ce qui témoigne de la fiabilité de mes réparations.` : `J'ai identifié et tracé <strong style="color:var(--danger)">${recidives} récidives</strong>, montrant ma rigueur dans le suivi qualité.`}
+          ${topCat ? `Je suis particulièrement actif sur les missions de type <strong style="color:var(--text)">${topCat[0]}</strong>.` : ''}"
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+// ---- EXPORT CSV ----
+function exportCSV() {
+  const data = filterData();
+  if (!data.length) { alert('Aucune donnée à exporter.'); return; }
+  const headers = ['Date','Train','Titre','Catégorie','Reprise','Récidive','Résultat','Durée (min)','Compétences','Description','Impact'];
+  const rows = data.map(d => [
+    d.date, d.train||'', d.title, d.cat,
+    d.reprise ? 'Oui' : 'Non',
+    d.recidive ? 'Oui' : 'Non',
+    d.result, d.duration,
+    d.skills.join(' | '), d.desc, d.impact
+  ].map(v => `"${String(v||'').replace(/"/g,'""')}"`));
+  const csv = [headers, ...rows].map(r=>r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'interventions_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+}
+
+// ---- TD DATA ----
+function getTDs() { return JSON.parse(localStorage.getItem('tickets') || '[]'); }
+function saveTDs(d) { localStorage.setItem('tickets', JSON.stringify(d)); }
+
+// ---- TD INIT ----
+document.getElementById('td-date').value = new Date().toISOString().split('T')[0];
+
+// ---- SAVE TD ----
+function saveTD() {
+  const title = document.getElementById('td-title').value.trim();
+  if (!title) { document.getElementById('tdFormMsg').textContent = '⚠ Veuillez renseigner un titre.'; return; }
+  const tds = getTDs();
+  const num = tds.length + 1;
+  const item = {
+    id: Date.now(),
+    num: 'TD-' + String(num).padStart(4, '0'),
+    date: document.getElementById('td-date').value,
+    deadline: document.getElementById('td-deadline').value,
+    priority: document.getElementById('td-priority').value,
+    type: document.getElementById('td-type').value,
+    title,
+    requester: document.getElementById('td-requester').value.trim(),
+    desc: document.getElementById('td-desc').value.trim(),
+    status: document.getElementById('td-status').value,
+    skills: document.getElementById('td-skills').value.split(',').map(s=>s.trim()).filter(Boolean),
+    timeline: [{
+      date: new Date().toISOString(),
+      text: 'Ticket créé — Statut : ' + document.getElementById('td-status').value,
+      type: 'create'
+    }],
+    closedDate: null,
+    resolution: ''
+  };
+  tds.unshift(item);
+  saveTDs(tds);
+  document.getElementById('tdFormMsg').textContent = '✅ Ticket ' + item.num + ' créé !';
+  setTimeout(() => document.getElementById('tdFormMsg').textContent = '', 2500);
+  clearTDForm();
+  renderTD();
+  renderTDKpis();
+}
+
+function clearTDForm() {
+  ['td-title','td-desc','td-requester','td-skills','td-deadline'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('td-priority').value = 'Moyenne';
+  document.getElementById('td-priority').value = 'Moyenne';
+  document.getElementById('td-status').value = 'Ouvert';
+  document.getElementById('td-type').value = 'Incident';
+  document.getElementById('td-date').value = new Date().toISOString().split('T')[0];
+}
+
+// ---- TD KPIS ----
+function renderTDKpis() {
+  const tds = getTDs();
+  const total = tds.length;
+  const ouverts = tds.filter(t => ['Ouvert','En cours','En attente'].includes(t.status)).length;
+  const resolus = tds.filter(t => t.status === 'Résolu' || t.status === 'Fermé').length;
+  const critiques = tds.filter(t => t.priority === 'Critique' && t.status !== 'Résolu' && t.status !== 'Fermé').length;
+  const txResol = total ? Math.round((resolus/total)*100) : 0;
+  const now = new Date();
+  const enRetard = tds.filter(t => t.deadline && new Date(t.deadline) < now && t.status !== 'Résolu' && t.status !== 'Fermé').length;
+
+  const kpis = [
+    { label: 'Total tickets', val: total, sub: 'créés', color: 'var(--accent3)' },
+    { label: 'Ouverts', val: ouverts, sub: 'à traiter', color: 'var(--warn)' },
+    { label: 'Résolus', val: resolus, sub: txResol + '% du total', color: 'var(--success)' },
+    { label: 'Critiques actifs', val: critiques, sub: 'priorité maximale', color: 'var(--danger)' },
+    { label: 'En retard', val: enRetard, sub: 'délai dépassé', color: 'var(--accent2)' },
+  ];
+  document.getElementById('tdKpiRow').innerHTML = kpis.map(k => `
+    <div class="kpi">
+      <div class="kpi-accent" style="background:${k.color}"></div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-val" style="color:${k.color}">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ---- RENDER TD LIST ----
+function statusClass(s) { return 'status-' + s.replace(' ','-'); }
+
+function priorityIcon(p) {
+  if (p==='Critique') return '🔴';
+  if (p==='Haute') return '🟠';
+  if (p==='Moyenne') return '🟡';
+  return '🟢';
+}
+
+function deadlineLabel(deadline, status) {
+  if (!deadline || status === 'Résolu' || status === 'Fermé') return '';
+  const now = new Date(); now.setHours(0,0,0,0);
+  const dl = new Date(deadline);
+  const diff = Math.round((dl - now) / 86400000);
+  if (diff < 0) return `<span class="td-deadline overdue">⚠ En retard (${Math.abs(diff)}j)</span>`;
+  if (diff === 0) return `<span class="td-deadline soon">⚡ Aujourd'hui</span>`;
+  if (diff <= 3) return `<span class="td-deadline soon">⏳ Dans ${diff}j</span>`;
+  return `<span class="td-deadline">📅 ${dl.toLocaleDateString('fr-FR')}</span>`;
+}
+
+function renderTD() {
+  let tds = getTDs();
+  const filterStatus = document.getElementById('td-filter-status').value;
+  const filterPrio = document.getElementById('td-filter-priority').value;
+  const filterType = document.getElementById('td-filter-type').value;
+  if (filterStatus !== 'all') tds = tds.filter(t => t.status === filterStatus);
+  if (filterPrio !== 'all') tds = tds.filter(t => t.priority === filterPrio);
+  if (filterType !== 'all') tds = tds.filter(t => t.type === filterType);
+
+  if (!tds.length) {
+    document.getElementById('tdList').innerHTML = '<div class="empty"><div class="empty-icon">🎫</div><div class="empty-text">Aucun ticket pour ces filtres.</div></div>';
+    return;
+  }
+
+  document.getElementById('tdList').innerHTML = tds.map(t => `
+    <div class="td-card" onclick="openTDModal(${t.id})">
+      <div class="td-card-header">
+        <span class="td-id">${t.num}</span>
+        <span class="td-card-title">${t.title}</span>
+        <div class="td-card-meta">
+          <span class="badge prio-${t.priority}">${priorityIcon(t.priority)} ${t.priority}</span>
+          <span class="badge ${statusClass(t.status)}">${t.status}</span>
+          <span class="badge badge-info">${t.type}</span>
+        </div>
+      </div>
+      ${t.desc ? `<div class="td-card-desc">${t.desc.slice(0,100)}${t.desc.length>100?'…':''}</div>` : ''}
+      <div class="td-card-footer">
+        ${t.requester ? `<span style="font-size:11px;color:var(--muted)">👤 ${t.requester}</span>` : ''}
+        <span style="font-size:11px;color:var(--muted)">📅 ${new Date(t.date).toLocaleDateString('fr-FR')}</span>
+        ${deadlineLabel(t.deadline, t.status)}
+        ${t.skills.length ? t.skills.map(s=>`<span class="badge badge-info">${s}</span>`).join('') : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---- MODAL TICKET DETAIL ----
+function openTDModal(id) {
+  const tds = getTDs();
+  const t = tds.find(x => x.id === id);
+  if (!t) return;
+
+  const statusOptions = ['Ouvert','En cours','En attente','Résolu','Fermé'];
+  document.getElementById('tdModalContent').innerHTML = `
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px">${t.num} · ${t.type}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:12px">${t.title}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <span class="badge prio-${t.priority}">${priorityIcon(t.priority)} ${t.priority}</span>
+        <span class="badge ${statusClass(t.status)}">${t.status}</span>
+        ${t.requester ? `<span class="badge badge-info">👤 ${t.requester}</span>` : ''}
+        ${deadlineLabel(t.deadline, t.status)}
+      </div>
+      ${t.desc ? `<div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px">${t.desc}</div>` : ''}
+      ${t.skills.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">${t.skills.map(s=>`<span class="badge badge-info">${s}</span>`).join('')}</div>` : ''}
+    </div>
+
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px">
+      <div style="font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">⚡ Mettre à jour le statut</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        ${statusOptions.map(s => `
+          <button class="btn ${t.status===s?'btn-primary':'btn-ghost'}"
+            onclick="updateTDStatus(${id}, '${s}')"
+            style="padding:6px 14px;font-size:11px">
+            ${s}
+          </button>
+        `).join('')}
+      </div>
+      <div>
+        <label>Ajouter une note / action</label>
+        <textarea id="td-note-${id}" placeholder="Décrivez l'action effectuée, la cause identifiée, la solution apportée..." style="min-height:70px"></textarea>
+      </div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-primary" onclick="addTDNote(${id})">Ajouter la note</button>
+        ${t.status !== 'Résolu' && t.status !== 'Fermé' ? `
+        <button class="btn btn-ghost" style="color:var(--success);border-color:var(--success)" onclick="resolveTD(${id})">✅ Marquer résolu</button>` : ''}
+        <button class="btn btn-danger" onclick="deleteTD(${id})" style="margin-left:auto">Supprimer</button>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">📋 Historique du ticket</div>
+      <div class="timeline">
+        ${[...t.timeline].reverse().map(e => `
+          <div class="tl-item">
+            <div class="tl-dot" style="border-color:${e.type==='create'?'var(--accent3)':e.type==='resolve'?'var(--success)':'var(--accent)'}"></div>
+            <div class="tl-body">
+              <div class="tl-date">${new Date(e.date).toLocaleString('fr-FR')}</div>
+              <div class="tl-text">${e.text}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById('tdModal').style.display = 'block';
+}
+
+function closeTDModal() {
+  document.getElementById('tdModal').style.display = 'none';
+}
+document.getElementById('tdModal').addEventListener('click', function(e) {
+  if (e.target === this) closeTDModal();
+});
+
+function updateTDStatus(id, newStatus) {
+  const tds = getTDs();
+  const t = tds.find(x => x.id === id);
+  if (!t) return;
+  const old = t.status;
+  t.status = newStatus;
+  t.timeline.push({ date: new Date().toISOString(), text: `Statut changé : ${old} → ${newStatus}`, type: 'status' });
+  if (newStatus === 'Résolu' || newStatus === 'Fermé') t.closedDate = new Date().toISOString();
+  saveTDs(tds);
+  renderTD(); renderTDKpis();
+  openTDModal(id);
+}
+
+function addTDNote(id) {
+  const noteEl = document.getElementById('td-note-' + id);
+  const note = noteEl ? noteEl.value.trim() : '';
+  if (!note) return;
+  const tds = getTDs();
+  const t = tds.find(x => x.id === id);
+  if (!t) return;
+  t.timeline.push({ date: new Date().toISOString(), text: note, type: 'note' });
+  saveTDs(tds);
+  renderTD();
+  openTDModal(id);
+}
+
+function resolveTD(id) {
+  updateTDStatus(id, 'Résolu');
+}
+
+function deleteTD(id) {
+  if (!confirm('Supprimer ce ticket ?')) return;
+  saveTDs(getTDs().filter(t => t.id !== id));
+  closeTDModal();
+  renderTD(); renderTDKpis();
+}
+
+// ---- EXPORT TD CSV ----
+function exportTDCSV() {
+  let tds = getTDs();
+  if (!tds.length) { alert('Aucun ticket à exporter.'); return; }
+  const headers = ['Num','Date','Type','Priorité','Statut','Titre','Demandeur','Deadline','Compétences','Description'];
+  const rows = tds.map(t => [
+    t.num, t.date, t.type, t.priority, t.status, t.title,
+    t.requester, t.deadline, t.skills.join(' | '), t.desc
+  ].map(v => `"${String(v||'').replace(/"/g,'""')}"`));
+  const csv = [headers, ...rows].map(r=>r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'tickets_td_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+}
+
+// ======================================================
+// ---- GOOGLE DRIVE SYNC ----
+// ======================================================
+const G_CLIENT_ID = ''; // Rempli par l'utilisateur si clé API configurée
+const G_SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
+const G_FILE_NAME = 'suivi_pro_data.json';
+
+let gTokenClient = null;
+let gAccessToken = null;
+let gFileId = null;
+let gIsReady = false;
+
+// Charge le script Google Identity Services
+function loadGoogleScript() {
+  return new Promise(resolve => {
+    if (window.google && window.google.accounts) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = resolve;
+    document.head.appendChild(s);
+  });
+}
+
+function loadGapiScript() {
+  return new Promise(resolve => {
+    if (window.gapi) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://apis.google.com/js/api.js';
+    s.onload = () => {
+      gapi.load('client', resolve);
+    };
+    document.head.appendChild(s);
+  });
+}
+
+async function gSignIn() {
+  // Vérifier si CLIENT_ID configuré
+  const clientId = localStorage.getItem('g_client_id') || '';
+  if (!clientId) {
+    const id = prompt(
+      '🔑 Pour activer la sync Google Drive, entrez votre Client ID Google OAuth 2.0.\n\n' +
+      'Comment l\'obtenir :\n' +
+      '1. Allez sur console.cloud.google.com\n' +
+      '2. Créez un projet → APIs & Services → Identifiants\n' +
+      '3. Créez un ID client OAuth (Application Web)\n' +
+      '4. Ajoutez l\'URL de cette page dans les origines autorisées\n\n' +
+      'Client ID (se termine par .apps.googleusercontent.com) :'
+    );
+    if (!id || !id.includes('.apps.googleusercontent.com')) {
+      setSyncStatus('❌ Client ID invalide ou annulé');
+      return;
+    }
+    localStorage.setItem('g_client_id', id);
+  }
+
+  setSyncStatus('⏳ Connexion en cours…');
+  try {
+    await loadGoogleScript();
+    await loadGapiScript();
+    await gapi.client.init({
+      discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+    });
+
+    gTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: localStorage.getItem('g_client_id'),
+      scope: G_SCOPES,
+      callback: async (resp) => {
+        if (resp.error) { setSyncStatus('❌ Erreur : ' + resp.error); return; }
+        gAccessToken = resp.access_token;
+        gapi.client.setToken({ access_token: gAccessToken });
+        gIsReady = true;
+        onGSignedIn();
+      }
+    });
+    gTokenClient.requestAccessToken();
+  } catch(e) {
+    setSyncStatus('❌ ' + (e.message || 'Erreur connexion'));
+  }
+}
+
+async function onGSignedIn() {
+  document.getElementById('btnSignIn').style.display = 'none';
+  document.getElementById('btnSignOut').style.display = '';
+  document.getElementById('btnSave').style.display = '';
+  document.getElementById('btnLoad').style.display = '';
+  setSyncStatus('✅ Connecté — chargement…', true);
+  await gFindOrCreateFile();
+  await gLoadData();
+}
+
+function gSignOut() {
+  if (gAccessToken) google.accounts.oauth2.revoke(gAccessToken);
+  gAccessToken = null; gFileId = null; gIsReady = false;
+  document.getElementById('btnSignIn').style.display = '';
+  document.getElementById('btnSignOut').style.display = 'none';
+  document.getElementById('btnSave').style.display = 'none';
+  document.getElementById('btnLoad').style.display = 'none';
+  setSyncStatus('Déconnecté');
+}
+
+async function gFindOrCreateFile() {
+  // Cherche dans appDataFolder
+  const res = await gapi.client.drive.files.list({
+    spaces: 'appDataFolder',
+    q: `name='${G_FILE_NAME}'`,
+    fields: 'files(id,name,modifiedTime)'
+  });
+  const files = res.result.files;
+  if (files && files.length > 0) {
+    gFileId = files[0].id;
+    const mod = files[0].modifiedTime ? new Date(files[0].modifiedTime).toLocaleString('fr-FR') : '';
+    setSyncStatus('☁️ Fichier trouvé — modifié le ' + mod, true);
+  } else {
+    gFileId = null;
+    setSyncStatus('☁️ Connecté — aucun fichier encore', true);
+  }
+}
+
+async function gSaveData() {
+  if (!gIsReady) { setSyncStatus('❌ Non connecté'); return; }
+  setSyncStatus('⏳ Sauvegarde…');
+  const payload = JSON.stringify({
+    version: 1,
+    savedAt: new Date().toISOString(),
+    interventions: getData(),
+    tickets: getTDs()
+  });
+
+  const boundary = '-------314159265358979323846';
+  const contentType = 'application/json';
+  const metadata = JSON.stringify({ name: G_FILE_NAME, parents: ['appDataFolder'] });
+
+  let body;
+  let url;
+  let method;
+
+  if (gFileId) {
+    // Update
+    url = `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`;
+    method = 'PATCH';
+    body = payload;
+  } else {
+    // Create multipart
+    url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+    method = 'POST';
+    body = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metadata}\r\n--${boundary}\r\nContent-Type: ${contentType}\r\n\r\n${payload}\r\n--${boundary}--`;
+  }
+
+  try {
+    const headers = { 'Authorization': 'Bearer ' + gAccessToken };
+    if (!gFileId) headers['Content-Type'] = `multipart/related; boundary="${boundary}"`;
+    else headers['Content-Type'] = 'application/json';
+
+    const r = await fetch(url, { method, headers, body });
+    const json = await r.json();
+    if (json.id) { gFileId = json.id; }
+    const now = new Date().toLocaleString('fr-FR');
+    setSyncStatus('✅ Sauvegardé le ' + now, true);
+    localStorage.setItem('g_last_save', now);
+  } catch(e) {
+    setSyncStatus('❌ Erreur sauvegarde : ' + e.message);
+  }
+}
+
+async function gLoadData() {
+  if (!gIsReady || !gFileId) {
+    setSyncStatus(gIsReady ? '☁️ Connecté — aucune donnée cloud' : '❌ Non connecté');
+    return;
+  }
+  setSyncStatus('⏳ Chargement…');
+  try {
+    const r = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
+      { headers: { 'Authorization': 'Bearer ' + gAccessToken } }
+    );
+    const payload = await r.json();
+    if (!payload.interventions && !payload.tickets) throw new Error('Format invalide');
+
+    const mergeById = (existing, incoming) => {
+      const map = {};
+      existing.forEach(x => map[x.id] = x);
+      (incoming||[]).forEach(x => map[x.id] = x);
+      return Object.values(map).sort((a,b) => b.id - a.id);
+    };
+
+    const newI = mergeById(getData(), payload.interventions || []);
+    const newT = mergeById(getTDs(), payload.tickets || []);
+    saveData(newI);
+    saveTDs(newT);
+
+    const mod = payload.savedAt ? new Date(payload.savedAt).toLocaleString('fr-FR') : '?';
+    setSyncStatus('✅ Chargé — ' + newI.length + ' interventions · ' + newT.length + ' tickets (cloud du ' + mod + ')', true);
+    renderDashboard(); renderHistory(); renderTD(); renderTDKpis();
+  } catch(e) {
+    setSyncStatus('❌ Erreur chargement : ' + e.message);
+  }
+}
+
+function setSyncStatus(msg, ok=false) {
+  const el = document.getElementById('syncStatus');
+  el.textContent = msg;
+  el.className = 'sync-status' + (ok ? ' ok' : '');
+}
+
+function updateSyncStatus() {
+  const i = getData().length;
+  const t = getTDs().length;
+  if (!gIsReady) setSyncStatus('💾 ' + i + ' intervention' + (i>1?'s':'') + ' · ' + t + ' ticket' + (t>1?'s':'') + ' (local)');
+}
+
+// ---- INITIAL RENDER ----
+renderDashboard();
+updateSyncStatus();
+
+// ---- SERVICE WORKER ----
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW enregistré :', reg.scope))
+      .catch(err => console.log('SW erreur :', err));
+  });
+}
+</script>
+</body>
+</html>
