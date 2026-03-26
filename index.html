@@ -959,7 +959,8 @@ function renderDashboard() {
   const txReussite = total ? Math.round((reussi / total) * 100) : 0;
   const txPartiel = total ? Math.round(((reussi+partiel) / total) * 100) : 0;
 
-  const clpTotal = data.filter(d=>d.clp).length;
+  const currentYear = new Date().getFullYear();
+  const clpTotal = data.filter(d=>d.clp && new Date(d.date).getFullYear() === currentYear).length;
   const clpObjectif = 30;
   const clpPct = Math.min(Math.round((clpTotal/clpObjectif)*100), 100);
 
@@ -969,7 +970,7 @@ function renderDashboard() {
     { label: 'Réussies', val: reussi, sub: txReussite + '% du total', color: 'var(--success)' },
     { label: 'Taux réussite', val: txReussite + '%', sub: 'succès complets', color: 'var(--accent)' },
     { label: 'Temps total', val: totalMin >= 60 ? Math.round(totalMin/60) + 'h' : totalMin + 'min', sub: 'investi', color: 'var(--accent2)' },
-    { label: 'CLP effectués', val: clpTotal + ' / ' + clpObjectif, sub: clpPct + '% de l\'objectif', color: clpPct >= 100 ? 'var(--success)' : clpPct >= 60 ? 'var(--warn)' : 'var(--danger)' },
+    { label: 'CLP ' + currentYear, val: clpTotal + ' / ' + clpObjectif, sub: clpPct + '% de l\'objectif annuel', color: clpPct >= 100 ? 'var(--success)' : clpPct >= 60 ? 'var(--warn)' : 'var(--danger)' },
     { label: 'Reprises', val: data.filter(d=>d.reprise).length, sub: 'dépannages repris', color: 'var(--accent2)' },
     { label: 'Récidives', val: data.filter(d=>d.recidive).length, sub: 'pannes réapparues', color: 'var(--danger)' },
     { label: 'En cours', val: enCours, sub: 'à finaliser', color: 'var(--warn)' },
@@ -987,7 +988,7 @@ function renderDashboard() {
   const clpColor = clpPct >= 100 ? 'var(--success)' : clpPct >= 60 ? 'var(--warn)' : 'var(--danger)';
   document.getElementById('clpProgress').innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px">Objectif CLP mensuel</span>
+      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px">Objectif CLP annuel ${currentYear}</span>
       <span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:${clpColor}">${clpTotal}<span style="font-size:13px;color:var(--muted)"> / ${clpObjectif}</span></span>
     </div>
     <div style="background:var(--border);border-radius:8px;height:16px;overflow:hidden;margin-bottom:8px">
@@ -995,7 +996,7 @@ function renderDashboard() {
     </div>
     <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)">
       <span>${clpPct}% atteint</span>
-      <span>${clpObjectif - clpTotal > 0 ? (clpObjectif - clpTotal) + ' CLP restants' : '✅ Objectif atteint !'}</span>
+      <span>${clpObjectif - clpTotal > 0 ? (clpObjectif - clpTotal) + ' CLP restants cette année' : '✅ Objectif annuel atteint !'}</span>
     </div>
   `;
 
