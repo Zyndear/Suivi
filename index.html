@@ -1661,18 +1661,86 @@ function exportTDCSV() {
 }
 
 // ======================================================
-// ---- GOOGLE DRIVE SYNC ----
+// ---- CHIFFREMENT AES-256 (Web Crypto API natif) ----
 // ======================================================
-const G_CLIENT_ID = ''; // Rempli par l'utilisateur si clé API configurée
+
+// Dérive une clé AES-256-GCM à partir d'un mot de passe
+async function deriveKey(password, salt) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 200000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+// Chiffre une chaîne JSON → base64
+async function chiffrer(jsonStr, password) {
+  const enc = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv   = crypto.getRandomValues(new Uint8Array(12));
+  const key  = await deriveKey(password, salt);
+  const encrypted = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    enc.encode(jsonStr)
+  );
+  // On empaquète : salt(16) + iv(12) + données chiffrées → base64
+  const buf = new Uint8Array(salt.byteLength + iv.byteLength + encrypted.byteLength);
+  buf.set(salt, 0);
+  buf.set(iv, 16);
+  buf.set(new Uint8Array(encrypted), 28);
+  return btoa(String.fromCharCode(...buf));
+}
+
+// Déchiffre un base64 → chaîne JSON
+async function dechiffrer(base64, password) {
+  const buf  = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+  const salt = buf.slice(0, 16);
+  const iv   = buf.slice(16, 28);
+  const data = buf.slice(28);
+  const key  = await deriveKey(password, salt);
+  const dec  = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+  return new TextDecoder().decode(dec);
+}
+
+// Demande et mémorise le mot de passe (sessionStorage = effacé à la fermeture)
+function getPassword(action) {
+  const saved = sessionStorage.getItem('crypto_pwd');
+  if (saved) return saved;
+  const pwd = prompt(
+    '🔐 Mot de passe de chiffrement\n\n' +
+    (action === 'first'
+      ? 'Choisissez un mot de passe pour chiffrer vos données.\n⚠️ Notez-le bien — sans lui, vos données sont irrécupérables.'
+      : 'Entrez votre mot de passe pour ' + (action === 'save' ? 'chiffrer' : 'déchiffrer') + ' vos données.') +
+    '\n\nMot de passe :'
+  );
+  if (!pwd) return null;
+  sessionStorage.setItem('crypto_pwd', pwd);
+  return pwd;
+}
+
+function clearPassword() {
+  sessionStorage.removeItem('crypto_pwd');
+}
+
+// ======================================================
+// ---- GOOGLE DRIVE SYNC (avec chiffrement) ----
+// ======================================================
+const G_CLIENT_ID = '';
 const G_SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
-const G_FILE_NAME = 'suivi_pro_data.json';
+const G_FILE_NAME = 'suivi_pro_encrypted.bin';
 
 let gTokenClient = null;
 let gAccessToken = null;
 let gFileId = null;
 let gIsReady = false;
 
-// Charge le script Google Identity Services
 function loadGoogleScript() {
   return new Promise(resolve => {
     if (window.google && window.google.accounts) { resolve(); return; }
@@ -1688,31 +1756,35 @@ function loadGapiScript() {
     if (window.gapi) { resolve(); return; }
     const s = document.createElement('script');
     s.src = 'https://apis.google.com/js/api.js';
-    s.onload = () => {
-      gapi.load('client', resolve);
-    };
+    s.onload = () => { gapi.load('client', resolve); };
     document.head.appendChild(s);
   });
 }
 
 async function gSignIn() {
-  // Vérifier si CLIENT_ID configuré
   const clientId = localStorage.getItem('g_client_id') || '';
   if (!clientId) {
     const id = prompt(
-      '🔑 Pour activer la sync Google Drive, entrez votre Client ID Google OAuth 2.0.\n\n' +
-      'Comment l\'obtenir :\n' +
-      '1. Allez sur console.cloud.google.com\n' +
-      '2. Créez un projet → APIs & Services → Identifiants\n' +
-      '3. Créez un ID client OAuth (Application Web)\n' +
-      '4. Ajoutez l\'URL de cette page dans les origines autorisées\n\n' +
-      'Client ID (se termine par .apps.googleusercontent.com) :'
+      '🔑 Client ID Google OAuth 2.0\n\n' +
+      '1. console.cloud.google.com\n' +
+      '2. APIs & Services → Identifiants\n' +
+      '3. Créer ID client OAuth (Application Web)\n' +
+      '4. Ajouter l\'URL de cette page dans les origines autorisées\n\n' +
+      'Client ID (.apps.googleusercontent.com) :'
     );
     if (!id || !id.includes('.apps.googleusercontent.com')) {
-      setSyncStatus('❌ Client ID invalide ou annulé');
-      return;
+      setSyncStatus('❌ Client ID invalide'); return;
     }
     localStorage.setItem('g_client_id', id);
+  }
+
+  // Demander le mot de passe dès la connexion
+  const hasPwd = sessionStorage.getItem('crypto_pwd');
+  if (!hasPwd) {
+    const isFirst = !localStorage.getItem('g_pwd_set');
+    const pwd = getPassword(isFirst ? 'first' : 'load');
+    if (!pwd) { setSyncStatus('❌ Mot de passe requis'); return; }
+    if (isFirst) localStorage.setItem('g_pwd_set', '1');
   }
 
   setSyncStatus('⏳ Connexion en cours…');
@@ -1722,12 +1794,11 @@ async function gSignIn() {
     await gapi.client.init({
       discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
     });
-
     gTokenClient = google.accounts.oauth2.initTokenClient({
       client_id: localStorage.getItem('g_client_id'),
       scope: G_SCOPES,
       callback: async (resp) => {
-        if (resp.error) { setSyncStatus('❌ Erreur : ' + resp.error); return; }
+        if (resp.error) { setSyncStatus('❌ ' + resp.error); return; }
         gAccessToken = resp.access_token;
         gapi.client.setToken({ access_token: gAccessToken });
         gIsReady = true;
@@ -1753,15 +1824,15 @@ async function onGSignedIn() {
 function gSignOut() {
   if (gAccessToken) google.accounts.oauth2.revoke(gAccessToken);
   gAccessToken = null; gFileId = null; gIsReady = false;
+  clearPassword();
   document.getElementById('btnSignIn').style.display = '';
   document.getElementById('btnSignOut').style.display = 'none';
   document.getElementById('btnSave').style.display = 'none';
   document.getElementById('btnLoad').style.display = 'none';
-  setSyncStatus('Déconnecté');
+  setSyncStatus('Déconnecté — session chiffrée fermée');
 }
 
 async function gFindOrCreateFile() {
-  // Cherche dans appDataFolder
   const res = await gapi.client.drive.files.list({
     spaces: 'appDataFolder',
     q: `name='${G_FILE_NAME}'`,
@@ -1771,71 +1842,83 @@ async function gFindOrCreateFile() {
   if (files && files.length > 0) {
     gFileId = files[0].id;
     const mod = files[0].modifiedTime ? new Date(files[0].modifiedTime).toLocaleString('fr-FR') : '';
-    setSyncStatus('☁️ Fichier trouvé — modifié le ' + mod, true);
+    setSyncStatus('🔐 Fichier chiffré trouvé — modifié le ' + mod, true);
   } else {
     gFileId = null;
-    setSyncStatus('☁️ Connecté — aucun fichier encore', true);
+    setSyncStatus('🔐 Connecté — aucun fichier encore', true);
   }
 }
 
 async function gSaveData() {
   if (!gIsReady) { setSyncStatus('❌ Non connecté'); return; }
-  setSyncStatus('⏳ Sauvegarde…');
-  const payload = JSON.stringify({
-    version: 1,
-    savedAt: new Date().toISOString(),
-    interventions: getData(),
-    tickets: getTDs()
-  });
+  const pwd = getPassword('save');
+  if (!pwd) { setSyncStatus('❌ Mot de passe requis'); return; }
 
-  const boundary = '-------314159265358979323846';
-  const contentType = 'application/json';
-  const metadata = JSON.stringify({ name: G_FILE_NAME, parents: ['appDataFolder'] });
-
-  let body;
-  let url;
-  let method;
-
-  if (gFileId) {
-    // Update
-    url = `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`;
-    method = 'PATCH';
-    body = payload;
-  } else {
-    // Create multipart
-    url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
-    method = 'POST';
-    body = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metadata}\r\n--${boundary}\r\nContent-Type: ${contentType}\r\n\r\n${payload}\r\n--${boundary}--`;
-  }
-
+  setSyncStatus('⏳ Chiffrement et sauvegarde…');
   try {
-    const headers = { 'Authorization': 'Bearer ' + gAccessToken };
-    if (!gFileId) headers['Content-Type'] = `multipart/related; boundary="${boundary}"`;
-    else headers['Content-Type'] = 'application/json';
+    const jsonStr = JSON.stringify({
+      version: 2,
+      savedAt: new Date().toISOString(),
+      interventions: getData(),
+      tickets: getTDs()
+    });
+
+    // Chiffrement AES-256
+    const encrypted = await chiffrer(jsonStr, pwd);
+
+    const boundary = '-------suivi314159';
+    const metadata = JSON.stringify({ name: G_FILE_NAME, parents: ['appDataFolder'] });
+
+    let url, method, body, headers = { 'Authorization': 'Bearer ' + gAccessToken };
+
+    if (gFileId) {
+      url = `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`;
+      method = 'PATCH';
+      body = encrypted;
+      headers['Content-Type'] = 'text/plain';
+    } else {
+      url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+      method = 'POST';
+      body = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metadata}\r\n--${boundary}\r\nContent-Type: text/plain\r\n\r\n${encrypted}\r\n--${boundary}--`;
+      headers['Content-Type'] = `multipart/related; boundary="${boundary}"`;
+    }
 
     const r = await fetch(url, { method, headers, body });
     const json = await r.json();
-    if (json.id) { gFileId = json.id; }
+    if (json.id) gFileId = json.id;
     const now = new Date().toLocaleString('fr-FR');
-    setSyncStatus('✅ Sauvegardé le ' + now, true);
-    localStorage.setItem('g_last_save', now);
+    setSyncStatus('🔐 Sauvegardé et chiffré le ' + now, true);
   } catch(e) {
-    setSyncStatus('❌ Erreur sauvegarde : ' + e.message);
+    setSyncStatus('❌ Erreur : ' + e.message);
   }
 }
 
 async function gLoadData() {
   if (!gIsReady || !gFileId) {
-    setSyncStatus(gIsReady ? '☁️ Connecté — aucune donnée cloud' : '❌ Non connecté');
+    setSyncStatus(gIsReady ? '🔐 Connecté — aucune donnée cloud' : '❌ Non connecté');
     return;
   }
-  setSyncStatus('⏳ Chargement…');
+  const pwd = getPassword('load');
+  if (!pwd) { setSyncStatus('❌ Mot de passe requis'); return; }
+
+  setSyncStatus('⏳ Chargement et déchiffrement…');
   try {
     const r = await fetch(
       `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
       { headers: { 'Authorization': 'Bearer ' + gAccessToken } }
     );
-    const payload = await r.json();
+    const encrypted = await r.text();
+
+    let payload;
+    try {
+      const jsonStr = await dechiffrer(encrypted, pwd);
+      payload = JSON.parse(jsonStr);
+    } catch(e) {
+      clearPassword();
+      setSyncStatus('❌ Mot de passe incorrect ou données corrompues');
+      return;
+    }
+
     if (!payload.interventions && !payload.tickets) throw new Error('Format invalide');
 
     const mergeById = (existing, incoming) => {
@@ -1851,10 +1934,10 @@ async function gLoadData() {
     saveTDs(newT);
 
     const mod = payload.savedAt ? new Date(payload.savedAt).toLocaleString('fr-FR') : '?';
-    setSyncStatus('✅ Chargé — ' + newI.length + ' interventions · ' + newT.length + ' tickets (cloud du ' + mod + ')', true);
+    setSyncStatus('🔐 Déchiffré — ' + newI.length + ' interventions · ' + newT.length + ' tickets (cloud du ' + mod + ')', true);
     renderDashboard(); renderHistory(); renderTD(); renderTDKpis();
   } catch(e) {
-    setSyncStatus('❌ Erreur chargement : ' + e.message);
+    setSyncStatus('❌ Erreur : ' + e.message);
   }
 }
 
