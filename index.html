@@ -516,6 +516,10 @@
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap;" id="chartsGrid">
       <div class="card" style="grid-column:1/-1">
+        <div class="card-title">✅ Objectif CLP</div>
+        <div id="clpProgress"></div>
+      </div>
+      <div class="card" style="grid-column:1/-1">
         <div class="card-title">Taux de réussite — Visuels</div>
         <div class="ring-wrap" id="ringWrap"></div>
       </div>
@@ -628,6 +632,15 @@
         <div class="form-full">
           <label>Impact / Ce que j'ai appris</label>
           <textarea id="f-impact" placeholder="Impact mesurable, satisfaction, apprentissage..."></textarea>
+        </div>
+        <div class="form-full">
+          <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;cursor:pointer;transition:border-color .2s;" id="clpBox" onclick="toggleCheck('f-clp');document.getElementById('clpBox').style.borderColor=document.getElementById('f-clp').checked?'var(--accent)':''">
+            <input type="checkbox" id="f-clp" style="width:20px;height:20px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;" onclick="event.stopPropagation();document.getElementById('clpBox').style.borderColor=this.checked?'var(--accent)':''">
+            <div>
+              <div style="font-size:13px;color:var(--text);font-weight:700;">✅ CLP — Contrôle effectué</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;">Vérification / contrôle réalisé sur cette intervention</div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="btn-row">
@@ -870,6 +883,7 @@ function saveIntervention() {
     reprise: document.getElementById('f-reprise').checked,
     repriseColleague: document.getElementById('f-reprise').checked ? document.getElementById('f-reprise-colleague').value : '',
     recidive: document.getElementById('f-recidive').checked,
+    clp: document.getElementById('f-clp').checked,
     title,
     desc: document.getElementById('f-desc').value.trim(),
     result: document.getElementById('f-result').value,
@@ -895,6 +909,8 @@ function clearForm() {
   document.getElementById('repriseColleagueWrap').style.display = 'none';
   document.getElementById('repriseBox').style.borderColor = '';
   document.getElementById('f-recidive').checked = false;
+  document.getElementById('f-clp').checked = false;
+  document.getElementById('clpBox').style.borderColor = '';
 }
 
 function toggleReprise() {
@@ -909,6 +925,19 @@ function toggleReprise() {
 function toggleCheck(id) {
   const el = document.getElementById(id);
   el.checked = !el.checked;
+}
+
+function toggleDesc(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
+  // Flip arrow
+  const row = el.previousElementSibling;
+  if (row) {
+    const arrow = row.querySelector('span[style*="color:var(--accent)"]');
+    if (arrow) arrow.textContent = isOpen ? '▼' : '▲';
+  }
 }
 
 function deleteItem(id) {
@@ -930,12 +959,17 @@ function renderDashboard() {
   const txReussite = total ? Math.round((reussi / total) * 100) : 0;
   const txPartiel = total ? Math.round(((reussi+partiel) / total) * 100) : 0;
 
+  const clpTotal = data.filter(d=>d.clp).length;
+  const clpObjectif = 30;
+  const clpPct = Math.min(Math.round((clpTotal/clpObjectif)*100), 100);
+
   // KPI
   const kpis = [
     { label: 'Total interventions', val: total, sub: 'depuis le début', color: 'var(--accent3)' },
     { label: 'Réussies', val: reussi, sub: txReussite + '% du total', color: 'var(--success)' },
     { label: 'Taux réussite', val: txReussite + '%', sub: 'succès complets', color: 'var(--accent)' },
     { label: 'Temps total', val: totalMin >= 60 ? Math.round(totalMin/60) + 'h' : totalMin + 'min', sub: 'investi', color: 'var(--accent2)' },
+    { label: 'CLP effectués', val: clpTotal + ' / ' + clpObjectif, sub: clpPct + '% de l\'objectif', color: clpPct >= 100 ? 'var(--success)' : clpPct >= 60 ? 'var(--warn)' : 'var(--danger)' },
     { label: 'Reprises', val: data.filter(d=>d.reprise).length, sub: 'dépannages repris', color: 'var(--accent2)' },
     { label: 'Récidives', val: data.filter(d=>d.recidive).length, sub: 'pannes réapparues', color: 'var(--danger)' },
     { label: 'En cours', val: enCours, sub: 'à finaliser', color: 'var(--warn)' },
@@ -948,6 +982,22 @@ function renderDashboard() {
       <div class="kpi-sub">${k.sub}</div>
     </div>
   `).join('');
+
+  // Barre de progression CLP
+  const clpColor = clpPct >= 100 ? 'var(--success)' : clpPct >= 60 ? 'var(--warn)' : 'var(--danger)';
+  document.getElementById('clpProgress').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px">Objectif CLP mensuel</span>
+      <span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:${clpColor}">${clpTotal}<span style="font-size:13px;color:var(--muted)"> / ${clpObjectif}</span></span>
+    </div>
+    <div style="background:var(--border);border-radius:8px;height:16px;overflow:hidden;margin-bottom:8px">
+      <div style="height:100%;width:${clpPct}%;background:${clpColor};border-radius:8px;transition:width 1s cubic-bezier(.4,0,.2,1)"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)">
+      <span>${clpPct}% atteint</span>
+      <span>${clpObjectif - clpTotal > 0 ? (clpObjectif - clpTotal) + ' CLP restants' : '✅ Objectif atteint !'}</span>
+    </div>
+  `;
 
   // Rings
   const rings = [
@@ -1039,7 +1089,7 @@ function renderHistory() {
     <table>
       <thead>
         <tr>
-          <th>Date</th><th>Train</th><th>Intervention</th><th>Catégorie</th><th>Résultat</th><th>Durée</th><th></th>
+          <th>Date</th><th>Train</th><th>Intervention</th><th>CLP</th><th>Catégorie</th><th>Résultat</th><th>Durée</th><th></th>
         </tr>
       </thead>
       <tbody>
@@ -1050,15 +1100,20 @@ function renderHistory() {
               ${d.train ? `<span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2)">🚆 ${d.train}</span>` : '<span style="color:var(--border)">—</span>'}
             </td>
             <td>
-              <div class="td-title">${d.title}</div>
-              ${d.desc ? `<div class="td-sub">${d.desc.slice(0,80)}${d.desc.length>80?'…':''}</div>` : ''}
+              <div class="td-title" style="cursor:pointer" onclick="toggleDesc('desc-${d.id}')">${d.title} ${d.desc ? '<span style="font-size:10px;color:var(--accent);margin-left:4px">▼</span>' : ''}</div>
+              ${d.desc ? `
+                <div id="desc-${d.id}" style="display:none;margin-top:8px;padding:10px 12px;background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:12px;color:var(--text);line-height:1.7">
+                  ${d.desc}
+                  ${d.impact ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--accent);font-size:11px"><strong>Impact :</strong> ${d.impact}</div>` : ''}
+                </div>` : ''}
               <div style="margin-top:5px;display:flex;gap:4px;flex-wrap:wrap">
                 ${d.colleague ? `<span class="badge" style="background:rgba(124,111,255,.15);color:var(--accent3);border:1px solid rgba(124,111,255,.3)">👥 ${d.colleague}</span>` : ''}
-                ${d.reprise ? `<span class="badge" style="background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)">🔁 Reprise${d.repriseColleague ? ' — après ' + d.repriseColleague : ''}</span>` : ''}
+                ${d.reprise ? `<span class="badge" style="background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)">🔁 Reprise${d.repriseColleague ? ' — ' + d.repriseColleague : ''}</span>` : ''}
                 ${d.recidive ? `<span class="badge badge-danger">⚠️ Récidive</span>` : ''}
                 ${d.skills && d.skills.length ? d.skills.map(s=>`<span class="badge badge-info">${s}</span>`).join('') : ''}
               </div>
             </td>
+            <td style="text-align:center">${d.clp ? '<span style="font-size:18px" title="CLP effectué">✅</span>' : '<span style="color:var(--border)">—</span>'}</td>
             <td><span class="badge badge-info">${d.cat}</span></td>
             <td>${resultBadge(d.result)}</td>
             <td style="color:var(--muted)">${d.duration ? d.duration+'min' : '—'}</td>
@@ -1086,10 +1141,20 @@ function renderHistory() {
             <div class="hist-card-date">${new Date(d.date).toLocaleDateString('fr-FR')}</div>
           </div>
           ${d.train ? `<div class="hist-card-train">🚆 ${d.train}</div>` : ''}
-          ${d.desc ? `<div class="hist-card-desc">${d.desc.slice(0,100)}${d.desc.length>100?'…':''}</div>` : ''}
+          ${d.desc ? `
+            <div style="margin-bottom:8px">
+              <div onclick="toggleDesc('mob-desc-${d.id}')" style="font-size:12px;color:var(--accent);cursor:pointer;display:flex;align-items:center;gap:4px">
+                <span>📄 Voir la description</span><span id="mob-arrow-${d.id}">▼</span>
+              </div>
+              <div id="mob-desc-${d.id}" style="display:none;margin-top:6px;padding:10px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:13px;line-height:1.7">
+                ${d.desc}
+                ${d.impact ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--accent);font-size:12px"><strong>Impact :</strong> ${d.impact}</div>` : ''}
+              </div>
+            </div>` : ''}
           <div class="hist-card-badges">
             ${resultBadge(d.result)}
             <span class="badge badge-info">${d.cat}</span>
+            ${d.clp ? `<span class="badge badge-success">✅ CLP</span>` : ''}
             ${d.colleague ? `<span class="badge" style="background:rgba(124,111,255,.15);color:var(--accent3);border:1px solid rgba(124,111,255,.3)">👥 ${d.colleague}</span>` : ''}
             ${d.reprise ? `<span class="badge" style="background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)">🔁 Reprise${d.repriseColleague?' — '+d.repriseColleague:''}</span>` : ''}
             ${d.recidive ? `<span class="badge badge-danger">⚠️ Récidive</span>` : ''}
@@ -1259,15 +1324,48 @@ function renderEntretien() {
 function exportCSV() {
   const data = filterData();
   if (!data.length) { alert('Aucune donnée à exporter.'); return; }
-  const headers = ['Date','Train','Titre','Catégorie','Reprise','Récidive','Résultat','Durée (min)','Compétences','Description','Impact'];
-  const rows = data.map(d => [
-    d.date, d.train||'', d.title, d.cat,
-    d.reprise ? 'Oui' : 'Non',
-    d.recidive ? 'Oui' : 'Non',
-    d.result, d.duration,
-    d.skills.join(' | '), d.desc, d.impact
-  ].map(v => `"${String(v||'').replace(/"/g,'""')}"`));
-  const csv = [headers, ...rows].map(r=>r.join(',')).join('\n');
+  const headers = [
+    'Date',
+    'Numéro de train',
+    'Titre',
+    'Catégorie',
+    'Collègue présent',
+    'Reprise de dépannage',
+    'Collègue avant (reprise)',
+    'Récidive',
+    'CLP effectué',
+    'Résultat',
+    'Durée (min)',
+    'Compétence 1',
+    'Compétence 2',
+    'Compétence 3',
+    'Compétences supplémentaires',
+    'Description',
+    'Impact'
+  ];
+  const rows = data.map(d => {
+    const skills = d.skills || [];
+    return [
+      d.date,
+      d.train || '',
+      d.title,
+      d.cat,
+      d.colleague || '',
+      d.reprise ? 'Oui' : 'Non',
+      d.repriseColleague || '',
+      d.recidive ? 'Oui' : 'Non',
+      d.clp ? 'Oui' : 'Non',
+      d.result,
+      d.duration || '',
+      skills[0] || '',
+      skills[1] || '',
+      skills[2] || '',
+      skills.slice(3).join(' | '),
+      d.desc || '',
+      d.impact || ''
+    ].map(v => `"${String(v).replace(/"/g,'""')}"`);
+  });
+  const csv = [headers.map(h=>`"${h}"`), ...rows].map(r=>r.join(',')).join('\n');
   const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
