@@ -466,6 +466,8 @@
     <button class="tab" onclick="showTab('add', this)">➕ Ajouter</button>
     <button class="tab" onclick="showTab('history', this)">📋 Historique</button>
     <button class="tab" onclick="showTab('td', this)">🎫 Tickets / TD</button>
+    <button class="tab" onclick="showTab('set', this)">⏱ Heures SET</button>
+    <button class="tab" onclick="showTab('innov', this)">💡 Innovations</button>
     <button class="tab" onclick="showTab('entretien', this)">🎯 Entretien</button>
   </nav>
 
@@ -484,13 +486,13 @@
         <span class="mob-icon">➕</span>
         <span class="mob-label">Ajouter</span>
       </button>
-      <button class="mob-tab" id="mob-td" onclick="showTab('td', this)">
-        <span class="mob-icon">🎫</span>
-        <span class="mob-label">Tickets</span>
+      <button class="mob-tab" id="mob-set" onclick="showTab('set', this)">
+        <span class="mob-icon">⏱</span>
+        <span class="mob-label">SET</span>
       </button>
-      <button class="mob-tab" id="mob-entretien" onclick="showTab('entretien', this)">
-        <span class="mob-icon">🎯</span>
-        <span class="mob-label">Entretien</span>
+      <button class="mob-tab" id="mob-innov" onclick="showTab('innov', this)">
+        <span class="mob-icon">💡</span>
+        <span class="mob-label">Innov</span>
       </button>
     </div>
   </nav>
@@ -518,6 +520,14 @@
       <div class="card" style="grid-column:1/-1">
         <div class="card-title">✅ Objectif CLP</div>
         <div id="clpProgress"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">⏱ Heures SET</div>
+        <div id="setProgress"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">💡 Innovations & Précurseurs</div>
+        <div id="innovProgress"></div>
       </div>
       <div class="card" style="grid-column:1/-1">
         <div class="card-title">Taux de réussite — Visuels</div>
@@ -826,6 +836,114 @@
 
   </div>
 
+  <!-- HEURES SET -->
+  <div class="view" id="view-set">
+    <div class="kpi-row" id="setKpiRow"></div>
+
+    <!-- Formulaire ajout SET -->
+    <div class="card">
+      <div class="card-title">⏱ Nouvelle session SET</div>
+      <div class="form-grid">
+        <div>
+          <label>Date</label>
+          <input type="date" id="set-date">
+        </div>
+        <div>
+          <label>Durée (heures)</label>
+          <input type="number" id="set-hours" placeholder="Ex : 2.5" min="0.5" step="0.5">
+        </div>
+        <div class="form-full">
+          <label>Description de la session</label>
+          <textarea id="set-desc" placeholder="Supervision à distance, diagnostic effectué, matériel concerné..."></textarea>
+        </div>
+        <div class="form-full">
+          <label>Train / Matériel</label>
+          <input type="text" id="set-train" placeholder="Ex : TER 830042, UM Z50000...">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveSET()">Enregistrer</button>
+        <button class="btn btn-ghost" onclick="clearSETForm()">Effacer</button>
+      </div>
+      <div id="setMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
+    </div>
+
+    <!-- Liste des sessions SET -->
+    <div class="card">
+      <div class="card-title">Mes sessions SET</div>
+      <div id="setList"></div>
+    </div>
+  </div>
+
+  <!-- INNOVATIONS & PRÉCURSEURS -->
+  <div class="view" id="view-innov">
+    <div class="kpi-row" id="innovKpiRow"></div>
+
+    <!-- Formulaire -->
+    <div class="card">
+      <div class="card-title">💡 Nouvelle entrée</div>
+      <div class="form-grid">
+        <div>
+          <label>Date</label>
+          <input type="date" id="innov-date">
+        </div>
+        <div>
+          <label>Type</label>
+          <select id="innov-type">
+            <option value="Innovation">💡 Innovation</option>
+            <option value="Précurseur">⚠️ Précurseur (situation à risque)</option>
+          </select>
+        </div>
+        <div class="form-full">
+          <label>Titre</label>
+          <input type="text" id="innov-title" placeholder="Ex : Amélioration procédure X, Risque détecté sur Y...">
+        </div>
+        <div class="form-full">
+          <label>Description détaillée</label>
+          <textarea id="innov-desc" placeholder="Contexte, problème identifié, solution proposée, situation à risque..."></textarea>
+        </div>
+        <div>
+          <label>Statut</label>
+          <select id="innov-status">
+            <option value="Proposé">📤 Proposé</option>
+            <option value="En étude">🔍 En étude</option>
+            <option value="Accepté">✅ Accepté</option>
+            <option value="Refusé">❌ Refusé</option>
+            <option value="Déployé">🚀 Déployé</option>
+          </select>
+        </div>
+        <div>
+          <label>Impact estimé</label>
+          <select id="innov-impact">
+            <option value="Faible">🟢 Faible</option>
+            <option value="Moyen">🟡 Moyen</option>
+            <option value="Fort">🔴 Fort</option>
+          </select>
+        </div>
+        <div class="form-full">
+          <label>Notes / Retour obtenu</label>
+          <textarea id="innov-notes" placeholder="Retour de la hiérarchie, résultat, suite donnée..."></textarea>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveInnov()">Enregistrer</button>
+        <button class="btn btn-ghost" onclick="clearInnovForm()">Effacer</button>
+      </div>
+      <div id="innovMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
+    </div>
+
+    <!-- Liste -->
+    <div class="card">
+      <div class="card-title">Mes innovations & précurseurs</div>
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn btn-ghost" id="filter-all" onclick="renderInnov('all')" style="padding:8px 16px;font-size:12px">Tout</button>
+        <button class="btn btn-ghost" id="filter-Innovation" onclick="renderInnov('Innovation')" style="padding:8px 16px;font-size:12px">💡 Innovations</button>
+        <button class="btn btn-ghost" id="filter-Précurseur" onclick="renderInnov('Précurseur')" style="padding:8px 16px;font-size:12px">⚠️ Précurseurs</button>
+      </div>
+      <div id="innovList"></div>
+    </div>
+  </div>
+
   <!-- ENTRETIEN -->
   <div class="view" id="view-entretien">
     <div class="card">
@@ -866,6 +984,8 @@ function showTab(id, triggerEl) {
   if (id === 'dashboard') renderDashboard();
   if (id === 'history') renderHistory();
   if (id === 'td') { renderTDKpis(); renderTD(); }
+  if (id === 'set') { renderSETKpis(); renderSET(); }
+  if (id === 'innov') { renderInnovKpis(); renderInnov('all'); }
   if (id === 'entretien') renderEntretien();
 }
 
@@ -998,6 +1118,51 @@ function renderDashboard() {
       <span>${clpPct}% atteint</span>
       <span>${clpObjectif - clpTotal > 0 ? (clpObjectif - clpTotal) + ' CLP restants cette année' : '✅ Objectif annuel atteint !'}</span>
     </div>
+  `;
+
+  // Barre SET dans dashboard
+  const setSessions = getSETs().filter(s => new Date(s.date).getFullYear() === currentYear);
+  const setHTotal = setSessions.reduce((a,s) => a + (s.hours||0), 0);
+  // objectif = 20% du total interventions en heures (on prend nb interventions comme base)
+  const setObjectifH = Math.max(total * 0.2, 1);
+  const setPct = Math.min(Math.round((setHTotal / setObjectifH) * 100), 100);
+  const setColor = setPct >= 100 ? 'var(--success)' : setPct >= 60 ? 'var(--warn)' : 'var(--danger)';
+  document.getElementById('setProgress').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">Sessions SET ${currentYear}</span>
+      <span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:${setColor}">${setHTotal}h</span>
+    </div>
+    <div style="background:var(--border);border-radius:8px;height:14px;overflow:hidden;margin-bottom:8px">
+      <div style="height:100%;width:${setPct}%;background:${setColor};border-radius:8px;transition:width 1s cubic-bezier(.4,0,.2,1)"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)">
+      <span>${setSessions.length} session${setSessions.length>1?'s':''}</span>
+      <span>${setPct}% de l'objectif 20%</span>
+    </div>
+  `;
+
+  // Barre Innovations & Précurseurs dans dashboard
+  const innovs = getInnovs().filter(i => new Date(i.date).getFullYear() === currentYear);
+  const nbInnov = innovs.filter(i=>i.type==='Innovation').length;
+  const nbPrec = innovs.filter(i=>i.type==='Précurseur').length;
+  const precObjectif = 2;
+  const precPct = Math.min(Math.round((nbPrec/precObjectif)*100), 100);
+  const precColor = precPct >= 100 ? 'var(--success)' : precPct >= 50 ? 'var(--warn)' : 'var(--danger)';
+  document.getElementById('innovProgress').innerHTML = `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:12px;color:var(--muted)">💡 Innovations proposées</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--accent3)">${nbInnov}</span>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-size:12px;color:var(--muted)">⚠️ Précurseurs — objectif ${precObjectif}/an</span>
+      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:${precColor}">${nbPrec} / ${precObjectif}</span>
+    </div>
+    <div style="background:var(--border);border-radius:8px;height:14px;overflow:hidden;margin-bottom:6px">
+      <div style="height:100%;width:${precPct}%;background:${precColor};border-radius:8px;transition:width 1s cubic-bezier(.4,0,.2,1)"></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);text-align:right">${precPct >= 100 ? '✅ Objectif précurseurs atteint !' : (precObjectif - nbPrec) + ' précurseur(s) restant(s)'}</div>
   `;
 
   // Rings
@@ -1730,6 +1895,222 @@ function clearPassword() {
 }
 
 // ======================================================
+// ---- HEURES SET ----
+// ======================================================
+function getSETs() { return JSON.parse(localStorage.getItem('set_sessions') || '[]'); }
+function saveSETs(d) { localStorage.setItem('set_sessions', JSON.stringify(d)); }
+
+document.getElementById('set-date').value = new Date().toISOString().split('T')[0];
+
+function saveSET() {
+  const hours = parseFloat(document.getElementById('set-hours').value);
+  if (!hours || hours <= 0) { document.getElementById('setMsg').textContent = '⚠ Renseignez une durée.'; return; }
+  const sessions = getSETs();
+  sessions.unshift({
+    id: Date.now(),
+    date: document.getElementById('set-date').value,
+    hours,
+    desc: document.getElementById('set-desc').value.trim(),
+    train: document.getElementById('set-train').value.trim()
+  });
+  saveSETs(sessions);
+  document.getElementById('setMsg').textContent = '✅ Session enregistrée !';
+  setTimeout(() => document.getElementById('setMsg').textContent = '', 2500);
+  clearSETForm();
+  renderSETKpis(); renderSET();
+}
+
+function clearSETForm() {
+  document.getElementById('set-hours').value = '';
+  document.getElementById('set-desc').value = '';
+  document.getElementById('set-train').value = '';
+  document.getElementById('set-date').value = new Date().toISOString().split('T')[0];
+}
+
+function deleteSET(id) {
+  if (!confirm('Supprimer cette session SET ?')) return;
+  saveSETs(getSETs().filter(s => s.id !== id));
+  renderSETKpis(); renderSET(); renderDashboard();
+}
+
+function renderSETKpis() {
+  const all = getSETs();
+  const year = new Date().getFullYear();
+  const thisYear = all.filter(s => new Date(s.date).getFullYear() === year);
+  const totalH = all.reduce((a,s) => a+(s.hours||0), 0);
+  const yearH = thisYear.reduce((a,s) => a+(s.hours||0), 0);
+  const kpis = [
+    { label: 'Total heures SET', val: totalH + 'h', sub: 'depuis le début', color: 'var(--accent3)' },
+    { label: 'Heures ' + year, val: yearH + 'h', sub: thisYear.length + ' session(s)', color: 'var(--accent)' },
+    { label: 'Sessions total', val: all.length, sub: 'enregistrées', color: 'var(--accent2)' },
+  ];
+  document.getElementById('setKpiRow').innerHTML = kpis.map(k => `
+    <div class="kpi">
+      <div class="kpi-accent" style="background:${k.color}"></div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-val" style="color:${k.color}">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+}
+
+function renderSET() {
+  const sessions = getSETs();
+  if (!sessions.length) {
+    document.getElementById('setList').innerHTML = '<div class="empty"><div class="empty-icon">⏱</div><div class="empty-text">Aucune session SET enregistrée.</div></div>';
+    return;
+  }
+  document.getElementById('setList').innerHTML = sessions.map(s => `
+    <div class="hist-card" style="margin-bottom:12px">
+      <div class="hist-card-top">
+        <div class="hist-card-title">${s.desc || 'Session SET'}</div>
+        <div class="hist-card-date">${new Date(s.date).toLocaleDateString('fr-FR')}</div>
+      </div>
+      ${s.train ? `<div class="hist-card-train">🚆 ${s.train}</div>` : ''}
+      <div class="hist-card-footer" style="margin-top:10px">
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--accent)">${s.hours}h</span>
+        <button class="btn btn-danger" onclick="deleteSET(${s.id})" style="padding:8px 14px;font-size:12px">Supprimer</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ======================================================
+// ---- INNOVATIONS & PRÉCURSEURS ----
+// ======================================================
+function getInnovs() { return JSON.parse(localStorage.getItem('innovations') || '[]'); }
+function saveInnovs(d) { localStorage.setItem('innovations', JSON.stringify(d)); }
+
+document.getElementById('innov-date').value = new Date().toISOString().split('T')[0];
+
+function saveInnov() {
+  const title = document.getElementById('innov-title').value.trim();
+  if (!title) { document.getElementById('innovMsg').textContent = '⚠ Renseignez un titre.'; return; }
+  const innovs = getInnovs();
+  innovs.unshift({
+    id: Date.now(),
+    date: document.getElementById('innov-date').value,
+    type: document.getElementById('innov-type').value,
+    title,
+    desc: document.getElementById('innov-desc').value.trim(),
+    status: document.getElementById('innov-status').value,
+    impact: document.getElementById('innov-impact').value,
+    notes: document.getElementById('innov-notes').value.trim()
+  });
+  saveInnovs(innovs);
+  document.getElementById('innovMsg').textContent = '✅ Enregistré !';
+  setTimeout(() => document.getElementById('innovMsg').textContent = '', 2500);
+  clearInnovForm();
+  renderInnovKpis(); renderInnov('all'); renderDashboard();
+}
+
+function clearInnovForm() {
+  ['innov-title','innov-desc','innov-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('innov-type').value = 'Innovation';
+  document.getElementById('innov-status').value = 'Proposé';
+  document.getElementById('innov-impact').value = 'Moyen';
+  document.getElementById('innov-date').value = new Date().toISOString().split('T')[0];
+}
+
+function deleteInnov(id) {
+  if (!confirm('Supprimer cette entrée ?')) return;
+  saveInnovs(getInnovs().filter(i => i.id !== id));
+  renderInnovKpis(); renderInnov('all'); renderDashboard();
+}
+
+function updateInnovStatus(id, newStatus) {
+  const innovs = getInnovs();
+  const item = innovs.find(i => i.id === id);
+  if (!item) return;
+  item.status = newStatus;
+  saveInnovs(innovs);
+  renderInnov('all');
+}
+
+function renderInnovKpis() {
+  const all = getInnovs();
+  const year = new Date().getFullYear();
+  const thisYear = all.filter(i => new Date(i.date).getFullYear() === year);
+  const nbInnov = thisYear.filter(i=>i.type==='Innovation').length;
+  const nbPrec = thisYear.filter(i=>i.type==='Précurseur').length;
+  const nbAccepte = thisYear.filter(i=>i.type==='Innovation'&&i.status==='Accepté').length;
+  const kpis = [
+    { label: 'Innovations ' + year, val: nbInnov, sub: 'proposées', color: 'var(--accent3)' },
+    { label: 'Acceptées', val: nbAccepte, sub: nbInnov ? Math.round(nbAccepte/nbInnov*100)+'%' : '—', color: 'var(--success)' },
+    { label: 'Précurseurs ' + year, val: nbPrec + ' / 2', sub: nbPrec >= 2 ? '✅ Objectif atteint' : (2-nbPrec) + ' restant(s)', color: nbPrec >= 2 ? 'var(--success)' : 'var(--warn)' },
+    { label: 'Total historique', val: all.length, sub: 'entrées', color: 'var(--muted)' },
+  ];
+  document.getElementById('innovKpiRow').innerHTML = kpis.map(k => `
+    <div class="kpi">
+      <div class="kpi-accent" style="background:${k.color}"></div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-val" style="color:${k.color}">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+}
+
+function innovStatusBadge(s) {
+  const map = {
+    'Proposé':   'background:rgba(124,111,255,.15);color:var(--accent3);border:1px solid rgba(124,111,255,.3)',
+    'En étude':  'background:rgba(255,193,7,.15);color:var(--warn);border:1px solid rgba(255,193,7,.3)',
+    'Accepté':   'background:rgba(0,229,160,.15);color:var(--success);border:1px solid rgba(0,229,160,.3)',
+    'Refusé':    'background:rgba(255,77,106,.15);color:var(--danger);border:1px solid rgba(255,77,106,.3)',
+    'Déployé':   'background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)',
+  };
+  return `<span class="badge" style="${map[s]||''}">${s}</span>`;
+}
+
+function renderInnov(filter) {
+  // Highlight active filter button
+  ['all','Innovation','Précurseur'].forEach(f => {
+    const btn = document.getElementById('filter-' + f);
+    if (btn) btn.className = 'btn ' + (filter === f ? 'btn-primary' : 'btn-ghost');
+  });
+
+  let items = getInnovs();
+  if (filter !== 'all') items = items.filter(i => i.type === filter);
+
+  if (!items.length) {
+    document.getElementById('innovList').innerHTML = '<div class="empty"><div class="empty-icon">💡</div><div class="empty-text">Aucune entrée pour ce filtre.</div></div>';
+    return;
+  }
+
+  document.getElementById('innovList').innerHTML = items.map(i => `
+    <div class="hist-card" style="margin-bottom:12px;border-left:3px solid ${i.type==='Innovation'?'var(--accent3)':'var(--warn)'}">
+      <div class="hist-card-top">
+        <div>
+          <span style="font-size:11px;color:${i.type==='Innovation'?'var(--accent3)':'var(--warn)'};font-weight:700">${i.type==='Innovation'?'💡 Innovation':'⚠️ Précurseur'}</span>
+          <div class="hist-card-title" style="margin-top:4px">${i.title}</div>
+        </div>
+        <div class="hist-card-date">${new Date(i.date).toLocaleDateString('fr-FR')}</div>
+      </div>
+      ${i.desc ? `
+        <div onclick="toggleDesc('innov-desc-${i.id}')" style="font-size:12px;color:var(--accent);cursor:pointer;margin-bottom:6px">
+          📄 Description <span id="innov-arr-${i.id}">▼</span>
+        </div>
+        <div id="innov-desc-${i.id}" style="display:none;margin-bottom:8px;padding:10px;background:var(--surface);border-left:3px solid var(--accent3);border-radius:0 8px 8px 0;font-size:13px;line-height:1.7">${i.desc}${i.notes?`<div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;color:var(--muted)"><strong>Notes :</strong> ${i.notes}</div>`:''}</div>
+      ` : ''}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+        ${innovStatusBadge(i.status)}
+        <span class="badge badge-info">Impact ${i.impact}</span>
+      </div>
+      ${i.type === 'Innovation' ? `
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+          ${['Proposé','En étude','Accepté','Refusé','Déployé'].map(s =>
+            `<button class="btn ${i.status===s?'btn-primary':'btn-ghost'}" onclick="updateInnovStatus(${i.id},'${s}')" style="padding:6px 10px;font-size:11px;min-height:36px">${s}</button>`
+          ).join('')}
+        </div>
+      ` : ''}
+      <div class="hist-card-footer">
+        <span></span>
+        <button class="btn btn-danger" onclick="deleteInnov(${i.id})" style="padding:8px 14px;font-size:12px">Supprimer</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ======================================================
 // ---- GOOGLE DRIVE SYNC (avec chiffrement) ----
 // ======================================================
 const G_CLIENT_ID = '';
@@ -1860,7 +2241,9 @@ async function gSaveData() {
       version: 2,
       savedAt: new Date().toISOString(),
       interventions: getData(),
-      tickets: getTDs()
+      tickets: getTDs(),
+      set_sessions: getSETs(),
+      innovations: getInnovs()
     });
 
     // Chiffrement AES-256
@@ -1930,11 +2313,15 @@ async function gLoadData() {
 
     const newI = mergeById(getData(), payload.interventions || []);
     const newT = mergeById(getTDs(), payload.tickets || []);
+    const newS = mergeById(getSETs(), payload.set_sessions || []);
+    const newV = mergeById(getInnovs(), payload.innovations || []);
     saveData(newI);
     saveTDs(newT);
+    saveSETs(newS);
+    saveInnovs(newV);
 
     const mod = payload.savedAt ? new Date(payload.savedAt).toLocaleString('fr-FR') : '?';
-    setSyncStatus('🔐 Déchiffré — ' + newI.length + ' interventions · ' + newT.length + ' tickets (cloud du ' + mod + ')', true);
+    setSyncStatus('🔐 Déchiffré — ' + newI.length + ' interventions · ' + newT.length + ' tickets · ' + newS.length + ' SET · ' + newV.length + ' innovations (cloud du ' + mod + ')', true);
     renderDashboard(); renderHistory(); renderTD(); renderTDKpis();
   } catch(e) {
     setSyncStatus('❌ Erreur : ' + e.message);
