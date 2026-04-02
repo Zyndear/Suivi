@@ -610,12 +610,27 @@
               </select>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;" onclick="toggleCheck('f-recidive')">
-            <input type="checkbox" id="f-recidive" style="width:16px;height:16px;cursor:pointer;accent-color:var(--danger);">
+          <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;transition:border-color .2s;" id="recidiveBox" onclick="toggleRecidive()">
+            <input type="checkbox" id="f-recidive" style="width:16px;height:16px;cursor:pointer;accent-color:var(--danger);" onclick="event.stopPropagation();toggleRecidive()">
             <div>
               <div style="font-size:12px;color:var(--text);font-weight:500;">⚠️ Récidive constatée</div>
               <div style="font-size:10px;color:var(--muted);">La panne est réapparue après une réparation</div>
             </div>
+          </div>
+          <div id="recidiveMotifWrap" style="display:none;margin-top:8px;padding:12px 14px;background:rgba(255,77,106,.07);border:1px solid rgba(255,77,106,.3);border-radius:8px;">
+            <label style="color:var(--danger);">📋 Motif de la récidive</label>
+            <select id="f-recidive-motif" style="width:100%;margin-top:6px;margin-bottom:8px;">
+              <option value="">— Sélectionner un motif —</option>
+              <option value="Réparation incomplète">Réparation incomplète</option>
+              <option value="Pièce défectueuse">Pièce défectueuse</option>
+              <option value="Mauvais diagnostic initial">Mauvais diagnostic initial</option>
+              <option value="Problème systémique">Problème systémique récurrent</option>
+              <option value="Conditions d'exploitation">Conditions d'exploitation</option>
+              <option value="Cause inconnue">Cause inconnue</option>
+              <option value="Autre">Autre</option>
+            </select>
+            <label style="color:var(--danger);">Précisions</label>
+            <textarea id="f-recidive-detail" placeholder="Détails supplémentaires sur la récidive..." style="margin-top:6px;min-height:60px;"></textarea>
           </div>
         </div>
         <div class="form-full">
@@ -624,12 +639,28 @@
         </div>
         <div>
           <label>Résultat</label>
-          <select id="f-result">
+          <select id="f-result" onchange="toggleNonTermineMotif()">
             <option value="Réussi">✅ Réussi</option>
             <option value="Partiel">⚠️ Partiel</option>
             <option value="Échoué">❌ Échoué</option>
             <option value="En cours">🔄 En cours</option>
           </select>
+        </div>
+        <div id="nonTermineWrap" style="display:none;">
+          <label style="color:var(--warn);">📋 Motif — panne non terminée</label>
+          <select id="f-nontermine-motif" style="width:100%;">
+            <option value="">— Sélectionner un motif —</option>
+            <option value="Pièce manquante">Pièce manquante</option>
+            <option value="Outil manquant">Outil manquant</option>
+            <option value="Contrainte horaire">Contrainte horaire (train à l'heure)</option>
+            <option value="Attente expertise">Attente d'une expertise extérieure</option>
+            <option value="Problème non reproduit">Problème non reproduit en atelier</option>
+            <option value="En attente de pièce">En attente de livraison pièce</option>
+            <option value="Diagnostic en cours">Diagnostic en cours</option>
+            <option value="Manque d'information">Manque d'information</option>
+            <option value="Autre">Autre</option>
+          </select>
+          <textarea id="f-nontermine-detail" placeholder="Précisions sur la raison..." style="margin-top:8px;min-height:60px;"></textarea>
         </div>
         <div>
           <label>Durée (minutes)</label>
@@ -1003,10 +1034,14 @@ function saveIntervention() {
     reprise: document.getElementById('f-reprise').checked,
     repriseColleague: document.getElementById('f-reprise').checked ? document.getElementById('f-reprise-colleague').value : '',
     recidive: document.getElementById('f-recidive').checked,
+    recidiveMotif: document.getElementById('f-recidive').checked ? document.getElementById('f-recidive-motif').value : '',
+    recidiveDetail: document.getElementById('f-recidive').checked ? document.getElementById('f-recidive-detail').value.trim() : '',
     clp: document.getElementById('f-clp').checked,
     title,
     desc: document.getElementById('f-desc').value.trim(),
     result: document.getElementById('f-result').value,
+    nonTermineMotif: ['Partiel','En cours','Échoué'].includes(document.getElementById('f-result').value) ? document.getElementById('f-nontermine-motif').value : '',
+    nonTermineDetail: ['Partiel','En cours','Échoué'].includes(document.getElementById('f-result').value) ? document.getElementById('f-nontermine-detail').value.trim() : '',
     duration: parseInt(document.getElementById('f-duration').value) || 0,
     skills: document.getElementById('f-skills').value.split(',').map(s=>s.trim()).filter(Boolean),
     impact: document.getElementById('f-impact').value.trim(),
@@ -1029,8 +1064,28 @@ function clearForm() {
   document.getElementById('repriseColleagueWrap').style.display = 'none';
   document.getElementById('repriseBox').style.borderColor = '';
   document.getElementById('f-recidive').checked = false;
+  document.getElementById('f-recidive-motif').value = '';
+  document.getElementById('f-recidive-detail').value = '';
+  document.getElementById('recidiveMotifWrap').style.display = 'none';
+  document.getElementById('recidiveBox').style.borderColor = '';
+  document.getElementById('f-nontermine-motif').value = '';
+  document.getElementById('f-nontermine-detail').value = '';
+  document.getElementById('nonTermineWrap').style.display = 'none';
   document.getElementById('f-clp').checked = false;
   document.getElementById('clpBox').style.borderColor = '';
+}
+
+function toggleRecidive() {
+  const cb = document.getElementById('f-recidive');
+  cb.checked = !cb.checked;
+  document.getElementById('recidiveMotifWrap').style.display = cb.checked ? 'block' : 'none';
+  document.getElementById('recidiveBox').style.borderColor = cb.checked ? 'var(--danger)' : '';
+}
+
+function toggleNonTermineMotif() {
+  const result = document.getElementById('f-result').value;
+  const show = ['Partiel','En cours','Échoué'].includes(result);
+  document.getElementById('nonTermineWrap').style.display = show ? 'block' : 'none';
 }
 
 function toggleReprise() {
@@ -1271,11 +1326,14 @@ function renderHistory() {
                 <div id="desc-${d.id}" style="display:none;margin-top:8px;padding:10px 12px;background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:12px;color:var(--text);line-height:1.7">
                   ${d.desc}
                   ${d.impact ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--accent);font-size:11px"><strong>Impact :</strong> ${d.impact}</div>` : ''}
+                  ${d.recidive && d.recidiveDetail ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--danger);font-size:11px"><strong>Motif récidive :</strong> ${d.recidiveDetail}</div>` : ''}
+                  ${d.nonTermineDetail ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--warn);font-size:11px"><strong>Motif non terminé :</strong> ${d.nonTermineDetail}</div>` : ''}
                 </div>` : ''}
               <div style="margin-top:5px;display:flex;gap:4px;flex-wrap:wrap">
                 ${d.colleague ? `<span class="badge" style="background:rgba(124,111,255,.15);color:var(--accent3);border:1px solid rgba(124,111,255,.3)">👥 ${d.colleague}</span>` : ''}
                 ${d.reprise ? `<span class="badge" style="background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)">🔁 Reprise${d.repriseColleague ? ' — ' + d.repriseColleague : ''}</span>` : ''}
-                ${d.recidive ? `<span class="badge badge-danger">⚠️ Récidive</span>` : ''}
+                ${d.recidive ? `<span class="badge badge-danger">⚠️ Récidive${d.recidiveMotif ? ' — ' + d.recidiveMotif : ''}</span>` : ''}
+                ${d.nonTermineMotif ? `<span class="badge badge-warn">🔧 ${d.nonTermineMotif}</span>` : ''}
                 ${d.skills && d.skills.length ? d.skills.map(s=>`<span class="badge badge-info">${s}</span>`).join('') : ''}
               </div>
             </td>
@@ -1315,6 +1373,8 @@ function renderHistory() {
               <div id="mob-desc-${d.id}" style="display:none;margin-top:6px;padding:10px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:13px;line-height:1.7">
                 ${d.desc}
                 ${d.impact ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--accent);font-size:12px"><strong>Impact :</strong> ${d.impact}</div>` : ''}
+                ${d.recidive && d.recidiveDetail ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--danger);font-size:12px"><strong>Motif récidive :</strong> ${d.recidiveDetail}</div>` : ''}
+                ${d.nonTermineDetail ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--warn);font-size:12px"><strong>Motif non terminé :</strong> ${d.nonTermineDetail}</div>` : ''}
               </div>
             </div>` : ''}
           <div class="hist-card-badges">
@@ -1323,7 +1383,8 @@ function renderHistory() {
             ${d.clp ? `<span class="badge badge-success">✅ CLP</span>` : ''}
             ${d.colleague ? `<span class="badge" style="background:rgba(124,111,255,.15);color:var(--accent3);border:1px solid rgba(124,111,255,.3)">👥 ${d.colleague}</span>` : ''}
             ${d.reprise ? `<span class="badge" style="background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)">🔁 Reprise${d.repriseColleague?' — '+d.repriseColleague:''}</span>` : ''}
-            ${d.recidive ? `<span class="badge badge-danger">⚠️ Récidive</span>` : ''}
+            ${d.recidive ? `<span class="badge badge-danger">⚠️ Récidive${d.recidiveMotif ? ' — ' + d.recidiveMotif : ''}</span>` : ''}
+            ${d.nonTermineMotif ? `<span class="badge badge-warn">🔧 ${d.nonTermineMotif}</span>` : ''}
           </div>
           <div class="hist-card-footer">
             <span style="font-size:11px;color:var(--muted)">${d.duration ? '⏱ '+d.duration+'min' : ''}</span>
@@ -1499,8 +1560,12 @@ function exportCSV() {
     'Reprise de dépannage',
     'Collègue avant (reprise)',
     'Récidive',
+    'Motif récidive',
+    'Détail récidive',
     'CLP effectué',
     'Résultat',
+    'Motif non terminé',
+    'Détail non terminé',
     'Durée (min)',
     'Compétence 1',
     'Compétence 2',
@@ -1520,8 +1585,12 @@ function exportCSV() {
       d.reprise ? 'Oui' : 'Non',
       d.repriseColleague || '',
       d.recidive ? 'Oui' : 'Non',
+      d.recidiveMotif || '',
+      d.recidiveDetail || '',
       d.clp ? 'Oui' : 'Non',
       d.result,
+      d.nonTermineMotif || '',
+      d.nonTermineDetail || '',
       d.duration || '',
       skills[0] || '',
       skills[1] || '',
