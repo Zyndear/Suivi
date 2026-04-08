@@ -728,7 +728,7 @@
             <option value="Autre">Autre</option>
           </select>
         </div>
-        <button class="btn btn-ghost" onclick="exportCSV()" style="margin-left:auto">⬇ Export CSV</button>
+        <button class="btn btn-ghost" onclick="exportExcel()" style="margin-left:auto">⬇ Export Excel</button>
       </div>
     </div>
     <div class="card">
@@ -1341,7 +1341,10 @@ function renderHistory() {
             <td><span class="badge badge-info">${d.cat}</span></td>
             <td>${resultBadge(d.result)}</td>
             <td style="color:var(--muted)">${d.duration ? d.duration+'min' : '—'}</td>
-            <td><button class="btn btn-danger" onclick="deleteItem(${d.id})" style="padding:4px 10px;font-size:10px">✕</button></td>
+            <td style="white-space:nowrap;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              ${(d.result === 'Partiel' || d.result === 'En cours') ? `<button class="btn btn-ghost" onclick="cloturerIntervention(${d.id})" style="padding:4px 10px;font-size:10px;color:var(--success);border-color:var(--success)">✅ Clôturer</button>` : ''}
+              <button class="btn btn-danger" onclick="deleteItem(${d.id})" style="padding:4px 10px;font-size:10px">✕</button>
+            </td>
           </tr>
         `).join('')}
       </tbody>
@@ -1388,7 +1391,10 @@ function renderHistory() {
           </div>
           <div class="hist-card-footer">
             <span style="font-size:11px;color:var(--muted)">${d.duration ? '⏱ '+d.duration+'min' : ''}</span>
-            <button class="btn btn-danger" onclick="deleteItem(${d.id})" style="padding:8px 16px;font-size:12px">Supprimer</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              ${(d.result === 'Partiel' || d.result === 'En cours') ? `<button class="btn btn-ghost" onclick="cloturerIntervention(${d.id})" style="padding:8px 14px;font-size:12px;color:var(--success);border-color:var(--success)">✅ Clôturer</button>` : ''}
+              <button class="btn btn-danger" onclick="deleteItem(${d.id})" style="padding:8px 16px;font-size:12px">Supprimer</button>
+            </div>
           </div>
         </div>
       `).join('');
@@ -1547,65 +1553,101 @@ function renderEntretien() {
   `;
 }
 
-// ---- EXPORT CSV ----
-function exportCSV() {
+// ---- CLÔTURER UNE INTERVENTION ----
+function cloturerIntervention(id) {
+  const data = getData();
+  const item = data.find(d => d.id === id);
+  if (!item) return;
+
+  // Petit formulaire de clôture inline
+  const motif = prompt(
+    '✅ Clôturer l\'intervention\n\n' +
+    '"' + item.title + '"\n\n' +
+    'Résolution finale (facultatif) :'
+  );
+  if (motif === null) return; // annulé
+
+  item.result = 'Réussi';
+  item.nonTermineMotif = '';
+  item.nonTermineDetail = '';
+  item.clotureLe = new Date().toISOString().split('T')[0];
+  item.clotureNote = motif.trim();
+
+  saveData(data);
+  renderHistory();
+  renderDashboard();
+}
+
+// ---- EXPORT EXCEL (SheetJS) ----
+function exportExcel() {
   const data = filterData();
   if (!data.length) { alert('Aucune donnée à exporter.'); return; }
-  const headers = [
-    'Date',
-    'Numéro de train',
-    'Titre',
-    'Catégorie',
-    'Collègue présent',
-    'Reprise de dépannage',
-    'Collègue avant (reprise)',
-    'Récidive',
-    'Motif récidive',
-    'Détail récidive',
-    'CLP effectué',
-    'Résultat',
-    'Motif non terminé',
-    'Détail non terminé',
-    'Durée (min)',
-    'Compétence 1',
-    'Compétence 2',
-    'Compétence 3',
-    'Compétences supplémentaires',
-    'Description',
-    'Impact'
-  ];
+
+  // Chargement dynamique de SheetJS
+  if (!window.XLSX) {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = () => _doExportExcel(data);
+    document.head.appendChild(s);
+  } else {
+    _doExportExcel(data);
+  }
+}
+
+function _doExportExcel(data) {
   const rows = data.map(d => {
     const skills = d.skills || [];
-    return [
-      d.date,
-      d.train || '',
-      d.title,
-      d.cat,
-      d.colleague || '',
-      d.reprise ? 'Oui' : 'Non',
-      d.repriseColleague || '',
-      d.recidive ? 'Oui' : 'Non',
-      d.recidiveMotif || '',
-      d.recidiveDetail || '',
-      d.clp ? 'Oui' : 'Non',
-      d.result,
-      d.nonTermineMotif || '',
-      d.nonTermineDetail || '',
-      d.duration || '',
-      skills[0] || '',
-      skills[1] || '',
-      skills[2] || '',
-      skills.slice(3).join(' | '),
-      d.desc || '',
-      d.impact || ''
-    ].map(v => `"${String(v).replace(/"/g,'""')}"`);
+    return {
+      'Date':                    d.date,
+      'Numéro de train':         d.train || '',
+      'Titre':                   d.title,
+      'Catégorie':               d.cat,
+      'Collègue présent':        d.colleague || '',
+      'Reprise de dépannage':    d.reprise ? 'Oui' : 'Non',
+      'Collègue avant (reprise)':d.repriseColleague || '',
+      'Récidive':                d.recidive ? 'Oui' : 'Non',
+      'Motif récidive':          d.recidiveMotif || '',
+      'Détail récidive':         d.recidiveDetail || '',
+      'CLP effectué':            d.clp ? 'Oui' : 'Non',
+      'Résultat':                d.result,
+      'Clôturée le':             d.clotureLe || '',
+      'Note de clôture':         d.clotureNote || '',
+      'Motif non terminé':       d.nonTermineMotif || '',
+      'Détail non terminé':      d.nonTermineDetail || '',
+      'Durée (min)':             d.duration || '',
+      'Compétence 1':            skills[0] || '',
+      'Compétence 2':            skills[1] || '',
+      'Compétence 3':            skills[2] || '',
+      'Compétences supp.':       skills.slice(3).join(', '),
+      'Description':             d.desc || '',
+      'Impact':                  d.impact || '',
+    };
   });
-  const csv = [headers.map(h=>`"${h}"`), ...rows].map(r=>r.join(',')).join('\n');
-  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'interventions_' + new Date().toISOString().split('T')[0] + '.csv';
-  a.click();
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+
+  // Largeur des colonnes automatique
+  const colWidths = Object.keys(rows[0] || {}).map(k => ({
+    wch: Math.max(k.length, ...rows.map(r => String(r[k] || '').length), 10)
+  }));
+  ws['!cols'] = colWidths;
+
+  // Style en-têtes (fond vert, gras)
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let C = range.s.c; C <= range.e.c; C++) {
+    const cell = ws[XLSX.utils.encode_cell({ r: 0, c: C })];
+    if (cell) {
+      cell.s = {
+        font: { bold: true, color: { rgb: '000000' } },
+        fill: { fgColor: { rgb: '00E5A0' } },
+        alignment: { horizontal: 'center' }
+      };
+    }
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Interventions');
+  XLSX.writeFile(wb, 'interventions_' + new Date().toISOString().split('T')[0] + '.xlsx');
 }
 
 // ---- TD DATA ----
