@@ -1139,6 +1139,9 @@ function renderDashboard() {
   const clpObjectif = 30;
   const clpPct = Math.min(Math.round((clpTotal/clpObjectif)*100), 100);
 
+  const reprises = data.filter(d=>d.reprise).length;
+  const txRepriseDash = total ? Math.round((reprises/total)*100) : 0;
+
   // KPI
   const kpis = [
     { label: 'Total interventions', val: total, sub: 'depuis le début', color: 'var(--accent3)' },
@@ -1146,8 +1149,8 @@ function renderDashboard() {
     { label: 'Taux réussite', val: txReussite + '%', sub: 'succès complets', color: 'var(--accent)' },
     { label: 'Temps total', val: totalMin >= 60 ? Math.round(totalMin/60) + 'h' : totalMin + 'min', sub: 'investi', color: 'var(--accent2)' },
     { label: 'CLP ' + currentYear, val: clpTotal + ' / ' + clpObjectif, sub: clpPct + '% de l\'objectif annuel', color: clpPct >= 100 ? 'var(--success)' : clpPct >= 60 ? 'var(--warn)' : 'var(--danger)' },
-    { label: 'Reprises', val: data.filter(d=>d.reprise).length, sub: 'dépannages repris', color: 'var(--accent2)' },
-    { label: 'Récidives', val: data.filter(d=>d.recidive).length, sub: 'pannes réapparues', color: 'var(--danger)' },
+    { label: 'Reprises', val: reprises, sub: txRepriseDash + '% des interventions', color: 'var(--accent2)' },
+    { label: 'Récidives', val: data.filter(d=>d.recidive).length, sub: total ? Math.round((data.filter(d=>d.recidive).length/total)*100) + '% des interventions' : '—', color: 'var(--danger)' },
     { label: 'En cours', val: enCours, sub: 'à finaliser', color: 'var(--warn)' },
   ];
   document.getElementById('kpiRow').innerHTML = kpis.map(k => `
