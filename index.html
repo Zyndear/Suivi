@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -6,6 +7,7 @@
 <title>Mes Interventions</title>
 
 <!-- PWA -->
+
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00e5a0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -29,426 +31,430 @@
     font-style: normal;
   }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg: #0b0f1a;
-    --surface: #111827;
-    --surface2: #1a2235;
-    --border: #1f2d45;
-    --accent: #00e5a0;
-    --accent2: #ff6b35;
-    --accent3: #7c6fff;
-    --text: #e8f0fe;
-    --muted: #6b7fa3;
-    --success: #00e5a0;
-    --danger: #ff4d6a;
-    --warn: #ffc107;
-  }
+:root {
+–bg: #0b0f1a;
+–surface: #111827;
+–surface2: #1a2235;
+–border: #1f2d45;
+–accent: #00e5a0;
+–accent2: #ff6b35;
+–accent3: #7c6fff;
+–text: #e8f0fe;
+–muted: #6b7fa3;
+–success: #00e5a0;
+–danger: #ff4d6a;
+–warn: #ffc107;
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'OpenDyslexic', 'Arial', sans-serif;
-    font-size: 15px;
-    line-height: 1.8;
-    letter-spacing: 0.04em;
-    word-spacing: 0.1em;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘OpenDyslexic’, ‘Arial’, sans-serif;
+font-size: 15px;
+line-height: 1.8;
+letter-spacing: 0.04em;
+word-spacing: 0.1em;
+min-height: 100vh;
+overflow-x: hidden;
+}
 
-  /* ---- GRID BG ---- */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,229,160,.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,229,160,.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
+/* –– GRID BG –– */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image:
+linear-gradient(rgba(0,229,160,.03) 1px, transparent 1px),
+linear-gradient(90deg, rgba(0,229,160,.03) 1px, transparent 1px);
+background-size: 40px 40px;
+pointer-events: none;
+z-index: 0;
+}
 
-  .app { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
+.app { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
 
-  /* ---- HEADER ---- */
-  header {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 20px; margin-bottom: 32px;
-  }
-  .logo { display: flex; flex-direction: column; gap: 2px; }
-  .logo-tag { font-size: 10px; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; }
-  .logo-title {
-    font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
-    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    line-height: 1;
-  }
-  .date-pill {
-    background: var(--surface2); border: 1px solid var(--border);
-    padding: 6px 14px; border-radius: 20px; font-size: 11px; color: var(--muted);
-  }
+/* –– HEADER –– */
+header {
+display: flex; align-items: flex-end; justify-content: space-between;
+border-bottom: 1px solid var(–border);
+padding-bottom: 20px; margin-bottom: 32px;
+}
+.logo { display: flex; flex-direction: column; gap: 2px; }
+.logo-tag { font-size: 10px; color: var(–accent); letter-spacing: 4px; text-transform: uppercase; }
+.logo-title {
+font-family: ‘Syne’, sans-serif; font-size: 28px; font-weight: 800;
+background: linear-gradient(135deg, #fff 0%, var(–accent) 100%);
+-webkit-background-clip: text; -webkit-text-fill-color: transparent;
+line-height: 1;
+}
+.date-pill {
+background: var(–surface2); border: 1px solid var(–border);
+padding: 6px 14px; border-radius: 20px; font-size: 11px; color: var(–muted);
+}
 
-  /* ---- NAV ---- */
-  nav { display: flex; gap: 4px; margin-bottom: 28px; flex-wrap: wrap; }
-  .tab {
-    padding: 8px 18px; border-radius: 8px; border: 1px solid var(--border);
-    background: transparent; color: var(--muted); font-family: 'OpenDyslexic', 'Arial', sans-serif;
-    font-size: 12px; cursor: pointer; transition: all .2s; letter-spacing: 1px;
-  }
-  .tab:hover { color: var(--text); border-color: var(--accent); }
-  .tab.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 500; }
+/* –– NAV –– */
+nav { display: flex; gap: 4px; margin-bottom: 28px; flex-wrap: wrap; }
+.tab {
+padding: 8px 18px; border-radius: 8px; border: 1px solid var(–border);
+background: transparent; color: var(–muted); font-family: ‘OpenDyslexic’, ‘Arial’, sans-serif;
+font-size: 12px; cursor: pointer; transition: all .2s; letter-spacing: 1px;
+}
+.tab:hover { color: var(–text); border-color: var(–accent); }
+.tab.active { background: var(–accent); color: #000; border-color: var(–accent); font-weight: 500; }
 
-  /* ---- VIEWS ---- */
-  .view { display: none; }
-  .view.active { display: block; animation: fadeIn .3s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+/* –– VIEWS –– */
+.view { display: none; }
+.view.active { display: block; animation: fadeIn .3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* ---- KPI ROW ---- */
-  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
-  .kpi {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 18px 16px;
-    position: relative; overflow: hidden;
-    transition: border-color .2s;
-  }
-  .kpi:hover { border-color: var(--accent); }
-  .kpi-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
-  .kpi-val {
-    font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800;
-    line-height: 1;
-  }
-  .kpi-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
-  .kpi-accent { position: absolute; top: 0; right: 0; width: 4px; height: 100%; }
+/* –– KPI ROW –– */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.kpi {
+background: var(–surface); border: 1px solid var(–border);
+border-radius: 12px; padding: 18px 16px;
+position: relative; overflow: hidden;
+transition: border-color .2s;
+}
+.kpi:hover { border-color: var(–accent); }
+.kpi-label { font-size: 10px; color: var(–muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+.kpi-val {
+font-family: ‘Syne’, sans-serif; font-size: 32px; font-weight: 800;
+line-height: 1;
+}
+.kpi-sub { font-size: 10px; color: var(–muted); margin-top: 4px; }
+.kpi-accent { position: absolute; top: 0; right: 0; width: 4px; height: 100%; }
 
-  /* ---- FORM ---- */
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 24px; margin-bottom: 20px;
-  }
-  .card-title {
-    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase; color: var(--accent);
-    margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
-  }
-  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+/* –– FORM –– */
+.card {
+background: var(–surface); border: 1px solid var(–border);
+border-radius: 14px; padding: 24px; margin-bottom: 20px;
+}
+.card-title {
+font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700;
+letter-spacing: 2px; text-transform: uppercase; color: var(–accent);
+margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+}
+.card-title::after { content: ‘’; flex: 1; height: 1px; background: var(–border); }
 
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-full { grid-column: 1 / -1; }
-  label { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 7px; line-height: 1.6; }
-  input, select, textarea {
-    width: 100%; background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 11px 14px; color: var(--text);
-    font-family: 'OpenDyslexic', 'Arial', sans-serif; font-size: 14px;
-    line-height: 1.7; letter-spacing: 0.03em;
-    transition: border-color .2s; outline: none;
-  }
-  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
-  textarea { resize: vertical; min-height: 80px; }
-  select option { background: var(--surface2); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-full { grid-column: 1 / -1; }
+label { font-size: 11px; color: var(–muted); letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 7px; line-height: 1.6; }
+input, select, textarea {
+width: 100%; background: var(–surface2); border: 1px solid var(–border);
+border-radius: 8px; padding: 11px 14px; color: var(–text);
+font-family: ‘OpenDyslexic’, ‘Arial’, sans-serif; font-size: 14px;
+line-height: 1.7; letter-spacing: 0.03em;
+transition: border-color .2s; outline: none;
+}
+input:focus, select:focus, textarea:focus { border-color: var(–accent); }
+textarea { resize: vertical; min-height: 80px; }
+select option { background: var(–surface2); }
 
-  .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-  .btn {
-    padding: 11px 22px; border-radius: 8px; border: none; cursor: pointer;
-    font-family: 'OpenDyslexic', 'Arial', sans-serif; font-size: 13px; letter-spacing: 0.5px;
-    font-weight: 700; transition: all .2s;
-  }
-  .btn-primary { background: var(--accent); color: #000; }
-  .btn-primary:hover { background: #00ffb3; transform: translateY(-1px); }
-  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
-  .btn-ghost:hover { border-color: var(--text); color: var(--text); }
-  .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
-  .btn-danger:hover { background: var(--danger); color: #fff; }
+.btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+.btn {
+padding: 11px 22px; border-radius: 8px; border: none; cursor: pointer;
+font-family: ‘OpenDyslexic’, ‘Arial’, sans-serif; font-size: 13px; letter-spacing: 0.5px;
+font-weight: 700; transition: all .2s;
+}
+.btn-primary { background: var(–accent); color: #000; }
+.btn-primary:hover { background: #00ffb3; transform: translateY(-1px); }
+.btn-ghost { background: transparent; color: var(–muted); border: 1px solid var(–border); }
+.btn-ghost:hover { border-color: var(–text); color: var(–text); }
+.btn-danger { background: transparent; color: var(–danger); border: 1px solid var(–danger); }
+.btn-danger:hover { background: var(–danger); color: #fff; }
 
-  /* ---- RESULT BADGE ---- */
-  .badge {
-    display: inline-block; padding: 4px 11px; border-radius: 20px;
-    font-size: 11px; letter-spacing: 0.3px; font-weight: 700;
-  }
-  .badge-success { background: rgba(0,229,160,.15); color: var(--success); border: 1px solid rgba(0,229,160,.3); }
-  .badge-danger { background: rgba(255,77,106,.15); color: var(--danger); border: 1px solid rgba(255,77,106,.3); }
-  .badge-warn { background: rgba(255,193,7,.15); color: var(--warn); border: 1px solid rgba(255,193,7,.3); }
-  .badge-info { background: rgba(124,111,255,.15); color: var(--accent3); border: 1px solid rgba(124,111,255,.3); }
+/* –– RESULT BADGE –– */
+.badge {
+display: inline-block; padding: 4px 11px; border-radius: 20px;
+font-size: 11px; letter-spacing: 0.3px; font-weight: 700;
+}
+.badge-success { background: rgba(0,229,160,.15); color: var(–success); border: 1px solid rgba(0,229,160,.3); }
+.badge-danger { background: rgba(255,77,106,.15); color: var(–danger); border: 1px solid rgba(255,77,106,.3); }
+.badge-warn { background: rgba(255,193,7,.15); color: var(–warn); border: 1px solid rgba(255,193,7,.3); }
+.badge-info { background: rgba(124,111,255,.15); color: var(–accent3); border: 1px solid rgba(124,111,255,.3); }
 
-  /* ---- TABLE ---- */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.7; }
-  th {
-    text-align: left; padding: 10px 14px;
-    font-size: 11px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-  }
-  td { padding: 13px 14px; border-bottom: 1px solid rgba(31,45,69,.5); vertical-align: top; line-height: 1.7; }
-  tr:hover td { background: rgba(0,229,160,.03); }
-  .td-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 13px; }
-  .td-sub { color: var(--muted); font-size: 11px; margin-top: 2px; }
+/* –– TABLE –– */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.7; }
+th {
+text-align: left; padding: 10px 14px;
+font-size: 11px; color: var(–muted); letter-spacing: 0.5px; text-transform: uppercase;
+border-bottom: 1px solid var(–border);
+}
+td { padding: 13px 14px; border-bottom: 1px solid rgba(31,45,69,.5); vertical-align: top; line-height: 1.7; }
+tr:hover td { background: rgba(0,229,160,.03); }
+.td-title { font-family: ‘Syne’, sans-serif; font-weight: 600; font-size: 13px; }
+.td-sub { color: var(–muted); font-size: 11px; margin-top: 2px; }
 
-  /* ---- CHART BARS ---- */
-  .chart-row { display: flex; flex-direction: column; gap: 10px; }
-  .bar-item { display: flex; align-items: center; gap: 12px; }
-  .bar-label { width: 120px; font-size: 11px; color: var(--muted); flex-shrink: 0; }
-  .bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(.4,0,.2,1); }
-  .bar-val { width: 40px; text-align: right; font-size: 11px; color: var(--text); flex-shrink: 0; }
+/* –– CHART BARS –– */
+.chart-row { display: flex; flex-direction: column; gap: 10px; }
+.bar-item { display: flex; align-items: center; gap: 12px; }
+.bar-label { width: 120px; font-size: 11px; color: var(–muted); flex-shrink: 0; }
+.bar-track { flex: 1; height: 8px; background: var(–border); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.bar-val { width: 40px; text-align: right; font-size: 11px; color: var(–text); flex-shrink: 0; }
 
-  /* ---- ENTRETIEN ---- */
-  .insight-block {
-    background: var(--surface2); border-left: 3px solid var(--accent);
-    border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 14px;
-  }
-  .insight-label { font-size: 10px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-  .insight-text { font-size: 14px; line-height: 1.9; color: var(--text); }
+/* –– ENTRETIEN –– */
+.insight-block {
+background: var(–surface2); border-left: 3px solid var(–accent);
+border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 14px;
+}
+.insight-label { font-size: 10px; color: var(–accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+.insight-text { font-size: 14px; line-height: 1.9; color: var(–text); }
 
-  .stat-highlight {
-    display: inline-block;
-    background: linear-gradient(135deg, rgba(0,229,160,.2), rgba(0,229,160,.05));
-    border: 1px solid rgba(0,229,160,.3); border-radius: 8px;
-    padding: 2px 10px; color: var(--accent); font-weight: 500;
-  }
+.stat-highlight {
+display: inline-block;
+background: linear-gradient(135deg, rgba(0,229,160,.2), rgba(0,229,160,.05));
+border: 1px solid rgba(0,229,160,.3); border-radius: 8px;
+padding: 2px 10px; color: var(–accent); font-weight: 500;
+}
 
-  /* ---- EMPTY ---- */
-  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
-  .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .5; }
-  .empty-text { font-size: 13px; }
+/* –– EMPTY –– */
+.empty { text-align: center; padding: 60px 20px; color: var(–muted); }
+.empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .5; }
+.empty-text { font-size: 13px; }
 
-  /* ---- PROGRESS RING ---- */
-  .ring-wrap { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; justify-content: center; padding: 20px; }
-  .ring-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .ring-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-  svg.ring { transform: rotate(-90deg); }
-  circle.track { fill: none; stroke: var(--border); stroke-width: 8; }
-  circle.prog { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); }
-  .ring-center { position: relative; }
-  .ring-num {
-    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
-  }
+/* –– PROGRESS RING –– */
+.ring-wrap { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; justify-content: center; padding: 20px; }
+.ring-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ring-label { font-size: 10px; color: var(–muted); letter-spacing: 1px; text-transform: uppercase; }
+svg.ring { transform: rotate(-90deg); }
+circle.track { fill: none; stroke: var(–border); stroke-width: 8; }
+circle.prog { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); }
+.ring-center { position: relative; }
+.ring-num {
+position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+font-family: ‘Syne’, sans-serif; font-size: 20px; font-weight: 800;
+}
 
-  /* ---- SYNC BAR ---- */
-  .sync-bar {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px 16px; margin-bottom: 20px;
-    font-size: 12px;
-  }
-  .sync-bar-label { color: var(--muted); letter-spacing: 1px; font-size: 10px; text-transform: uppercase; margin-right: 4px; }
-  .sync-status { font-size: 11px; color: var(--muted); margin-left: auto; }
-  .sync-status.ok { color: var(--success); }
+/* –– SYNC BAR –– */
+.sync-bar {
+display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+background: var(–surface); border: 1px solid var(–border);
+border-radius: 10px; padding: 10px 16px; margin-bottom: 20px;
+font-size: 12px;
+}
+.sync-bar-label { color: var(–muted); letter-spacing: 1px; font-size: 10px; text-transform: uppercase; margin-right: 4px; }
+.sync-status { font-size: 11px; color: var(–muted); margin-left: auto; }
+.sync-status.ok { color: var(–success); }
 
-  /* ---- COLLEAGUE SELECT ---- */
-  .colleague-select-wrap { position: relative; }
-  .colleague-avatar {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 22px; height: 22px; border-radius: 50%;
-    background: var(--accent3); color: #fff; font-size: 9px; font-weight: 700;
-    flex-shrink: 0;
-  }
-  .td-card {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 16px 18px; margin-bottom: 12px;
-    transition: border-color .2s; cursor: pointer;
-  }
-  .td-card:hover { border-color: var(--accent3); }
-  .td-card-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-  .td-id { font-size: 10px; color: var(--muted); font-family: 'OpenDyslexic', 'Arial', sans-serif; }
-  .td-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; flex: 1; }
-  .td-card-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .td-card-desc { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
-  .td-card-footer { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
-  .td-deadline { font-size: 10px; color: var(--muted); }
-  .td-deadline.overdue { color: var(--danger); }
-  .td-deadline.soon { color: var(--warn); }
+/* –– COLLEAGUE SELECT –– */
+.colleague-select-wrap { position: relative; }
+.colleague-avatar {
+display: inline-flex; align-items: center; justify-content: center;
+width: 22px; height: 22px; border-radius: 50%;
+background: var(–accent3); color: #fff; font-size: 9px; font-weight: 700;
+flex-shrink: 0;
+}
+.td-card {
+background: var(–surface2); border: 1px solid var(–border);
+border-radius: 10px; padding: 16px 18px; margin-bottom: 12px;
+transition: border-color .2s; cursor: pointer;
+}
+.td-card:hover { border-color: var(–accent3); }
+.td-card-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.td-id { font-size: 10px; color: var(–muted); font-family: ‘OpenDyslexic’, ‘Arial’, sans-serif; }
+.td-card-title { font-family: ‘Syne’, sans-serif; font-weight: 700; font-size: 14px; flex: 1; }
+.td-card-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.td-card-desc { font-size: 12px; color: var(–muted); margin-bottom: 8px; line-height: 1.5; }
+.td-card-footer { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.td-deadline { font-size: 10px; color: var(–muted); }
+.td-deadline.overdue { color: var(–danger); }
+.td-deadline.soon { color: var(–warn); }
 
-  /* priority colors */
-  .prio-Critique { background: rgba(255,77,106,.15); color: var(--danger); border: 1px solid rgba(255,77,106,.3); }
-  .prio-Haute { background: rgba(255,107,53,.15); color: var(--accent2); border: 1px solid rgba(255,107,53,.3); }
-  .prio-Moyenne { background: rgba(255,193,7,.15); color: var(--warn); border: 1px solid rgba(255,193,7,.3); }
-  .prio-Basse { background: rgba(0,229,160,.15); color: var(--success); border: 1px solid rgba(0,229,160,.3); }
+/* priority colors */
+.prio-Critique { background: rgba(255,77,106,.15); color: var(–danger); border: 1px solid rgba(255,77,106,.3); }
+.prio-Haute { background: rgba(255,107,53,.15); color: var(–accent2); border: 1px solid rgba(255,107,53,.3); }
+.prio-Moyenne { background: rgba(255,193,7,.15); color: var(–warn); border: 1px solid rgba(255,193,7,.3); }
+.prio-Basse { background: rgba(0,229,160,.15); color: var(–success); border: 1px solid rgba(0,229,160,.3); }
 
-  /* status colors */
-  .status-Ouvert { background: rgba(124,111,255,.15); color: var(--accent3); border: 1px solid rgba(124,111,255,.3); }
-  .status-En-cours { background: rgba(255,193,7,.15); color: var(--warn); border: 1px solid rgba(255,193,7,.3); }
-  .status-En-attente { background: rgba(107,127,163,.15); color: var(--muted); border: 1px solid rgba(107,127,163,.3); }
-  .status-Résolu { background: rgba(0,229,160,.15); color: var(--success); border: 1px solid rgba(0,229,160,.3); }
-  .status-Fermé { background: rgba(31,45,69,.5); color: var(--muted); border: 1px solid var(--border); }
+/* status colors */
+.status-Ouvert { background: rgba(124,111,255,.15); color: var(–accent3); border: 1px solid rgba(124,111,255,.3); }
+.status-En-cours { background: rgba(255,193,7,.15); color: var(–warn); border: 1px solid rgba(255,193,7,.3); }
+.status-En-attente { background: rgba(107,127,163,.15); color: var(–muted); border: 1px solid rgba(107,127,163,.3); }
+.status-Résolu { background: rgba(0,229,160,.15); color: var(–success); border: 1px solid rgba(0,229,160,.3); }
+.status-Fermé { background: rgba(31,45,69,.5); color: var(–muted); border: 1px solid var(–border); }
 
-  /* timeline */
-  .timeline { display: flex; flex-direction: column; gap: 0; margin-top: 12px; }
-  .tl-item { display: flex; gap: 14px; position: relative; }
-  .tl-item:not(:last-child)::before {
-    content: ''; position: absolute; left: 7px; top: 18px;
-    width: 2px; bottom: -8px; background: var(--border);
-  }
-  .tl-dot {
-    width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
-    border: 2px solid var(--accent); background: var(--bg); margin-top: 2px;
-  }
-  .tl-body { flex: 1; padding-bottom: 16px; }
-  .tl-date { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
-  .tl-text { font-size: 13px; line-height: 1.7; }
+/* timeline */
+.timeline { display: flex; flex-direction: column; gap: 0; margin-top: 12px; }
+.tl-item { display: flex; gap: 14px; position: relative; }
+.tl-item:not(:last-child)::before {
+content: ‘’; position: absolute; left: 7px; top: 18px;
+width: 2px; bottom: -8px; background: var(–border);
+}
+.tl-dot {
+width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+border: 2px solid var(–accent); background: var(–bg); margin-top: 2px;
+}
+.tl-body { flex: 1; padding-bottom: 16px; }
+.tl-date { font-size: 11px; color: var(–muted); margin-bottom: 3px; }
+.tl-text { font-size: 13px; line-height: 1.7; }
 
-  /* ==============================
-     MOBILE FIRST — BARRE DU BAS
-     ============================== */
-  nav.desktop-nav { display: flex; gap: 4px; margin-bottom: 28px; flex-wrap: wrap; }
+/* ==============================
+MOBILE FIRST — BARRE DU BAS
+============================== */
+nav.desktop-nav { display: flex; gap: 4px; margin-bottom: 28px; flex-wrap: wrap; }
 
-  .mobile-nav {
-    display: none;
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-    background: var(--surface);
-    border-top: 2px solid var(--border);
-    padding: 0; margin: 0;
-    padding-bottom: env(safe-area-inset-bottom);
-    box-shadow: 0 -4px 24px rgba(0,0,0,.5);
-  }
-  .mobile-nav-inner {
-    display: flex; justify-content: space-around; align-items: center;
-    max-width: 600px; margin: 0 auto;
-    height: 72px;
-  }
-  .mob-tab {
-    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 5px; padding: 8px 4px;
-    background: none; border: none; color: var(--muted);
-    font-family: 'OpenDyslexic', 'Arial', sans-serif;
-    cursor: pointer; transition: color .2s;
-    -webkit-tap-highlight-color: transparent;
-    min-height: 72px; min-width: 56px;
-  }
-  .mob-tab .mob-icon { font-size: 26px; line-height: 1; }
-  .mob-tab .mob-label { font-size: 10px; line-height: 1.2; text-align: center; }
-  .mob-tab.active { color: var(--accent); }
-  .mob-tab.active .mob-icon { filter: drop-shadow(0 0 6px var(--accent)); }
+.mobile-nav {
+display: none;
+position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+background: var(–surface);
+border-top: 2px solid var(–border);
+padding: 0; margin: 0;
+padding-bottom: env(safe-area-inset-bottom);
+box-shadow: 0 -4px 24px rgba(0,0,0,.5);
+}
+.mobile-nav-inner {
+display: flex; justify-content: space-around; align-items: center;
+max-width: 600px; margin: 0 auto;
+height: 72px;
+}
+.mob-tab {
+flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+gap: 5px; padding: 8px 4px;
+background: none; border: none; color: var(–muted);
+font-family: ‘OpenDyslexic’, ‘Arial’, sans-serif;
+cursor: pointer; transition: color .2s;
+-webkit-tap-highlight-color: transparent;
+min-height: 72px; min-width: 56px;
+}
+.mob-tab .mob-icon { font-size: 26px; line-height: 1; }
+.mob-tab .mob-label { font-size: 10px; line-height: 1.2; text-align: center; }
+.mob-tab.active { color: var(–accent); }
+.mob-tab.active .mob-icon { filter: drop-shadow(0 0 6px var(–accent)); }
 
-  .mob-add-btn {
-    position: relative; top: -14px;
-    width: 64px; height: 64px; border-radius: 50%;
-    background: var(--accent); border: none;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; cursor: pointer; box-shadow: 0 4px 24px rgba(0,229,160,.5);
-    font-family: 'OpenDyslexic', 'Arial', sans-serif;
-    font-size: 10px; color: #000; font-weight: 700;
-    -webkit-tap-highlight-color: transparent;
-    transition: transform .15s;
-    flex-shrink: 0;
-  }
-  .mob-add-btn:active { transform: scale(.91); }
-  .mob-add-btn .mob-icon { font-size: 28px; line-height: 1; }
+.mob-add-btn {
+position: relative; top: -14px;
+width: 64px; height: 64px; border-radius: 50%;
+background: var(–accent); border: none;
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+gap: 2px; cursor: pointer; box-shadow: 0 4px 24px rgba(0,229,160,.5);
+font-family: ‘OpenDyslexic’, ‘Arial’, sans-serif;
+font-size: 10px; color: #000; font-weight: 700;
+-webkit-tap-highlight-color: transparent;
+transition: transform .15s;
+flex-shrink: 0;
+}
+.mob-add-btn:active { transform: scale(.91); }
+.mob-add-btn .mob-icon { font-size: 28px; line-height: 1; }
 
-  /* ---- HISTORY CARDS (mobile) ---- */
-  .hist-card {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 12px; padding: 14px; margin-bottom: 12px;
-  }
-  .hist-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
-  .hist-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; flex: 1; line-height: 1.3; }
-  .hist-card-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
-  .hist-card-train { font-size: 12px; color: var(--accent2); font-weight: 700; margin-bottom: 6px; }
-  .hist-card-desc { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
-  .hist-card-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
-  .hist-card-footer { display: flex; justify-content: space-between; align-items: center; }
+/* –– HISTORY CARDS (mobile) –– */
+.hist-card {
+background: var(–surface2); border: 1px solid var(–border);
+border-radius: 12px; padding: 14px; margin-bottom: 12px;
+}
+.hist-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+.hist-card-title { font-family: ‘Syne’, sans-serif; font-weight: 700; font-size: 14px; flex: 1; line-height: 1.3; }
+.hist-card-date { font-size: 11px; color: var(–muted); white-space: nowrap; }
+.hist-card-train { font-size: 12px; color: var(–accent2); font-weight: 700; margin-bottom: 6px; }
+.hist-card-desc { font-size: 12px; color: var(–muted); margin-bottom: 8px; line-height: 1.5; }
+.hist-card-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+.hist-card-footer { display: flex; justify-content: space-between; align-items: center; }
 
-  /* ---- BOTTOM SHEET (modal tickets) ---- */
-  .bottom-sheet-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,.6); z-index: 300;
-  }
-  .bottom-sheet-overlay.open { display: block; }
-  .bottom-sheet {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 301;
-    background: var(--surface); border-radius: 22px 22px 0 0;
-    padding: 0 0 env(safe-area-inset-bottom);
-    max-height: 90vh; overflow-y: auto;
-    transform: translateY(100%);
-    transition: transform .3s cubic-bezier(.4,0,.2,1);
-  }
-  .bottom-sheet.open { transform: translateY(0); }
-  .bottom-sheet-handle {
-    width: 40px; height: 4px; background: var(--border);
-    border-radius: 2px; margin: 14px auto 0;
-  }
-  .bottom-sheet-inner { padding: 16px 18px 32px; }
+/* –– BOTTOM SHEET (modal tickets) –– */
+.bottom-sheet-overlay {
+display: none; position: fixed; inset: 0;
+background: rgba(0,0,0,.6); z-index: 300;
+}
+.bottom-sheet-overlay.open { display: block; }
+.bottom-sheet {
+position: fixed; bottom: 0; left: 0; right: 0; z-index: 301;
+background: var(–surface); border-radius: 22px 22px 0 0;
+padding: 0 0 env(safe-area-inset-bottom);
+max-height: 90vh; overflow-y: auto;
+transform: translateY(100%);
+transition: transform .3s cubic-bezier(.4,0,.2,1);
+}
+.bottom-sheet.open { transform: translateY(0); }
+.bottom-sheet-handle {
+width: 40px; height: 4px; background: var(–border);
+border-radius: 2px; margin: 14px auto 0;
+}
+.bottom-sheet-inner { padding: 16px 18px 32px; }
 
-  @media (max-width: 700px) {
-    html { -webkit-text-size-adjust: 100%; }
-    body { font-size: 16px; }
+@media (max-width: 700px) {
+html { -webkit-text-size-adjust: 100%; }
+body { font-size: 16px; }
 
-    /* Padding app : compte la barre du bas 72px + safe area */
-    .app { padding: 10px 14px 90px; }
+```
+/* Padding app : compte la barre du bas 72px + safe area */
+.app { padding: 10px 14px 90px; }
 
-    /* Header COMPACT : juste une ligne fine */
-    header {
-      flex-direction: row; align-items: center; justify-content: space-between;
-      padding-bottom: 10px; margin-bottom: 14px; gap: 8px;
-    }
-    .logo-tag { display: none; }
-    .logo-title { font-size: 17px; }
-    .date-pill { font-size: 10px; padding: 4px 9px; white-space: nowrap; flex-shrink: 0; }
+/* Header COMPACT : juste une ligne fine */
+header {
+  flex-direction: row; align-items: center; justify-content: space-between;
+  padding-bottom: 10px; margin-bottom: 14px; gap: 8px;
+}
+.logo-tag { display: none; }
+.logo-title { font-size: 17px; }
+.date-pill { font-size: 10px; padding: 4px 9px; white-space: nowrap; flex-shrink: 0; }
 
-    nav.desktop-nav { display: none; }
-    .mobile-nav { display: block; }
+nav.desktop-nav { display: none; }
+.mobile-nav { display: block; }
 
-    .sync-bar { padding: 7px 12px; gap: 6px; }
-    .sync-bar-label { display: none; }
-    .sync-status { font-size: 10px; margin-left: 0; }
+.sync-bar { padding: 7px 12px; gap: 6px; }
+.sync-bar-label { display: none; }
+.sync-status { font-size: 10px; margin-left: 0; }
 
-    .kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .kpi { padding: 12px 10px; border-radius: 10px; }
-    .kpi-val { font-size: 24px; }
-    .kpi-label { font-size: 9px; }
-    .kpi-sub { font-size: 9px; }
+.kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.kpi { padding: 12px 10px; border-radius: 10px; }
+.kpi-val { font-size: 24px; }
+.kpi-label { font-size: 9px; }
+.kpi-sub { font-size: 9px; }
 
-    .card { padding: 14px 12px; border-radius: 12px; margin-bottom: 12px; }
-    .card-title { font-size: 12px; margin-bottom: 12px; }
+.card { padding: 14px 12px; border-radius: 12px; margin-bottom: 12px; }
+.card-title { font-size: 12px; margin-bottom: 12px; }
 
-    .form-grid { grid-template-columns: 1fr; gap: 12px; }
-    .form-full { grid-column: 1; }
-    label { font-size: 12px; margin-bottom: 6px; }
-    input, select, textarea {
-      font-size: 16px;
-      padding: 14px;
-      border-radius: 10px;
-      min-height: 52px;
-    }
-    textarea { min-height: 90px; }
+.form-grid { grid-template-columns: 1fr; gap: 12px; }
+.form-full { grid-column: 1; }
+label { font-size: 12px; margin-bottom: 6px; }
+input, select, textarea {
+  font-size: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  min-height: 52px;
+}
+textarea { min-height: 90px; }
 
-    .btn-row { flex-direction: column; gap: 10px; margin-top: 16px; }
-    .btn-row .btn { width: 100%; padding: 16px; font-size: 15px; border-radius: 12px; text-align: center; }
+.btn-row { flex-direction: column; gap: 10px; margin-top: 16px; }
+.btn-row .btn { width: 100%; padding: 16px; font-size: 15px; border-radius: 12px; text-align: center; }
 
-    /* Historique : cache le tableau, montre les cartes */
-    .history-table-desktop { display: none !important; }
-    .history-cards-mobile { display: block !important; }
+/* Historique : cache le tableau, montre les cartes */
+.history-table-desktop { display: none !important; }
+.history-cards-mobile { display: block !important; }
 
-    .td-card { padding: 14px; border-radius: 10px; }
-    .td-card-header { flex-wrap: wrap; gap: 6px; }
+.td-card { padding: 14px; border-radius: 10px; }
+.td-card-header { flex-wrap: wrap; gap: 6px; }
 
-    .bar-label { width: 80px; font-size: 10px; }
-    .bar-val { font-size: 10px; }
-    .ring-wrap { gap: 12px; padding: 8px; }
+.bar-label { width: 80px; font-size: 10px; }
+.bar-val { font-size: 10px; }
+.ring-wrap { gap: 12px; padding: 8px; }
 
-    .insight-block { padding: 12px; }
-    .insight-text { font-size: 13px; }
+.insight-block { padding: 12px; }
+.insight-text { font-size: 13px; }
 
-    #chartsGrid { grid-template-columns: 1fr !important; }
-    #repriseColleagueWrap { padding: 12px; }
+#chartsGrid { grid-template-columns: 1fr !important; }
+#repriseColleagueWrap { padding: 12px; }
 
-    /* Filtres historique en colonne */
-    #view-history .card:first-child > div { flex-direction: column; align-items: stretch; gap: 10px; }
-    #view-history select { min-height: 48px; font-size: 16px; }
+/* Filtres historique en colonne */
+#view-history .card:first-child > div { flex-direction: column; align-items: stretch; gap: 10px; }
+#view-history select { min-height: 48px; font-size: 16px; }
 
-    /* Cache l'ancien modal, montre le bottom sheet */
-    #tdModal { display: none !important; }
+/* Cache l'ancien modal, montre le bottom sheet */
+#tdModal { display: none !important; }
 
-    .empty { padding: 36px 14px; }
-    .empty-icon { font-size: 36px; }
+.empty { padding: 36px 14px; }
+.empty-icon { font-size: 36px; }
 
-    #gAuthArea { gap: 6px; flex-wrap: wrap; }
-    #gAuthArea .btn { padding: 10px 12px; font-size: 12px; }
-  }
+#gAuthArea { gap: 6px; flex-wrap: wrap; }
+#gAuthArea .btn { padding: 10px 12px; font-size: 12px; }
+```
+
+}
 </style>
+
 </head>
 <body>
 <div class="app">
@@ -472,6 +478,7 @@
   </nav>
 
   <!-- BARRE MOBILE BAS -->
+
   <nav class="mobile-nav">
     <div class="mobile-nav-inner">
       <button class="mob-tab active" id="mob-dashboard" onclick="showTab('dashboard', this)">
@@ -498,6 +505,7 @@
   </nav>
 
   <!-- SYNC BAR Google -->
+
   <div class="sync-bar" id="syncBar">
     <span class="sync-bar-label">☁️ Google Drive</span>
     <div id="gAuthArea" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -513,38 +521,47 @@
   </div>
 
   <!-- DASHBOARD -->
+
   <div class="view active" id="view-dashboard">
     <div class="kpi-row" id="kpiRow"></div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap;" id="chartsGrid">
-      <div class="card" style="grid-column:1/-1">
-        <div class="card-title">✅ Objectif CLP</div>
-        <div id="clpProgress"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">⏱ Heures SET</div>
-        <div id="setProgress"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">💡 Innovations & Précurseurs</div>
-        <div id="innovProgress"></div>
-      </div>
-      <div class="card" style="grid-column:1/-1">
-        <div class="card-title">Taux de réussite — Visuels</div>
-        <div class="ring-wrap" id="ringWrap"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Par catégorie</div>
-        <div class="chart-row" id="catChart"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Ce mois-ci</div>
-        <div id="monthStats"></div>
-      </div>
-    </div>
+```
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap;" id="chartsGrid">
+  <div class="card" style="grid-column:1/-1">
+    <div class="card-title">✅ Objectif CLP</div>
+    <div id="clpProgress"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">⏱ Heures SET</div>
+    <div id="setProgress"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💡 Innovations & Précurseurs</div>
+    <div id="innovProgress"></div>
+  </div>
+  <div class="card" style="grid-column:1/-1">
+    <div class="card-title">Taux de réussite — Visuels</div>
+    <div class="ring-wrap" id="ringWrap"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Par catégorie</div>
+    <div class="chart-row" id="catChart"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🚇 Par série de train</div>
+    <div class="chart-row" id="serieChart"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Ce mois-ci</div>
+    <div id="monthStats"></div>
+  </div>
+</div>
+```
+
   </div>
 
   <!-- ADD -->
+
   <div class="view" id="view-add">
     <div class="card">
       <div class="card-title">Nouvelle intervention</div>
@@ -570,7 +587,17 @@
         </div>
         <div>
           <label>🚆 Numéro de train</label>
-          <input type="text" id="f-train" placeholder="Ex : TER 830042, TGV 6201...">
+          <input type="text" id="f-train" placeholder="Ex : 830042, 6201...">
+        </div>
+        <div>
+          <label>🚇 Série de train</label>
+          <select id="f-serie" style="width:100%">
+            <option value="">— Non renseigné —</option>
+            <option value="AGC">AGC</option>
+            <option value="R2N">R2N</option>
+            <option value="ZTER">ZTER</option>
+            <option value="Autre">Autre</option>
+          </select>
         </div>
         <div>
           <label>👥 Collègue(s) présent(s)</label>
@@ -693,6 +720,7 @@
   </div>
 
   <!-- HISTORY -->
+
   <div class="view" id="view-history">
     <div class="card">
       <div class="card-title">Filtres</div>
@@ -738,244 +766,256 @@
   </div>
 
   <!-- TICKETS / TD -->
+
   <div class="view" id="view-td">
 
-    <!-- KPI TD -->
-    <div class="kpi-row" id="tdKpiRow"></div>
+```
+<!-- KPI TD -->
+<div class="kpi-row" id="tdKpiRow"></div>
 
-    <!-- Formulaire création TD -->
-    <div class="card" id="tdFormCard">
-      <div class="card-title">🎫 Nouveau ticket / TD</div>
-      <div class="form-grid">
-        <div>
-          <label>Date d'ouverture</label>
-          <input type="date" id="td-date">
-        </div>
-        <div>
-          <label>Priorité</label>
-          <select id="td-priority">
-            <option value="Critique">🔴 Critique</option>
-            <option value="Haute">🟠 Haute</option>
-            <option value="Moyenne" selected>🟡 Moyenne</option>
-            <option value="Basse">🟢 Basse</option>
-          </select>
-        </div>
-        <div class="form-full">
-          <label>Titre du ticket</label>
-          <input type="text" id="td-title" placeholder="Ex : Panne serveur prod, Demande installation logiciel...">
-        </div>
-        <div>
-          <label>Type</label>
-          <select id="td-type">
-            <option value="Incident">Incident</option>
-            <option value="Demande">Demande</option>
-            <option value="Changement">Changement</option>
-            <option value="Problème">Problème</option>
-            <option value="Tâche">Tâche</option>
-          </select>
-        </div>
-        <div>
-          <label>Demandeur / Info</label>
-          <input type="text" id="td-requester" placeholder="Nom, service, contexte...">
-        </div>
-        <div class="form-full">
-          <label>Description du problème / demande</label>
-          <textarea id="td-desc" placeholder="Contexte, symptômes, informations utiles..."></textarea>
-        </div>
-        <div>
-          <label>Statut initial</label>
-          <select id="td-status">
-            <option value="Ouvert">🔵 Ouvert</option>
-            <option value="En cours">🟡 En cours</option>
-            <option value="En attente">⏸ En attente</option>
-          </select>
-        </div>
-        <div>
-          <label>Délai souhaité (date)</label>
-          <input type="date" id="td-deadline">
-        </div>
-        <div class="form-full">
-          <label>Compétences / Domaine technique</label>
-          <input type="text" id="td-skills" placeholder="Ex : réseau, windows, imprimante (séparées par virgules)">
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="saveTD()">Créer le ticket</button>
-        <button class="btn btn-ghost" onclick="clearTDForm()">Effacer</button>
-      </div>
-      <div id="tdFormMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
+<!-- Formulaire création TD -->
+<div class="card" id="tdFormCard">
+  <div class="card-title">🎫 Nouveau ticket / TD</div>
+  <div class="form-grid">
+    <div>
+      <label>Date d'ouverture</label>
+      <input type="date" id="td-date">
     </div>
+    <div>
+      <label>Priorité</label>
+      <select id="td-priority">
+        <option value="Critique">🔴 Critique</option>
+        <option value="Haute">🟠 Haute</option>
+        <option value="Moyenne" selected>🟡 Moyenne</option>
+        <option value="Basse">🟢 Basse</option>
+      </select>
+    </div>
+    <div class="form-full">
+      <label>Titre du ticket</label>
+      <input type="text" id="td-title" placeholder="Ex : Panne serveur prod, Demande installation logiciel...">
+    </div>
+    <div>
+      <label>Type</label>
+      <select id="td-type">
+        <option value="Incident">Incident</option>
+        <option value="Demande">Demande</option>
+        <option value="Changement">Changement</option>
+        <option value="Problème">Problème</option>
+        <option value="Tâche">Tâche</option>
+      </select>
+    </div>
+    <div>
+      <label>Demandeur / Info</label>
+      <input type="text" id="td-requester" placeholder="Nom, service, contexte...">
+    </div>
+    <div class="form-full">
+      <label>Description du problème / demande</label>
+      <textarea id="td-desc" placeholder="Contexte, symptômes, informations utiles..."></textarea>
+    </div>
+    <div>
+      <label>Statut initial</label>
+      <select id="td-status">
+        <option value="Ouvert">🔵 Ouvert</option>
+        <option value="En cours">🟡 En cours</option>
+        <option value="En attente">⏸ En attente</option>
+      </select>
+    </div>
+    <div>
+      <label>Délai souhaité (date)</label>
+      <input type="date" id="td-deadline">
+    </div>
+    <div class="form-full">
+      <label>Compétences / Domaine technique</label>
+      <input type="text" id="td-skills" placeholder="Ex : réseau, windows, imprimante (séparées par virgules)">
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="saveTD()">Créer le ticket</button>
+    <button class="btn btn-ghost" onclick="clearTDForm()">Effacer</button>
+  </div>
+  <div id="tdFormMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
+</div>
 
-    <!-- Filtres + liste -->
-    <div class="card">
-      <div class="card-title">Mes tickets</div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;align-items:flex-end;">
-        <div>
-          <label>Statut</label>
-          <select id="td-filter-status" onchange="renderTD()">
-            <option value="all">Tous</option>
-            <option value="Ouvert">Ouvert</option>
-            <option value="En cours">En cours</option>
-            <option value="En attente">En attente</option>
-            <option value="Résolu">Résolu</option>
-            <option value="Fermé">Fermé</option>
-          </select>
-        </div>
-        <div>
-          <label>Priorité</label>
-          <select id="td-filter-priority" onchange="renderTD()">
-            <option value="all">Toutes</option>
-            <option value="Critique">Critique</option>
-            <option value="Haute">Haute</option>
-            <option value="Moyenne">Moyenne</option>
-            <option value="Basse">Basse</option>
-          </select>
-        </div>
-        <div>
-          <label>Type</label>
-          <select id="td-filter-type" onchange="renderTD()">
-            <option value="all">Tous</option>
-            <option value="Incident">Incident</option>
-            <option value="Demande">Demande</option>
-            <option value="Changement">Changement</option>
-            <option value="Problème">Problème</option>
-            <option value="Tâche">Tâche</option>
-          </select>
-        </div>
-        <button class="btn btn-ghost" onclick="exportTDCSV()" style="margin-left:auto">⬇ Export CSV</button>
-      </div>
-      <div id="tdList"></div>
+<!-- Filtres + liste -->
+<div class="card">
+  <div class="card-title">Mes tickets</div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;align-items:flex-end;">
+    <div>
+      <label>Statut</label>
+      <select id="td-filter-status" onchange="renderTD()">
+        <option value="all">Tous</option>
+        <option value="Ouvert">Ouvert</option>
+        <option value="En cours">En cours</option>
+        <option value="En attente">En attente</option>
+        <option value="Résolu">Résolu</option>
+        <option value="Fermé">Fermé</option>
+      </select>
     </div>
+    <div>
+      <label>Priorité</label>
+      <select id="td-filter-priority" onchange="renderTD()">
+        <option value="all">Toutes</option>
+        <option value="Critique">Critique</option>
+        <option value="Haute">Haute</option>
+        <option value="Moyenne">Moyenne</option>
+        <option value="Basse">Basse</option>
+      </select>
+    </div>
+    <div>
+      <label>Type</label>
+      <select id="td-filter-type" onchange="renderTD()">
+        <option value="all">Tous</option>
+        <option value="Incident">Incident</option>
+        <option value="Demande">Demande</option>
+        <option value="Changement">Changement</option>
+        <option value="Problème">Problème</option>
+        <option value="Tâche">Tâche</option>
+      </select>
+    </div>
+    <button class="btn btn-ghost" onclick="exportTDCSV()" style="margin-left:auto">⬇ Export CSV</button>
+  </div>
+  <div id="tdList"></div>
+</div>
 
-    <!-- Modal suivi ticket (desktop) -->
-    <div id="tdModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;overflow-y:auto;padding:20px;">
-      <div style="max-width:640px;margin:40px auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;">
-        <button onclick="closeTDModal()" style="position:absolute;top:16px;right:16px;background:var(--border);border:none;color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;">✕</button>
-        <div id="tdModalContent"></div>
-      </div>
-    </div>
+<!-- Modal suivi ticket (desktop) -->
+<div id="tdModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;overflow-y:auto;padding:20px;">
+  <div style="max-width:640px;margin:40px auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;">
+    <button onclick="closeTDModal()" style="position:absolute;top:16px;right:16px;background:var(--border);border:none;color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;">✕</button>
+    <div id="tdModalContent"></div>
+  </div>
+</div>
 
-    <!-- Bottom sheet ticket (mobile) -->
-    <div class="bottom-sheet-overlay" id="tdSheetOverlay" onclick="closeTDModal()"></div>
-    <div class="bottom-sheet" id="tdSheet">
-      <div class="bottom-sheet-handle"></div>
-      <div class="bottom-sheet-inner">
-        <button onclick="closeTDModal()" style="position:absolute;top:18px;right:18px;background:var(--border);border:none;color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;">✕</button>
-        <div id="tdSheetContent"></div>
-      </div>
-    </div>
+<!-- Bottom sheet ticket (mobile) -->
+<div class="bottom-sheet-overlay" id="tdSheetOverlay" onclick="closeTDModal()"></div>
+<div class="bottom-sheet" id="tdSheet">
+  <div class="bottom-sheet-handle"></div>
+  <div class="bottom-sheet-inner">
+    <button onclick="closeTDModal()" style="position:absolute;top:18px;right:18px;background:var(--border);border:none;color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;">✕</button>
+    <div id="tdSheetContent"></div>
+  </div>
+</div>
+```
 
   </div>
 
   <!-- HEURES SET -->
+
   <div class="view" id="view-set">
     <div class="kpi-row" id="setKpiRow"></div>
 
-    <!-- Formulaire ajout SET -->
-    <div class="card">
-      <div class="card-title">⏱ Nouvelle session SET</div>
-      <div class="form-grid">
-        <div>
-          <label>Date</label>
-          <input type="date" id="set-date">
-        </div>
-        <div>
-          <label>Durée (heures)</label>
-          <input type="number" id="set-hours" placeholder="Ex : 2.5" min="0.5" step="0.5">
-        </div>
-        <div class="form-full">
-          <label>Description de la session</label>
-          <textarea id="set-desc" placeholder="Supervision à distance, diagnostic effectué, matériel concerné..."></textarea>
-        </div>
-        <div class="form-full">
-          <label>Train / Matériel</label>
-          <input type="text" id="set-train" placeholder="Ex : TER 830042, UM Z50000...">
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="saveSET()">Enregistrer</button>
-        <button class="btn btn-ghost" onclick="clearSETForm()">Effacer</button>
-      </div>
-      <div id="setMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
+```
+<!-- Formulaire ajout SET -->
+<div class="card">
+  <div class="card-title">⏱ Nouvelle session SET</div>
+  <div class="form-grid">
+    <div>
+      <label>Date</label>
+      <input type="date" id="set-date">
     </div>
+    <div>
+      <label>Durée (heures)</label>
+      <input type="number" id="set-hours" placeholder="Ex : 2.5" min="0.5" step="0.5">
+    </div>
+    <div class="form-full">
+      <label>Description de la session</label>
+      <textarea id="set-desc" placeholder="Supervision à distance, diagnostic effectué, matériel concerné..."></textarea>
+    </div>
+    <div class="form-full">
+      <label>Train / Matériel</label>
+      <input type="text" id="set-train" placeholder="Ex : TER 830042, UM Z50000...">
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="saveSET()">Enregistrer</button>
+    <button class="btn btn-ghost" onclick="clearSETForm()">Effacer</button>
+  </div>
+  <div id="setMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
+</div>
 
-    <!-- Liste des sessions SET -->
-    <div class="card">
-      <div class="card-title">Mes sessions SET</div>
-      <div id="setList"></div>
-    </div>
+<!-- Liste des sessions SET -->
+<div class="card">
+  <div class="card-title">Mes sessions SET</div>
+  <div id="setList"></div>
+</div>
+```
+
   </div>
 
   <!-- INNOVATIONS & PRÉCURSEURS -->
+
   <div class="view" id="view-innov">
     <div class="kpi-row" id="innovKpiRow"></div>
 
-    <!-- Formulaire -->
-    <div class="card">
-      <div class="card-title">💡 Nouvelle entrée</div>
-      <div class="form-grid">
-        <div>
-          <label>Date</label>
-          <input type="date" id="innov-date">
-        </div>
-        <div>
-          <label>Type</label>
-          <select id="innov-type">
-            <option value="Innovation">💡 Innovation</option>
-            <option value="Précurseur">⚠️ Précurseur (situation à risque)</option>
-          </select>
-        </div>
-        <div class="form-full">
-          <label>Titre</label>
-          <input type="text" id="innov-title" placeholder="Ex : Amélioration procédure X, Risque détecté sur Y...">
-        </div>
-        <div class="form-full">
-          <label>Description détaillée</label>
-          <textarea id="innov-desc" placeholder="Contexte, problème identifié, solution proposée, situation à risque..."></textarea>
-        </div>
-        <div>
-          <label>Statut</label>
-          <select id="innov-status">
-            <option value="Proposé">📤 Proposé</option>
-            <option value="En étude">🔍 En étude</option>
-            <option value="Accepté">✅ Accepté</option>
-            <option value="Refusé">❌ Refusé</option>
-            <option value="Déployé">🚀 Déployé</option>
-          </select>
-        </div>
-        <div>
-          <label>Impact estimé</label>
-          <select id="innov-impact">
-            <option value="Faible">🟢 Faible</option>
-            <option value="Moyen">🟡 Moyen</option>
-            <option value="Fort">🔴 Fort</option>
-          </select>
-        </div>
-        <div class="form-full">
-          <label>Notes / Retour obtenu</label>
-          <textarea id="innov-notes" placeholder="Retour de la hiérarchie, résultat, suite donnée..."></textarea>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="saveInnov()">Enregistrer</button>
-        <button class="btn btn-ghost" onclick="clearInnovForm()">Effacer</button>
-      </div>
-      <div id="innovMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
+```
+<!-- Formulaire -->
+<div class="card">
+  <div class="card-title">💡 Nouvelle entrée</div>
+  <div class="form-grid">
+    <div>
+      <label>Date</label>
+      <input type="date" id="innov-date">
     </div>
+    <div>
+      <label>Type</label>
+      <select id="innov-type">
+        <option value="Innovation">💡 Innovation</option>
+        <option value="Précurseur">⚠️ Précurseur (situation à risque)</option>
+      </select>
+    </div>
+    <div class="form-full">
+      <label>Titre</label>
+      <input type="text" id="innov-title" placeholder="Ex : Amélioration procédure X, Risque détecté sur Y...">
+    </div>
+    <div class="form-full">
+      <label>Description détaillée</label>
+      <textarea id="innov-desc" placeholder="Contexte, problème identifié, solution proposée, situation à risque..."></textarea>
+    </div>
+    <div>
+      <label>Statut</label>
+      <select id="innov-status">
+        <option value="Proposé">📤 Proposé</option>
+        <option value="En étude">🔍 En étude</option>
+        <option value="Accepté">✅ Accepté</option>
+        <option value="Refusé">❌ Refusé</option>
+        <option value="Déployé">🚀 Déployé</option>
+      </select>
+    </div>
+    <div>
+      <label>Impact estimé</label>
+      <select id="innov-impact">
+        <option value="Faible">🟢 Faible</option>
+        <option value="Moyen">🟡 Moyen</option>
+        <option value="Fort">🔴 Fort</option>
+      </select>
+    </div>
+    <div class="form-full">
+      <label>Notes / Retour obtenu</label>
+      <textarea id="innov-notes" placeholder="Retour de la hiérarchie, résultat, suite donnée..."></textarea>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="saveInnov()">Enregistrer</button>
+    <button class="btn btn-ghost" onclick="clearInnovForm()">Effacer</button>
+  </div>
+  <div id="innovMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
+</div>
 
-    <!-- Liste -->
-    <div class="card">
-      <div class="card-title">Mes innovations & précurseurs</div>
-      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-        <button class="btn btn-ghost" id="filter-all" onclick="renderInnov('all')" style="padding:8px 16px;font-size:12px">Tout</button>
-        <button class="btn btn-ghost" id="filter-Innovation" onclick="renderInnov('Innovation')" style="padding:8px 16px;font-size:12px">💡 Innovations</button>
-        <button class="btn btn-ghost" id="filter-Précurseur" onclick="renderInnov('Précurseur')" style="padding:8px 16px;font-size:12px">⚠️ Précurseurs</button>
-      </div>
-      <div id="innovList"></div>
-    </div>
+<!-- Liste -->
+<div class="card">
+  <div class="card-title">Mes innovations & précurseurs</div>
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <button class="btn btn-ghost" id="filter-all" onclick="renderInnov('all')" style="padding:8px 16px;font-size:12px">Tout</button>
+    <button class="btn btn-ghost" id="filter-Innovation" onclick="renderInnov('Innovation')" style="padding:8px 16px;font-size:12px">💡 Innovations</button>
+    <button class="btn btn-ghost" id="filter-Précurseur" onclick="renderInnov('Précurseur')" style="padding:8px 16px;font-size:12px">⚠️ Précurseurs</button>
+  </div>
+  <div id="innovList"></div>
+</div>
+```
+
   </div>
 
   <!-- ENTRETIEN -->
+
   <div class="view" id="view-entretien">
     <div class="card">
       <div class="card-title">🎯 Mon pitch chiffré — Prêt pour l'entretien</div>
@@ -1030,6 +1070,7 @@ function saveIntervention() {
     date: document.getElementById('f-date').value,
     cat: document.getElementById('f-cat').value,
     train: document.getElementById('f-train').value.trim(),
+    serie: document.getElementById('f-serie').value,
     colleague: document.getElementById('f-colleague').value,
     reprise: document.getElementById('f-reprise').checked,
     repriseColleague: document.getElementById('f-reprise').checked ? document.getElementById('f-reprise-colleague').value : '',
@@ -1058,6 +1099,7 @@ function clearForm() {
   ['f-title','f-desc','f-skills','f-impact','f-duration','f-train'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f-result').value = 'Réussi';
   document.getElementById('f-cat').value = 'Technique';
+  document.getElementById('f-serie').value = '';
   document.getElementById('f-colleague').value = '';
   document.getElementById('f-reprise').checked = false;
   document.getElementById('f-reprise-colleague').value = '';
@@ -1259,6 +1301,25 @@ function renderDashboard() {
     </div>
   `).join('') : '<div class="empty"><div class="empty-text">Aucune donnée</div></div>';
 
+  // Graphique par série de train
+  const withSerie = data.filter(d => d.serie && d.serie !== '');
+  const series = {};
+  withSerie.forEach(d => { series[d.serie] = (series[d.serie]||0) + 1; });
+  const totalSerie = withSerie.length;
+  const serieColors = ['var(--accent)','var(--accent3)','var(--accent2)','var(--warn)','var(--success)'];
+  const maxS = Math.max(...Object.values(series), 1);
+  document.getElementById('serieChart').innerHTML = Object.entries(series).length
+    ? Object.entries(series).sort((a,b)=>b[1]-a[1]).map(([k,v],i) => {
+        const pct = totalSerie ? Math.round((v/totalSerie)*100) : 0;
+        return `
+          <div class="bar-item">
+            <div class="bar-label" style="font-weight:700">${k}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.round((v/maxS)*100)}%;background:${serieColors[i%serieColors.length]}"></div></div>
+            <div class="bar-val" style="width:60px;text-align:right">${v} <span style="color:var(--muted);font-size:10px">(${pct}%)</span></div>
+          </div>`;
+      }).join('')
+    : '<div style="color:var(--muted);font-size:12px;padding:8px">Renseignez la série lors de vos saisies pour voir la répartition.</div>';
+
   // Month stats
   const now = new Date();
   const thisMonth = data.filter(d => {
@@ -1322,6 +1383,7 @@ function renderHistory() {
             <td style="color:var(--muted);white-space:nowrap">${new Date(d.date).toLocaleDateString('fr-FR')}</td>
             <td style="white-space:nowrap">
               ${d.train ? `<span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2)">🚆 ${d.train}</span>` : '<span style="color:var(--border)">—</span>'}
+              ${d.serie ? `<div style="font-size:10px;color:var(--accent);margin-top:3px">${d.serie}</div>` : ''}
             </td>
             <td>
               <div class="td-title" style="cursor:pointer" onclick="toggleDesc('desc-${d.id}')">${d.title} ${d.desc ? '<span style="font-size:10px;color:var(--accent);margin-left:4px">▼</span>' : ''}</div>
@@ -1370,7 +1432,7 @@ function renderHistory() {
             <div class="hist-card-title">${d.title}</div>
             <div class="hist-card-date">${new Date(d.date).toLocaleDateString('fr-FR')}</div>
           </div>
-          ${d.train ? `<div class="hist-card-train">🚆 ${d.train}</div>` : ''}
+          ${d.train ? `<div class="hist-card-train">🚆 ${d.train}${d.serie ? ' <span style="color:var(--accent);font-size:11px">— '+d.serie+'</span>' : ''}</div>` : ''}
           ${d.desc ? `
             <div style="margin-bottom:8px">
               <div onclick="toggleDesc('mob-desc-${d.id}')" style="font-size:12px;color:var(--accent);cursor:pointer;display:flex;align-items:center;gap:4px">
@@ -1603,6 +1665,7 @@ function _doExportExcel(data) {
     return {
       'Date':                    d.date,
       'Numéro de train':         d.train || '',
+      'Série de train':           d.serie || '',
       'Titre':                   d.title,
       'Catégorie':               d.cat,
       'Collègue présent':        d.colleague || '',
@@ -1824,412 +1887,370 @@ function buildTDContent(t) {
       <div>
         <label>Ajouter une note</label>
         <textarea id="td-note-${id}" placeholder="Action effectuée, cause identifiée, solution..." style="min-height:80px;font-size:15px"></textarea>
-      </div>
-      <div class="btn-row" style="margin-top:14px">
-        <button class="btn btn-primary" onclick="addTDNote(${id})" style="min-height:50px">Ajouter la note</button>
-        ${t.status !== 'Résolu' && t.status !== 'Fermé' ? `
-        <button class="btn btn-ghost" style="color:var(--success);border-color:var(--success);min-height:50px" onclick="resolveTD(${id})">✅ Marquer résolu</button>` : ''}
-        <button class="btn btn-danger" onclick="deleteTD(${id})" style="min-height:50px">Supprimer</button>
-      </div>
-    </div>
 
-    <div>
-      <div style="font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">📋 Historique</div>
-      <div class="timeline">
-        ${[...t.timeline].reverse().map(e => `
-          <div class="tl-item">
-            <div class="tl-dot" style="border-color:${e.type==='create'?'var(--accent3)':e.type==='resolve'?'var(--success)':'var(--accent)'}"></div>
-            <div class="tl-body">
-              <div class="tl-date">${new Date(e.date).toLocaleString('fr-FR')}</div>
-              <div class="tl-text">${e.text}</div>
-            </div>
-          </div>
-        `).join('')}
+```
+  </div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn btn-primary" onclick="addTDNote(${id})" style="min-height:50px">Ajouter la note</button>
+    ${t.status !== 'Résolu' && t.status !== 'Fermé' ? `
+    <button class="btn btn-ghost" style="color:var(--success);border-color:var(--success);min-height:50px" onclick="resolveTD(${id})">✅ Marquer résolu</button>` : ''}
+    <button class="btn btn-danger" onclick="deleteTD(${id})" style="min-height:50px">Supprimer</button>
+  </div>
+</div>
+
+<div>
+  <div style="font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">📋 Historique</div>
+  <div class="timeline">
+    ${[...t.timeline].reverse().map(e => `
+      <div class="tl-item">
+        <div class="tl-dot" style="border-color:${e.type==='create'?'var(--accent3)':e.type==='resolve'?'var(--success)':'var(--accent)'}"></div>
+        <div class="tl-body">
+          <div class="tl-date">${new Date(e.date).toLocaleString('fr-FR')}</div>
+          <div class="tl-text">${e.text}</div>
+        </div>
       </div>
-    </div>
-  `;
+    `).join('')}
+  </div>
+</div>
+```
+
+`;
 }
 
 function openTDModal(id) {
-  const tds = getTDs();
-  const t = tds.find(x => x.id === id);
-  if (!t) return;
-  const html = buildTDContent(t);
-  const isMobile = window.innerWidth <= 700;
-  if (isMobile) {
-    document.getElementById('tdSheetContent').innerHTML = html;
-    document.getElementById('tdSheetOverlay').classList.add('open');
-    requestAnimationFrame(() => document.getElementById('tdSheet').classList.add('open'));
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.getElementById('tdModalContent').innerHTML = html;
-    document.getElementById('tdModal').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-  }
+const tds = getTDs();
+const t = tds.find(x => x.id === id);
+if (!t) return;
+const html = buildTDContent(t);
+const isMobile = window.innerWidth <= 700;
+if (isMobile) {
+document.getElementById(‘tdSheetContent’).innerHTML = html;
+document.getElementById(‘tdSheetOverlay’).classList.add(‘open’);
+requestAnimationFrame(() => document.getElementById(‘tdSheet’).classList.add(‘open’));
+document.body.style.overflow = ‘hidden’;
+} else {
+document.getElementById(‘tdModalContent’).innerHTML = html;
+document.getElementById(‘tdModal’).style.display = ‘block’;
+document.body.style.overflow = ‘hidden’;
+}
 }
 
 function closeTDModal() {
-  document.getElementById('tdModal').style.display = 'none';
-  const sheet = document.getElementById('tdSheet');
-  const overlay = document.getElementById('tdSheetOverlay');
-  sheet.classList.remove('open');
-  overlay.classList.remove('open');
-  document.body.style.overflow = '';
+document.getElementById(‘tdModal’).style.display = ‘none’;
+const sheet = document.getElementById(‘tdSheet’);
+const overlay = document.getElementById(‘tdSheetOverlay’);
+sheet.classList.remove(‘open’);
+overlay.classList.remove(‘open’);
+document.body.style.overflow = ‘’;
 }
 
-document.getElementById('tdModal').addEventListener('click', function(e) {
-  if (e.target === this) closeTDModal();
+document.getElementById(‘tdModal’).addEventListener(‘click’, function(e) {
+if (e.target === this) closeTDModal();
 });
 
 function updateTDStatus(id, newStatus) {
-  const tds = getTDs();
-  const t = tds.find(x => x.id === id);
-  if (!t) return;
-  const old = t.status;
-  t.status = newStatus;
-  t.timeline.push({ date: new Date().toISOString(), text: `Statut changé : ${old} → ${newStatus}`, type: 'status' });
-  if (newStatus === 'Résolu' || newStatus === 'Fermé') t.closedDate = new Date().toISOString();
-  saveTDs(tds);
-  renderTD(); renderTDKpis();
-  const html = buildTDContent(t);
-  if (window.innerWidth <= 700) document.getElementById('tdSheetContent').innerHTML = html;
-  else document.getElementById('tdModalContent').innerHTML = html;
+const tds = getTDs();
+const t = tds.find(x => x.id === id);
+if (!t) return;
+const old = t.status;
+t.status = newStatus;
+t.timeline.push({ date: new Date().toISOString(), text: `Statut changé : ${old} → ${newStatus}`, type: ‘status’ });
+if (newStatus === ‘Résolu’ || newStatus === ‘Fermé’) t.closedDate = new Date().toISOString();
+saveTDs(tds);
+renderTD(); renderTDKpis();
+const html = buildTDContent(t);
+if (window.innerWidth <= 700) document.getElementById(‘tdSheetContent’).innerHTML = html;
+else document.getElementById(‘tdModalContent’).innerHTML = html;
 }
 
 function addTDNote(id) {
-  const noteEl = document.getElementById('td-note-' + id);
-  const note = noteEl ? noteEl.value.trim() : '';
-  if (!note) return;
-  const tds = getTDs();
-  const t = tds.find(x => x.id === id);
-  if (!t) return;
-  t.timeline.push({ date: new Date().toISOString(), text: note, type: 'note' });
-  saveTDs(tds);
-  renderTD();
-  const html = buildTDContent(t);
-  if (window.innerWidth <= 700) document.getElementById('tdSheetContent').innerHTML = html;
-  else document.getElementById('tdModalContent').innerHTML = html;
+const noteEl = document.getElementById(‘td-note-’ + id);
+const note = noteEl ? noteEl.value.trim() : ‘’;
+if (!note) return;
+const tds = getTDs();
+const t = tds.find(x => x.id === id);
+if (!t) return;
+t.timeline.push({ date: new Date().toISOString(), text: note, type: ‘note’ });
+saveTDs(tds);
+renderTD();
+const html = buildTDContent(t);
+if (window.innerWidth <= 700) document.getElementById(‘tdSheetContent’).innerHTML = html;
+else document.getElementById(‘tdModalContent’).innerHTML = html;
 }
 
 function resolveTD(id) {
-  updateTDStatus(id, 'Résolu');
+updateTDStatus(id, ‘Résolu’);
 }
 
 function deleteTD(id) {
-  if (!confirm('Supprimer ce ticket ?')) return;
-  saveTDs(getTDs().filter(t => t.id !== id));
-  closeTDModal();
-  renderTD(); renderTDKpis();
+if (!confirm(‘Supprimer ce ticket ?’)) return;
+saveTDs(getTDs().filter(t => t.id !== id));
+closeTDModal();
+renderTD(); renderTDKpis();
 }
 
-// ---- EXPORT TD CSV ----
+// –– EXPORT TD CSV ––
 function exportTDCSV() {
-  let tds = getTDs();
-  if (!tds.length) { alert('Aucun ticket à exporter.'); return; }
-  const headers = ['Num','Date','Type','Priorité','Statut','Titre','Demandeur','Deadline','Compétences','Description'];
-  const rows = tds.map(t => [
-    t.num, t.date, t.type, t.priority, t.status, t.title,
-    t.requester, t.deadline, t.skills.join(' | '), t.desc
-  ].map(v => `"${String(v||'').replace(/"/g,'""')}"`));
-  const csv = [headers, ...rows].map(r=>r.join(',')).join('\n');
-  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'tickets_td_' + new Date().toISOString().split('T')[0] + '.csv';
-  a.click();
+let tds = getTDs();
+if (!tds.length) { alert(‘Aucun ticket à exporter.’); return; }
+const headers = [‘Num’,‘Date’,‘Type’,‘Priorité’,‘Statut’,‘Titre’,‘Demandeur’,‘Deadline’,‘Compétences’,‘Description’];
+const rows = tds.map(t => [
+t.num, t.date, t.type, t.priority, t.status, t.title,
+t.requester, t.deadline, t.skills.join(’ | ‘), t.desc
+].map(v => `"${String(v||'').replace(/"/g,'""')}"`));
+const csv = [headers, …rows].map(r=>r.join(’,’)).join(’\n’);
+const blob = new Blob([’\uFEFF’+csv], {type:‘text/csv;charset=utf-8’});
+const a = document.createElement(‘a’);
+a.href = URL.createObjectURL(blob);
+a.download = ‘tickets_td_’ + new Date().toISOString().split(‘T’)[0] + ‘.csv’;
+a.click();
 }
 
 // ======================================================
-// ---- CHIFFREMENT AES-256 (Web Crypto API natif) ----
+// –– CHIFFREMENT AES-256 (Web Crypto API natif) ––
 // ======================================================
 
-// Dérive une clé AES-256-GCM à partir d'un mot de passe
+// Dérive une clé AES-256-GCM à partir d’un mot de passe
 async function deriveKey(password, salt) {
-  const enc = new TextEncoder();
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
-  );
-  return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt, iterations: 200000, hash: 'SHA-256' },
-    keyMaterial,
-    { name: 'AES-GCM', length: 256 },
-    false,
-    ['encrypt', 'decrypt']
-  );
+const enc = new TextEncoder();
+const keyMaterial = await crypto.subtle.importKey(
+‘raw’, enc.encode(password), { name: ‘PBKDF2’ }, false, [‘deriveKey’]
+);
+return crypto.subtle.deriveKey(
+{ name: ‘PBKDF2’, salt, iterations: 200000, hash: ‘SHA-256’ },
+keyMaterial,
+{ name: ‘AES-GCM’, length: 256 },
+false,
+[‘encrypt’, ‘decrypt’]
+);
 }
 
 // Chiffre une chaîne JSON → base64
 async function chiffrer(jsonStr, password) {
-  const enc = new TextEncoder();
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const iv   = crypto.getRandomValues(new Uint8Array(12));
-  const key  = await deriveKey(password, salt);
-  const encrypted = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
-    key,
-    enc.encode(jsonStr)
-  );
-  // On empaquète : salt(16) + iv(12) + données chiffrées → base64
-  const buf = new Uint8Array(salt.byteLength + iv.byteLength + encrypted.byteLength);
-  buf.set(salt, 0);
-  buf.set(iv, 16);
-  buf.set(new Uint8Array(encrypted), 28);
-  return btoa(String.fromCharCode(...buf));
+const enc = new TextEncoder();
+const salt = crypto.getRandomValues(new Uint8Array(16));
+const iv   = crypto.getRandomValues(new Uint8Array(12));
+const key  = await deriveKey(password, salt);
+const encrypted = await crypto.subtle.encrypt(
+{ name: ‘AES-GCM’, iv },
+key,
+enc.encode(jsonStr)
+);
+// On empaquète : salt(16) + iv(12) + données chiffrées → base64
+const buf = new Uint8Array(salt.byteLength + iv.byteLength + encrypted.byteLength);
+buf.set(salt, 0);
+buf.set(iv, 16);
+buf.set(new Uint8Array(encrypted), 28);
+return btoa(String.fromCharCode(…buf));
 }
 
 // Déchiffre un base64 → chaîne JSON
 async function dechiffrer(base64, password) {
-  const buf  = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-  const salt = buf.slice(0, 16);
-  const iv   = buf.slice(16, 28);
-  const data = buf.slice(28);
-  const key  = await deriveKey(password, salt);
-  const dec  = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
-  return new TextDecoder().decode(dec);
+const buf  = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+const salt = buf.slice(0, 16);
+const iv   = buf.slice(16, 28);
+const data = buf.slice(28);
+const key  = await deriveKey(password, salt);
+const dec  = await crypto.subtle.decrypt({ name: ‘AES-GCM’, iv }, key, data);
+return new TextDecoder().decode(dec);
 }
 
 // Demande et mémorise le mot de passe (sessionStorage = effacé à la fermeture)
 function getPassword(action) {
-  const saved = sessionStorage.getItem('crypto_pwd');
-  if (saved) return saved;
-  const pwd = prompt(
-    '🔐 Mot de passe de chiffrement\n\n' +
-    (action === 'first'
-      ? 'Choisissez un mot de passe pour chiffrer vos données.\n⚠️ Notez-le bien — sans lui, vos données sont irrécupérables.'
-      : 'Entrez votre mot de passe pour ' + (action === 'save' ? 'chiffrer' : 'déchiffrer') + ' vos données.') +
-    '\n\nMot de passe :'
-  );
-  if (!pwd) return null;
-  sessionStorage.setItem('crypto_pwd', pwd);
-  return pwd;
+const saved = sessionStorage.getItem(‘crypto_pwd’);
+if (saved) return saved;
+const pwd = prompt(
+‘🔐 Mot de passe de chiffrement\n\n’ +
+(action === ‘first’
+? ‘Choisissez un mot de passe pour chiffrer vos données.\n⚠️ Notez-le bien — sans lui, vos données sont irrécupérables.’
+: ‘Entrez votre mot de passe pour ’ + (action === ‘save’ ? ‘chiffrer’ : ‘déchiffrer’) + ’ vos données.’) +
+‘\n\nMot de passe :’
+);
+if (!pwd) return null;
+sessionStorage.setItem(‘crypto_pwd’, pwd);
+return pwd;
 }
 
 function clearPassword() {
-  sessionStorage.removeItem('crypto_pwd');
+sessionStorage.removeItem(‘crypto_pwd’);
 }
 
 // ======================================================
-// ---- HEURES SET ----
+// –– HEURES SET ––
 // ======================================================
-function getSETs() { return JSON.parse(localStorage.getItem('set_sessions') || '[]'); }
-function saveSETs(d) { localStorage.setItem('set_sessions', JSON.stringify(d)); }
+function getSETs() { return JSON.parse(localStorage.getItem(‘set_sessions’) || ‘[]’); }
+function saveSETs(d) { localStorage.setItem(‘set_sessions’, JSON.stringify(d)); }
 
-document.getElementById('set-date').value = new Date().toISOString().split('T')[0];
+document.getElementById(‘set-date’).value = new Date().toISOString().split(‘T’)[0];
 
 function saveSET() {
-  const hours = parseFloat(document.getElementById('set-hours').value);
-  if (!hours || hours <= 0) { document.getElementById('setMsg').textContent = '⚠ Renseignez une durée.'; return; }
-  const sessions = getSETs();
-  sessions.unshift({
-    id: Date.now(),
-    date: document.getElementById('set-date').value,
-    hours,
-    desc: document.getElementById('set-desc').value.trim(),
-    train: document.getElementById('set-train').value.trim()
-  });
-  saveSETs(sessions);
-  document.getElementById('setMsg').textContent = '✅ Session enregistrée !';
-  setTimeout(() => document.getElementById('setMsg').textContent = '', 2500);
-  clearSETForm();
-  renderSETKpis(); renderSET();
+const hours = parseFloat(document.getElementById(‘set-hours’).value);
+if (!hours || hours <= 0) { document.getElementById(‘setMsg’).textContent = ‘⚠ Renseignez une durée.’; return; }
+const sessions = getSETs();
+sessions.unshift({
+id: Date.now(),
+date: document.getElementById(‘set-date’).value,
+hours,
+desc: document.getElementById(‘set-desc’).value.trim(),
+train: document.getElementById(‘set-train’).value.trim()
+});
+saveSETs(sessions);
+document.getElementById(‘setMsg’).textContent = ‘✅ Session enregistrée !’;
+setTimeout(() => document.getElementById(‘setMsg’).textContent = ‘’, 2500);
+clearSETForm();
+renderSETKpis(); renderSET();
 }
 
 function clearSETForm() {
-  document.getElementById('set-hours').value = '';
-  document.getElementById('set-desc').value = '';
-  document.getElementById('set-train').value = '';
-  document.getElementById('set-date').value = new Date().toISOString().split('T')[0];
+document.getElementById(‘set-hours’).value = ‘’;
+document.getElementById(‘set-desc’).value = ‘’;
+document.getElementById(‘set-train’).value = ‘’;
+document.getElementById(‘set-date’).value = new Date().toISOString().split(‘T’)[0];
 }
 
 function deleteSET(id) {
-  if (!confirm('Supprimer cette session SET ?')) return;
-  saveSETs(getSETs().filter(s => s.id !== id));
-  renderSETKpis(); renderSET(); renderDashboard();
+if (!confirm(‘Supprimer cette session SET ?’)) return;
+saveSETs(getSETs().filter(s => s.id !== id));
+renderSETKpis(); renderSET(); renderDashboard();
 }
 
 function renderSETKpis() {
-  const all = getSETs();
-  const year = new Date().getFullYear();
-  const thisYear = all.filter(s => new Date(s.date).getFullYear() === year);
-  const totalH = all.reduce((a,s) => a+(s.hours||0), 0);
-  const yearH = thisYear.reduce((a,s) => a+(s.hours||0), 0);
-  const kpis = [
-    { label: 'Total heures SET', val: totalH + 'h', sub: 'depuis le début', color: 'var(--accent3)' },
-    { label: 'Heures ' + year, val: yearH + 'h', sub: thisYear.length + ' session(s)', color: 'var(--accent)' },
-    { label: 'Sessions total', val: all.length, sub: 'enregistrées', color: 'var(--accent2)' },
-  ];
-  document.getElementById('setKpiRow').innerHTML = kpis.map(k => `
-    <div class="kpi">
-      <div class="kpi-accent" style="background:${k.color}"></div>
-      <div class="kpi-label">${k.label}</div>
-      <div class="kpi-val" style="color:${k.color}">${k.val}</div>
-      <div class="kpi-sub">${k.sub}</div>
-    </div>
-  `).join('');
+const all = getSETs();
+const year = new Date().getFullYear();
+const thisYear = all.filter(s => new Date(s.date).getFullYear() === year);
+const totalH = all.reduce((a,s) => a+(s.hours||0), 0);
+const yearH = thisYear.reduce((a,s) => a+(s.hours||0), 0);
+const kpis = [
+{ label: ‘Total heures SET’, val: totalH + ‘h’, sub: ‘depuis le début’, color: ‘var(–accent3)’ },
+{ label: ‘Heures ’ + year, val: yearH + ‘h’, sub: thisYear.length + ’ session(s)’, color: ‘var(–accent)’ },
+{ label: ‘Sessions total’, val: all.length, sub: ‘enregistrées’, color: ‘var(–accent2)’ },
+];
+document.getElementById(‘setKpiRow’).innerHTML = kpis.map(k => `<div class="kpi"> <div class="kpi-accent" style="background:${k.color}"></div> <div class="kpi-label">${k.label}</div> <div class="kpi-val" style="color:${k.color}">${k.val}</div> <div class="kpi-sub">${k.sub}</div> </div>`).join(’’);
 }
 
 function renderSET() {
-  const sessions = getSETs();
-  if (!sessions.length) {
-    document.getElementById('setList').innerHTML = '<div class="empty"><div class="empty-icon">⏱</div><div class="empty-text">Aucune session SET enregistrée.</div></div>';
-    return;
-  }
-  document.getElementById('setList').innerHTML = sessions.map(s => `
-    <div class="hist-card" style="margin-bottom:12px">
-      <div class="hist-card-top">
-        <div class="hist-card-title">${s.desc || 'Session SET'}</div>
-        <div class="hist-card-date">${new Date(s.date).toLocaleDateString('fr-FR')}</div>
-      </div>
-      ${s.train ? `<div class="hist-card-train">🚆 ${s.train}</div>` : ''}
-      <div class="hist-card-footer" style="margin-top:10px">
-        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--accent)">${s.hours}h</span>
-        <button class="btn btn-danger" onclick="deleteSET(${s.id})" style="padding:8px 14px;font-size:12px">Supprimer</button>
-      </div>
-    </div>
-  `).join('');
+const sessions = getSETs();
+if (!sessions.length) {
+document.getElementById(‘setList’).innerHTML = ‘<div class="empty"><div class="empty-icon">⏱</div><div class="empty-text">Aucune session SET enregistrée.</div></div>’;
+return;
+}
+document.getElementById(‘setList’).innerHTML = sessions.map(s => `<div class="hist-card" style="margin-bottom:12px"> <div class="hist-card-top"> <div class="hist-card-title">${s.desc || 'Session SET'}</div> <div class="hist-card-date">${new Date(s.date).toLocaleDateString('fr-FR')}</div> </div> ${s.train ?`<div class="hist-card-train">🚆 ${s.train}</div>`: ''} <div class="hist-card-footer" style="margin-top:10px"> <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--accent)">${s.hours}h</span> <button class="btn btn-danger" onclick="deleteSET(${s.id})" style="padding:8px 14px;font-size:12px">Supprimer</button> </div> </div>`).join(’’);
 }
 
 // ======================================================
-// ---- INNOVATIONS & PRÉCURSEURS ----
+// –– INNOVATIONS & PRÉCURSEURS ––
 // ======================================================
-function getInnovs() { return JSON.parse(localStorage.getItem('innovations') || '[]'); }
-function saveInnovs(d) { localStorage.setItem('innovations', JSON.stringify(d)); }
+function getInnovs() { return JSON.parse(localStorage.getItem(‘innovations’) || ‘[]’); }
+function saveInnovs(d) { localStorage.setItem(‘innovations’, JSON.stringify(d)); }
 
-document.getElementById('innov-date').value = new Date().toISOString().split('T')[0];
+document.getElementById(‘innov-date’).value = new Date().toISOString().split(‘T’)[0];
 
 function saveInnov() {
-  const title = document.getElementById('innov-title').value.trim();
-  if (!title) { document.getElementById('innovMsg').textContent = '⚠ Renseignez un titre.'; return; }
-  const innovs = getInnovs();
-  innovs.unshift({
-    id: Date.now(),
-    date: document.getElementById('innov-date').value,
-    type: document.getElementById('innov-type').value,
-    title,
-    desc: document.getElementById('innov-desc').value.trim(),
-    status: document.getElementById('innov-status').value,
-    impact: document.getElementById('innov-impact').value,
-    notes: document.getElementById('innov-notes').value.trim()
-  });
-  saveInnovs(innovs);
-  document.getElementById('innovMsg').textContent = '✅ Enregistré !';
-  setTimeout(() => document.getElementById('innovMsg').textContent = '', 2500);
-  clearInnovForm();
-  renderInnovKpis(); renderInnov('all'); renderDashboard();
+const title = document.getElementById(‘innov-title’).value.trim();
+if (!title) { document.getElementById(‘innovMsg’).textContent = ‘⚠ Renseignez un titre.’; return; }
+const innovs = getInnovs();
+innovs.unshift({
+id: Date.now(),
+date: document.getElementById(‘innov-date’).value,
+type: document.getElementById(‘innov-type’).value,
+title,
+desc: document.getElementById(‘innov-desc’).value.trim(),
+status: document.getElementById(‘innov-status’).value,
+impact: document.getElementById(‘innov-impact’).value,
+notes: document.getElementById(‘innov-notes’).value.trim()
+});
+saveInnovs(innovs);
+document.getElementById(‘innovMsg’).textContent = ‘✅ Enregistré !’;
+setTimeout(() => document.getElementById(‘innovMsg’).textContent = ‘’, 2500);
+clearInnovForm();
+renderInnovKpis(); renderInnov(‘all’); renderDashboard();
 }
 
 function clearInnovForm() {
-  ['innov-title','innov-desc','innov-notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('innov-type').value = 'Innovation';
-  document.getElementById('innov-status').value = 'Proposé';
-  document.getElementById('innov-impact').value = 'Moyen';
-  document.getElementById('innov-date').value = new Date().toISOString().split('T')[0];
+[‘innov-title’,‘innov-desc’,‘innov-notes’].forEach(id => document.getElementById(id).value = ‘’);
+document.getElementById(‘innov-type’).value = ‘Innovation’;
+document.getElementById(‘innov-status’).value = ‘Proposé’;
+document.getElementById(‘innov-impact’).value = ‘Moyen’;
+document.getElementById(‘innov-date’).value = new Date().toISOString().split(‘T’)[0];
 }
 
 function deleteInnov(id) {
-  if (!confirm('Supprimer cette entrée ?')) return;
-  saveInnovs(getInnovs().filter(i => i.id !== id));
-  renderInnovKpis(); renderInnov('all'); renderDashboard();
+if (!confirm(‘Supprimer cette entrée ?’)) return;
+saveInnovs(getInnovs().filter(i => i.id !== id));
+renderInnovKpis(); renderInnov(‘all’); renderDashboard();
 }
 
 function updateInnovStatus(id, newStatus) {
-  const innovs = getInnovs();
-  const item = innovs.find(i => i.id === id);
-  if (!item) return;
-  item.status = newStatus;
-  saveInnovs(innovs);
-  renderInnov('all');
+const innovs = getInnovs();
+const item = innovs.find(i => i.id === id);
+if (!item) return;
+item.status = newStatus;
+saveInnovs(innovs);
+renderInnov(‘all’);
 }
 
 function renderInnovKpis() {
-  const all = getInnovs();
-  const year = new Date().getFullYear();
-  const thisYear = all.filter(i => new Date(i.date).getFullYear() === year);
-  const nbInnov = thisYear.filter(i=>i.type==='Innovation').length;
-  const nbPrec = thisYear.filter(i=>i.type==='Précurseur').length;
-  const nbAccepte = thisYear.filter(i=>i.type==='Innovation'&&i.status==='Accepté').length;
-  const kpis = [
-    { label: 'Innovations ' + year, val: nbInnov, sub: 'proposées', color: 'var(--accent3)' },
-    { label: 'Acceptées', val: nbAccepte, sub: nbInnov ? Math.round(nbAccepte/nbInnov*100)+'%' : '—', color: 'var(--success)' },
-    { label: 'Précurseurs ' + year, val: nbPrec + ' / 2', sub: nbPrec >= 2 ? '✅ Objectif atteint' : (2-nbPrec) + ' restant(s)', color: nbPrec >= 2 ? 'var(--success)' : 'var(--warn)' },
-    { label: 'Total historique', val: all.length, sub: 'entrées', color: 'var(--muted)' },
-  ];
-  document.getElementById('innovKpiRow').innerHTML = kpis.map(k => `
-    <div class="kpi">
-      <div class="kpi-accent" style="background:${k.color}"></div>
-      <div class="kpi-label">${k.label}</div>
-      <div class="kpi-val" style="color:${k.color}">${k.val}</div>
-      <div class="kpi-sub">${k.sub}</div>
-    </div>
-  `).join('');
+const all = getInnovs();
+const year = new Date().getFullYear();
+const thisYear = all.filter(i => new Date(i.date).getFullYear() === year);
+const nbInnov = thisYear.filter(i=>i.type===‘Innovation’).length;
+const nbPrec = thisYear.filter(i=>i.type===‘Précurseur’).length;
+const nbAccepte = thisYear.filter(i=>i.type===‘Innovation’&&i.status===‘Accepté’).length;
+const kpis = [
+{ label: ‘Innovations ’ + year, val: nbInnov, sub: ‘proposées’, color: ‘var(–accent3)’ },
+{ label: ‘Acceptées’, val: nbAccepte, sub: nbInnov ? Math.round(nbAccepte/nbInnov*100)+’%’ : ‘—’, color: ‘var(–success)’ },
+{ label: ‘Précurseurs ’ + year, val: nbPrec + ’ / 2’, sub: nbPrec >= 2 ? ‘✅ Objectif atteint’ : (2-nbPrec) + ’ restant(s)’, color: nbPrec >= 2 ? ‘var(–success)’ : ‘var(–warn)’ },
+{ label: ‘Total historique’, val: all.length, sub: ‘entrées’, color: ‘var(–muted)’ },
+];
+document.getElementById(‘innovKpiRow’).innerHTML = kpis.map(k => `<div class="kpi"> <div class="kpi-accent" style="background:${k.color}"></div> <div class="kpi-label">${k.label}</div> <div class="kpi-val" style="color:${k.color}">${k.val}</div> <div class="kpi-sub">${k.sub}</div> </div>`).join(’’);
 }
 
 function innovStatusBadge(s) {
-  const map = {
-    'Proposé':   'background:rgba(124,111,255,.15);color:var(--accent3);border:1px solid rgba(124,111,255,.3)',
-    'En étude':  'background:rgba(255,193,7,.15);color:var(--warn);border:1px solid rgba(255,193,7,.3)',
-    'Accepté':   'background:rgba(0,229,160,.15);color:var(--success);border:1px solid rgba(0,229,160,.3)',
-    'Refusé':    'background:rgba(255,77,106,.15);color:var(--danger);border:1px solid rgba(255,77,106,.3)',
-    'Déployé':   'background:rgba(255,107,53,.15);color:var(--accent2);border:1px solid rgba(255,107,53,.3)',
-  };
-  return `<span class="badge" style="${map[s]||''}">${s}</span>`;
+const map = {
+‘Proposé’:   ‘background:rgba(124,111,255,.15);color:var(–accent3);border:1px solid rgba(124,111,255,.3)’,
+‘En étude’:  ‘background:rgba(255,193,7,.15);color:var(–warn);border:1px solid rgba(255,193,7,.3)’,
+‘Accepté’:   ‘background:rgba(0,229,160,.15);color:var(–success);border:1px solid rgba(0,229,160,.3)’,
+‘Refusé’:    ‘background:rgba(255,77,106,.15);color:var(–danger);border:1px solid rgba(255,77,106,.3)’,
+‘Déployé’:   ‘background:rgba(255,107,53,.15);color:var(–accent2);border:1px solid rgba(255,107,53,.3)’,
+};
+return `<span class="badge" style="${map[s]||''}">${s}</span>`;
 }
 
 function renderInnov(filter) {
-  // Highlight active filter button
-  ['all','Innovation','Précurseur'].forEach(f => {
-    const btn = document.getElementById('filter-' + f);
-    if (btn) btn.className = 'btn ' + (filter === f ? 'btn-primary' : 'btn-ghost');
-  });
+// Highlight active filter button
+[‘all’,‘Innovation’,‘Précurseur’].forEach(f => {
+const btn = document.getElementById(‘filter-’ + f);
+if (btn) btn.className = ’btn ’ + (filter === f ? ‘btn-primary’ : ‘btn-ghost’);
+});
 
-  let items = getInnovs();
-  if (filter !== 'all') items = items.filter(i => i.type === filter);
+let items = getInnovs();
+if (filter !== ‘all’) items = items.filter(i => i.type === filter);
 
-  if (!items.length) {
-    document.getElementById('innovList').innerHTML = '<div class="empty"><div class="empty-icon">💡</div><div class="empty-text">Aucune entrée pour ce filtre.</div></div>';
-    return;
-  }
+if (!items.length) {
+document.getElementById(‘innovList’).innerHTML = ‘<div class="empty"><div class="empty-icon">💡</div><div class="empty-text">Aucune entrée pour ce filtre.</div></div>’;
+return;
+}
 
-  document.getElementById('innovList').innerHTML = items.map(i => `
-    <div class="hist-card" style="margin-bottom:12px;border-left:3px solid ${i.type==='Innovation'?'var(--accent3)':'var(--warn)'}">
-      <div class="hist-card-top">
-        <div>
-          <span style="font-size:11px;color:${i.type==='Innovation'?'var(--accent3)':'var(--warn)'};font-weight:700">${i.type==='Innovation'?'💡 Innovation':'⚠️ Précurseur'}</span>
-          <div class="hist-card-title" style="margin-top:4px">${i.title}</div>
-        </div>
-        <div class="hist-card-date">${new Date(i.date).toLocaleDateString('fr-FR')}</div>
-      </div>
-      ${i.desc ? `
-        <div onclick="toggleDesc('innov-desc-${i.id}')" style="font-size:12px;color:var(--accent);cursor:pointer;margin-bottom:6px">
-          📄 Description <span id="innov-arr-${i.id}">▼</span>
-        </div>
-        <div id="innov-desc-${i.id}" style="display:none;margin-bottom:8px;padding:10px;background:var(--surface);border-left:3px solid var(--accent3);border-radius:0 8px 8px 0;font-size:13px;line-height:1.7">${i.desc}${i.notes?`<div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;color:var(--muted)"><strong>Notes :</strong> ${i.notes}</div>`:''}</div>
-      ` : ''}
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
-        ${innovStatusBadge(i.status)}
-        <span class="badge badge-info">Impact ${i.impact}</span>
-      </div>
-      ${i.type === 'Innovation' ? `
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-          ${['Proposé','En étude','Accepté','Refusé','Déployé'].map(s =>
-            `<button class="btn ${i.status===s?'btn-primary':'btn-ghost'}" onclick="updateInnovStatus(${i.id},'${s}')" style="padding:6px 10px;font-size:11px;min-height:36px">${s}</button>`
-          ).join('')}
-        </div>
-      ` : ''}
-      <div class="hist-card-footer">
-        <span></span>
-        <button class="btn btn-danger" onclick="deleteInnov(${i.id})" style="padding:8px 14px;font-size:12px">Supprimer</button>
-      </div>
-    </div>
-  `).join('');
+document.getElementById(‘innovList’).innerHTML = items.map(i => `<div class="hist-card" style="margin-bottom:12px;border-left:3px solid ${i.type==='Innovation'?'var(--accent3)':'var(--warn)'}"> <div class="hist-card-top"> <div> <span style="font-size:11px;color:${i.type==='Innovation'?'var(--accent3)':'var(--warn)'};font-weight:700">${i.type==='Innovation'?'💡 Innovation':'⚠️ Précurseur'}</span> <div class="hist-card-title" style="margin-top:4px">${i.title}</div> </div> <div class="hist-card-date">${new Date(i.date).toLocaleDateString('fr-FR')}</div> </div> ${i.desc ?`
+<div onclick="toggleDesc('innov-desc-${i.id}')" style="font-size:12px;color:var(--accent);cursor:pointer;margin-bottom:6px">
+📄 Description <span id="innov-arr-${i.id}">▼</span>
+</div>
+<div id="innov-desc-${i.id}" style="display:none;margin-bottom:8px;padding:10px;background:var(--surface);border-left:3px solid var(--accent3);border-radius:0 8px 8px 0;font-size:13px;line-height:1.7">${i.desc}${i.notes?`<div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;color:var(--muted)"><strong>Notes :</strong> ${i.notes}</div>`:’’}</div>
+`: ''} <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"> ${innovStatusBadge(i.status)} <span class="badge badge-info">Impact ${i.impact}</span> </div> ${i.type === 'Innovation' ?`
+<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+${[‘Proposé’,‘En étude’,‘Accepté’,‘Refusé’,‘Déployé’].map(s =>
+`<button class="btn ${i.status===s?'btn-primary':'btn-ghost'}" onclick="updateInnovStatus(${i.id},'${s}')" style="padding:6px 10px;font-size:11px;min-height:36px">${s}</button>`
+).join(’’)}
+</div>
+`: ''} <div class="hist-card-footer"> <span></span> <button class="btn btn-danger" onclick="deleteInnov(${i.id})" style="padding:8px 14px;font-size:12px">Supprimer</button> </div> </div>`).join(’’);
 }
 
 // ======================================================
-// ---- GOOGLE DRIVE SYNC (avec chiffrement) ----
+// –– GOOGLE DRIVE SYNC (avec chiffrement) ––
 // ======================================================
-const G_CLIENT_ID = '';
-const G_SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
-const G_FILE_NAME = 'suivi_pro_encrypted.bin';
+const G_CLIENT_ID = ‘’;
+const G_SCOPES = ‘https://www.googleapis.com/auth/drive.appdata’;
+const G_FILE_NAME = ‘suivi_pro_encrypted.bin’;
 
 let gTokenClient = null;
 let gAccessToken = null;
@@ -2237,235 +2258,242 @@ let gFileId = null;
 let gIsReady = false;
 
 function loadGoogleScript() {
-  return new Promise(resolve => {
-    if (window.google && window.google.accounts) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = 'https://accounts.google.com/gsi/client';
-    s.onload = resolve;
-    document.head.appendChild(s);
-  });
+return new Promise(resolve => {
+if (window.google && window.google.accounts) { resolve(); return; }
+const s = document.createElement(‘script’);
+s.src = ‘https://accounts.google.com/gsi/client’;
+s.onload = resolve;
+document.head.appendChild(s);
+});
 }
 
 function loadGapiScript() {
-  return new Promise(resolve => {
-    if (window.gapi) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = 'https://apis.google.com/js/api.js';
-    s.onload = () => { gapi.load('client', resolve); };
-    document.head.appendChild(s);
-  });
+return new Promise(resolve => {
+if (window.gapi) { resolve(); return; }
+const s = document.createElement(‘script’);
+s.src = ‘https://apis.google.com/js/api.js’;
+s.onload = () => { gapi.load(‘client’, resolve); };
+document.head.appendChild(s);
+});
 }
 
 async function gSignIn() {
-  const clientId = localStorage.getItem('g_client_id') || '';
-  if (!clientId) {
-    const id = prompt(
-      '🔑 Client ID Google OAuth 2.0\n\n' +
-      '1. console.cloud.google.com\n' +
-      '2. APIs & Services → Identifiants\n' +
-      '3. Créer ID client OAuth (Application Web)\n' +
-      '4. Ajouter l\'URL de cette page dans les origines autorisées\n\n' +
-      'Client ID (.apps.googleusercontent.com) :'
-    );
-    if (!id || !id.includes('.apps.googleusercontent.com')) {
-      setSyncStatus('❌ Client ID invalide'); return;
-    }
-    localStorage.setItem('g_client_id', id);
-  }
+const clientId = localStorage.getItem(‘g_client_id’) || ‘’;
+if (!clientId) {
+const id = prompt(
+‘🔑 Client ID Google OAuth 2.0\n\n’ +
+‘1. console.cloud.google.com\n’ +
+‘2. APIs & Services → Identifiants\n’ +
+‘3. Créer ID client OAuth (Application Web)\n’ +
+‘4. Ajouter l'URL de cette page dans les origines autorisées\n\n’ +
+‘Client ID (.apps.googleusercontent.com) :’
+);
+if (!id || !id.includes(’.apps.googleusercontent.com’)) {
+setSyncStatus(‘❌ Client ID invalide’); return;
+}
+localStorage.setItem(‘g_client_id’, id);
+}
 
-  // Demander le mot de passe dès la connexion
-  const hasPwd = sessionStorage.getItem('crypto_pwd');
-  if (!hasPwd) {
-    const isFirst = !localStorage.getItem('g_pwd_set');
-    const pwd = getPassword(isFirst ? 'first' : 'load');
-    if (!pwd) { setSyncStatus('❌ Mot de passe requis'); return; }
-    if (isFirst) localStorage.setItem('g_pwd_set', '1');
-  }
+// Demander le mot de passe dès la connexion
+const hasPwd = sessionStorage.getItem(‘crypto_pwd’);
+if (!hasPwd) {
+const isFirst = !localStorage.getItem(‘g_pwd_set’);
+const pwd = getPassword(isFirst ? ‘first’ : ‘load’);
+if (!pwd) { setSyncStatus(‘❌ Mot de passe requis’); return; }
+if (isFirst) localStorage.setItem(‘g_pwd_set’, ‘1’);
+}
 
-  setSyncStatus('⏳ Connexion en cours…');
-  try {
-    await loadGoogleScript();
-    await loadGapiScript();
-    await gapi.client.init({
-      discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-    });
-    gTokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: localStorage.getItem('g_client_id'),
-      scope: G_SCOPES,
-      callback: async (resp) => {
-        if (resp.error) { setSyncStatus('❌ ' + resp.error); return; }
-        gAccessToken = resp.access_token;
-        gapi.client.setToken({ access_token: gAccessToken });
-        gIsReady = true;
-        onGSignedIn();
-      }
-    });
-    gTokenClient.requestAccessToken();
-  } catch(e) {
-    setSyncStatus('❌ ' + (e.message || 'Erreur connexion'));
-  }
+setSyncStatus(‘⏳ Connexion en cours…’);
+try {
+await loadGoogleScript();
+await loadGapiScript();
+await gapi.client.init({
+discoveryDocs: [‘https://www.googleapis.com/discovery/v1/apis/drive/v3/rest’]
+});
+gTokenClient = google.accounts.oauth2.initTokenClient({
+client_id: localStorage.getItem(‘g_client_id’),
+scope: G_SCOPES,
+callback: async (resp) => {
+if (resp.error) { setSyncStatus(’❌ ’ + resp.error); return; }
+gAccessToken = resp.access_token;
+gapi.client.setToken({ access_token: gAccessToken });
+gIsReady = true;
+onGSignedIn();
+}
+});
+gTokenClient.requestAccessToken();
+} catch(e) {
+setSyncStatus(’❌ ’ + (e.message || ‘Erreur connexion’));
+}
 }
 
 async function onGSignedIn() {
-  document.getElementById('btnSignIn').style.display = 'none';
-  document.getElementById('btnSignOut').style.display = '';
-  document.getElementById('btnSave').style.display = '';
-  document.getElementById('btnLoad').style.display = '';
-  setSyncStatus('✅ Connecté — chargement…', true);
-  await gFindOrCreateFile();
-  await gLoadData();
+document.getElementById(‘btnSignIn’).style.display = ‘none’;
+document.getElementById(‘btnSignOut’).style.display = ‘’;
+document.getElementById(‘btnSave’).style.display = ‘’;
+document.getElementById(‘btnLoad’).style.display = ‘’;
+setSyncStatus(‘✅ Connecté — chargement…’, true);
+await gFindOrCreateFile();
+await gLoadData();
 }
 
 function gSignOut() {
-  if (gAccessToken) google.accounts.oauth2.revoke(gAccessToken);
-  gAccessToken = null; gFileId = null; gIsReady = false;
-  clearPassword();
-  document.getElementById('btnSignIn').style.display = '';
-  document.getElementById('btnSignOut').style.display = 'none';
-  document.getElementById('btnSave').style.display = 'none';
-  document.getElementById('btnLoad').style.display = 'none';
-  setSyncStatus('Déconnecté — session chiffrée fermée');
+if (gAccessToken) google.accounts.oauth2.revoke(gAccessToken);
+gAccessToken = null; gFileId = null; gIsReady = false;
+clearPassword();
+document.getElementById(‘btnSignIn’).style.display = ‘’;
+document.getElementById(‘btnSignOut’).style.display = ‘none’;
+document.getElementById(‘btnSave’).style.display = ‘none’;
+document.getElementById(‘btnLoad’).style.display = ‘none’;
+setSyncStatus(‘Déconnecté — session chiffrée fermée’);
 }
 
 async function gFindOrCreateFile() {
-  const res = await gapi.client.drive.files.list({
-    spaces: 'appDataFolder',
-    q: `name='${G_FILE_NAME}'`,
-    fields: 'files(id,name,modifiedTime)'
-  });
-  const files = res.result.files;
-  if (files && files.length > 0) {
-    gFileId = files[0].id;
-    const mod = files[0].modifiedTime ? new Date(files[0].modifiedTime).toLocaleString('fr-FR') : '';
-    setSyncStatus('🔐 Fichier chiffré trouvé — modifié le ' + mod, true);
-  } else {
-    gFileId = null;
-    setSyncStatus('🔐 Connecté — aucun fichier encore', true);
-  }
+const res = await gapi.client.drive.files.list({
+spaces: ‘appDataFolder’,
+q: `name='${G_FILE_NAME}'`,
+fields: ‘files(id,name,modifiedTime)’
+});
+const files = res.result.files;
+if (files && files.length > 0) {
+gFileId = files[0].id;
+const mod = files[0].modifiedTime ? new Date(files[0].modifiedTime).toLocaleString(‘fr-FR’) : ‘’;
+setSyncStatus(’🔐 Fichier chiffré trouvé — modifié le ’ + mod, true);
+} else {
+gFileId = null;
+setSyncStatus(‘🔐 Connecté — aucun fichier encore’, true);
+}
 }
 
 async function gSaveData() {
-  if (!gIsReady) { setSyncStatus('❌ Non connecté'); return; }
-  const pwd = getPassword('save');
-  if (!pwd) { setSyncStatus('❌ Mot de passe requis'); return; }
+if (!gIsReady) { setSyncStatus(‘❌ Non connecté’); return; }
+const pwd = getPassword(‘save’);
+if (!pwd) { setSyncStatus(‘❌ Mot de passe requis’); return; }
 
-  setSyncStatus('⏳ Chiffrement et sauvegarde…');
-  try {
-    const jsonStr = JSON.stringify({
-      version: 2,
-      savedAt: new Date().toISOString(),
-      interventions: getData(),
-      tickets: getTDs(),
-      set_sessions: getSETs(),
-      innovations: getInnovs()
-    });
+setSyncStatus(‘⏳ Chiffrement et sauvegarde…’);
+try {
+const jsonStr = JSON.stringify({
+version: 2,
+savedAt: new Date().toISOString(),
+interventions: getData(),
+tickets: getTDs(),
+set_sessions: getSETs(),
+innovations: getInnovs()
+});
 
-    // Chiffrement AES-256
-    const encrypted = await chiffrer(jsonStr, pwd);
+```
+// Chiffrement AES-256
+const encrypted = await chiffrer(jsonStr, pwd);
 
-    const boundary = '-------suivi314159';
-    const metadata = JSON.stringify({ name: G_FILE_NAME, parents: ['appDataFolder'] });
+const boundary = '-------suivi314159';
+const metadata = JSON.stringify({ name: G_FILE_NAME, parents: ['appDataFolder'] });
 
-    let url, method, body, headers = { 'Authorization': 'Bearer ' + gAccessToken };
+let url, method, body, headers = { 'Authorization': 'Bearer ' + gAccessToken };
 
-    if (gFileId) {
-      url = `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`;
-      method = 'PATCH';
-      body = encrypted;
-      headers['Content-Type'] = 'text/plain';
-    } else {
-      url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
-      method = 'POST';
-      body = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metadata}\r\n--${boundary}\r\nContent-Type: text/plain\r\n\r\n${encrypted}\r\n--${boundary}--`;
-      headers['Content-Type'] = `multipart/related; boundary="${boundary}"`;
-    }
+if (gFileId) {
+  url = `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`;
+  method = 'PATCH';
+  body = encrypted;
+  headers['Content-Type'] = 'text/plain';
+} else {
+  url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+  method = 'POST';
+  body = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metadata}\r\n--${boundary}\r\nContent-Type: text/plain\r\n\r\n${encrypted}\r\n--${boundary}--`;
+  headers['Content-Type'] = `multipart/related; boundary="${boundary}"`;
+}
 
-    const r = await fetch(url, { method, headers, body });
-    const json = await r.json();
-    if (json.id) gFileId = json.id;
-    const now = new Date().toLocaleString('fr-FR');
-    setSyncStatus('🔐 Sauvegardé et chiffré le ' + now, true);
-  } catch(e) {
-    setSyncStatus('❌ Erreur : ' + e.message);
-  }
+const r = await fetch(url, { method, headers, body });
+const json = await r.json();
+if (json.id) gFileId = json.id;
+const now = new Date().toLocaleString('fr-FR');
+setSyncStatus('🔐 Sauvegardé et chiffré le ' + now, true);
+```
+
+} catch(e) {
+setSyncStatus(’❌ Erreur : ’ + e.message);
+}
 }
 
 async function gLoadData() {
-  if (!gIsReady || !gFileId) {
-    setSyncStatus(gIsReady ? '🔐 Connecté — aucune donnée cloud' : '❌ Non connecté');
-    return;
-  }
-  const pwd = getPassword('load');
-  if (!pwd) { setSyncStatus('❌ Mot de passe requis'); return; }
+if (!gIsReady || !gFileId) {
+setSyncStatus(gIsReady ? ‘🔐 Connecté — aucune donnée cloud’ : ‘❌ Non connecté’);
+return;
+}
+const pwd = getPassword(‘load’);
+if (!pwd) { setSyncStatus(‘❌ Mot de passe requis’); return; }
 
-  setSyncStatus('⏳ Chargement et déchiffrement…');
-  try {
-    const r = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
-      { headers: { 'Authorization': 'Bearer ' + gAccessToken } }
-    );
-    const encrypted = await r.text();
+setSyncStatus(‘⏳ Chargement et déchiffrement…’);
+try {
+const r = await fetch(
+`https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
+{ headers: { ‘Authorization’: ’Bearer ’ + gAccessToken } }
+);
+const encrypted = await r.text();
 
-    let payload;
-    try {
-      const jsonStr = await dechiffrer(encrypted, pwd);
-      payload = JSON.parse(jsonStr);
-    } catch(e) {
-      clearPassword();
-      setSyncStatus('❌ Mot de passe incorrect ou données corrompues');
-      return;
-    }
+```
+let payload;
+try {
+  const jsonStr = await dechiffrer(encrypted, pwd);
+  payload = JSON.parse(jsonStr);
+} catch(e) {
+  clearPassword();
+  setSyncStatus('❌ Mot de passe incorrect ou données corrompues');
+  return;
+}
 
-    if (!payload.interventions && !payload.tickets) throw new Error('Format invalide');
+if (!payload.interventions && !payload.tickets) throw new Error('Format invalide');
 
-    const mergeById = (existing, incoming) => {
-      const map = {};
-      existing.forEach(x => map[x.id] = x);
-      (incoming||[]).forEach(x => map[x.id] = x);
-      return Object.values(map).sort((a,b) => b.id - a.id);
-    };
+const mergeById = (existing, incoming) => {
+  const map = {};
+  existing.forEach(x => map[x.id] = x);
+  (incoming||[]).forEach(x => map[x.id] = x);
+  return Object.values(map).sort((a,b) => b.id - a.id);
+};
 
-    const newI = mergeById(getData(), payload.interventions || []);
-    const newT = mergeById(getTDs(), payload.tickets || []);
-    const newS = mergeById(getSETs(), payload.set_sessions || []);
-    const newV = mergeById(getInnovs(), payload.innovations || []);
-    saveData(newI);
-    saveTDs(newT);
-    saveSETs(newS);
-    saveInnovs(newV);
+const newI = mergeById(getData(), payload.interventions || []);
+const newT = mergeById(getTDs(), payload.tickets || []);
+const newS = mergeById(getSETs(), payload.set_sessions || []);
+const newV = mergeById(getInnovs(), payload.innovations || []);
+saveData(newI);
+saveTDs(newT);
+saveSETs(newS);
+saveInnovs(newV);
 
-    const mod = payload.savedAt ? new Date(payload.savedAt).toLocaleString('fr-FR') : '?';
-    setSyncStatus('🔐 Déchiffré — ' + newI.length + ' interventions · ' + newT.length + ' tickets · ' + newS.length + ' SET · ' + newV.length + ' innovations (cloud du ' + mod + ')', true);
-    renderDashboard(); renderHistory(); renderTD(); renderTDKpis();
-  } catch(e) {
-    setSyncStatus('❌ Erreur : ' + e.message);
-  }
+const mod = payload.savedAt ? new Date(payload.savedAt).toLocaleString('fr-FR') : '?';
+setSyncStatus('🔐 Déchiffré — ' + newI.length + ' interventions · ' + newT.length + ' tickets · ' + newS.length + ' SET · ' + newV.length + ' innovations (cloud du ' + mod + ')', true);
+renderDashboard(); renderHistory(); renderTD(); renderTDKpis();
+```
+
+} catch(e) {
+setSyncStatus(’❌ Erreur : ’ + e.message);
+}
 }
 
 function setSyncStatus(msg, ok=false) {
-  const el = document.getElementById('syncStatus');
-  el.textContent = msg;
-  el.className = 'sync-status' + (ok ? ' ok' : '');
+const el = document.getElementById(‘syncStatus’);
+el.textContent = msg;
+el.className = ‘sync-status’ + (ok ? ’ ok’ : ‘’);
 }
 
 function updateSyncStatus() {
-  const i = getData().length;
-  const t = getTDs().length;
-  if (!gIsReady) setSyncStatus('💾 ' + i + ' intervention' + (i>1?'s':'') + ' · ' + t + ' ticket' + (t>1?'s':'') + ' (local)');
+const i = getData().length;
+const t = getTDs().length;
+if (!gIsReady) setSyncStatus(‘💾 ’ + i + ’ intervention’ + (i>1?‘s’:’’) + ’ · ’ + t + ’ ticket’ + (t>1?‘s’:’’) + ’ (local)’);
 }
 
-// ---- INITIAL RENDER ----
+// –– INITIAL RENDER ––
 renderDashboard();
 updateSyncStatus();
 
-// ---- SERVICE WORKER ----
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('SW enregistré :', reg.scope))
-      .catch(err => console.log('SW erreur :', err));
-  });
+// –– SERVICE WORKER ––
+if (‘serviceWorker’ in navigator) {
+window.addEventListener(‘load’, () => {
+navigator.serviceWorker.register(‘sw.js’)
+.then(reg => console.log(‘SW enregistré :’, reg.scope))
+.catch(err => console.log(‘SW erreur :’, err));
+});
 }
 </script>
+
 </body>
 </html>
