@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>EXCALIBUR · Maintenance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#0a0c10;--surface:#111418;--surface2:#181c24;--border:#1e2530;--border2:#252d3a;--amber:#f59e0b;--blue:#3b82f6;--green:#10b981;--red:#ef4444;--purple:#8b5cf6;--text:#dde1ea;--text2:#8892a4;--text3:#4a5568;--mono:'JetBrains Mono',monospace;--sans:'IBM Plex Sans',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column;max-width:520px;margin:0 auto}
+.header{background:var(--surface);border-bottom:2px solid var(--amber);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-logo{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--amber);letter-spacing:.2em;display:flex;align-items:center;gap:8px}
+.header-logo::before{content:'';width:8px;height:8px;background:var(--amber);border-radius:50%;animation:pulse 2s infinite}
+.sp-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);transition:background .3s}
+.sp-dot.ok{background:var(--green);box-shadow:0 0 6px var(--green)}
+.header-right{display:flex;align-items:center;gap:8px}
+.header-info{font-family:var(--mono);font-size:11px;color:var(--text2);text-align:right;line-height:1.5}
+.content{flex:1;overflow-y:auto;padding:14px 14px 90px}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0)}
+.nav-btn{flex:1;padding:10px 4px 12px;border:none;background:none;color:var(--text3);font-family:var(--mono);font-size:9px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:color .2s;letter-spacing:.05em;text-transform:uppercase}
+.nav-btn .icon{font-size:20px}.nav-btn.active{color:var(--amber)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.card-title{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--amber);letter-spacing:.12em;text-transform:uppercase}
+.sp-card{background:var(--surface);border:1px solid rgba(139,92,246,.3);border-radius:10px;padding:14px;margin-bottom:12px}
+.sp-title{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--purple);letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sp-meta{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:8px}
+.sp-item{padding:9px 0;border-bottom:1px solid var(--border);font-size:12px}.sp-item:last-child{border-bottom:none}
+.sp-field{display:flex;gap:8px;margin-bottom:3px}
+.sp-key{font-family:var(--mono);font-size:10px;color:var(--text3);min-width:90px;flex-shrink:0}
+.sp-val{font-size:12px;color:var(--text);word-break:break-word}
+/* DROP ZONE */
+.drop-zone{border:2px dashed rgba(139,92,246,.3);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;margin-top:10px}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--purple);background:rgba(139,92,246,.06)}
+.drop-zone-icon{font-size:28px;margin-bottom:6px}
+.drop-zone-txt{font-size:13px;color:var(--text2);line-height:1.6}
+.drop-zone-sub{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px}
+input[type=file]{display:none}
+/* GUIDE */
+.guide-step{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.step-num{width:22px;height:22px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);border-radius:50%;color:var(--purple);font-family:var(--mono);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-txt{font-size:12px;color:var(--text2);line-height:1.6}
+/* BADGES */
+.badge{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:.05em;text-transform:uppercase}
+.bg{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+.ba{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.25)}
+.br{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.bb{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.25)}
+.bp{background:rgba(139,92,246,.12);color:var(--purple);border:1px solid rgba(139,92,246,.25)}
+.section-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;margin-top:18px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.ai-out{background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.18);border-radius:8px;padding:14px;font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap}
+.ai-tag{font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:.12em;margin-bottom:10px;display:flex;align-items:center;gap:6px;text-transform:uppercase}
+.ai-dot{width:6px;height:6px;background:var(--amber);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.form-group{margin-bottom:13px}
+label{display:block;font-size:10px;font-weight:600;color:var(--text3);margin-bottom:5px;letter-spacing:.08em;text-transform:uppercase;font-family:var(--mono)}
+input:not([type=file]),select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:10px 12px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--amber)}
+textarea{resize:vertical;min-height:80px}
+select option{background:#181c24}
+.btn{width:100%;padding:12px;border:none;border-radius:8px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-primary{background:var(--amber);color:#0a0c10}.btn-primary:active{transform:scale(.97)}
+.btn-ai{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.25)}
+.btn-sp{background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.3)}
+.btn-sm{padding:7px 12px;font-size:11px;width:auto;border-radius:6px}
+.btn-danger{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);margin-top:8px}
+.train-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}.train-item:last-child{border-bottom:none}
+.train-num{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text)}
+.train-note{font-size:11px;color:var(--text2);margin-top:2px}
+.iv-item{padding:10px 0;border-bottom:1px solid var(--border)}.iv-item:last-child{border-bottom:none}
+.iv-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.iv-train{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--amber)}
+.iv-cat{font-size:11px;color:var(--text2)}
+.iv-desc{font-size:13px;color:var(--text);line-height:1.4;margin-top:3px}
+.del-btn{background:none;border:none;color:var(--text3);font-size:17px;cursor:pointer;padding:0 2px;flex-shrink:0}
+.del-btn:active{color:var(--red)}
+.doc-item{padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer}.doc-item:last-child{border-bottom:none}
+.doc-ref{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.doc-title{font-size:14px;font-weight:500;color:var(--text);margin:3px 0}
+.doc-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.tag{font-size:10px;padding:2px 6px;background:var(--surface2);border-radius:3px;color:var(--text2);font-family:var(--mono)}
+.empty{text-align:center;padding:28px 16px;color:var(--text3);font-size:13px;line-height:1.6}
+.empty-icon{font-size:30px;margin-bottom:8px}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(245,158,11,.25);border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tab{display:none}.tab.active{display:block}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--surface);border-top:2px solid var(--amber);border-radius:14px 14px 0 0;padding:18px 16px calc(32px + env(safe-area-inset-bottom,0));width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modal-title{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--amber);letter-spacing:.12em}
+.close-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.info-box{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.75}
+.info-box strong{color:var(--blue);font-family:var(--mono);font-size:10px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:12px;font-weight:700;padding:9px 18px;border-radius:20px;z-index:300;white-space:nowrap;animation:tIn .2s ease,tOut .3s ease 2.2s forwards;letter-spacing:.05em;color:#0a0c10}
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}}
+@keyframes tOut{to{opacity:0;transform:translateX(-50%) translateY(10px)}}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="header-logo">EXCALIBUR</div>
+    <div class="sp-dot" id="spDot"></div>
+  </div>
+  <div class="header-right">
+    <div class="header-info">
+      <div id="hDate"></div>
+      <div id="hTime" style="color:var(--text)"></div>
+    </div>
+    <button class="gear-btn" onclick="openKeyModal()" id="keyBtn" title="Clé API">🔑</button>
+  </div>
+</div>
+
+<!-- MODAL CLÉ API -->
+<div class="modal-overlay" id="keyModal" style="display:none" onclick="closeKeyModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🔑 CONFIGURATION IA</span>
+      <button class="close-btn" onclick="closeKeyModal()">✕</button>
+    </div>
+
+    <!-- Provider selector -->
+    <div class="form-group">
+      <label>Fournisseur IA</label>
+      <select id="aiProvider" onchange="updateProviderUI()">
+        <option value="gemini">Google Gemini — GRATUIT ✓</option>
+        <option value="anthropic">Anthropic Claude — Payant</option>
+      </select>
+    </div>
+
+    <!-- Gemini info -->
+    <div id="geminiInfo" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.75;margin-bottom:12px">
+      <strong style="color:var(--green);font-family:var(--mono);font-size:10px">✓ GOOGLE GEMINI — 100% GRATUIT</strong><br><br>
+      <strong>1 500 requêtes/jour</strong> gratuites, sans carte bancaire.<br><br>
+      👉 <strong style="color:var(--text)">aistudio.google.com</strong> → Se connecter avec votre compte Google → <strong>Get API key</strong> → Create API key
+    </div>
+
+    <!-- Anthropic info -->
+    <div id="anthropicInfo" style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.75;margin-bottom:12px;display:none">
+      <strong style="color:var(--amber);font-family:var(--mono);font-size:10px">ANTHROPIC CLAUDE — PAYANT</strong><br><br>
+      👉 <strong style="color:var(--text)">console.anthropic.com</strong> → API Keys → Create Key<br>
+      La clé commence par <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:10px">sk-ant-</code>
+    </div>
+
+    <div class="form-group">
+      <label id="keyLabel">Clé API Google (commence par AIza...)</label>
+      <input type="password" id="apiKeyInput" placeholder="AIzaSy...">
+    </div>
+    <div id="keyStatus" style="font-family:var(--mono);font-size:10px;margin-bottom:12px;display:none"></div>
+    <button class="btn btn-primary" onclick="saveApiKey()">Enregistrer la clé</button>
+    <button class="btn btn-danger" onclick="clearApiKey()" style="margin-top:8px">Effacer la clé</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- BRIEFING -->
+  <div class="tab active" id="tab-briefing">
+
+    <!-- SharePoint Card -->
+    <div class="sp-card">
+      <div class="sp-row">
+        <div class="sp-title">🔗 SharePoint</div>
+        <span id="spBadge" class="badge bp" style="font-size:9px">AUCUN FICHIER</span>
+      </div>
+      <div id="spMeta" class="sp-meta" style="display:none"></div>
+      <div id="spContent">
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('spFileInput').click()" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+          <div class="drop-zone-icon">📥</div>
+          <div class="drop-zone-txt"><strong>Importer le fichier SharePoint</strong><br>Cliquez ou glissez votre export Excel/CSV</div>
+          <div class="drop-zone-sub">.xlsx · .xls · .csv — données stockées localement</div>
+        </div>
+        <input type="file" id="spFileInput" accept=".xlsx,.xls,.csv" onchange="importFile(this.files[0])">
+      </div>
+
+      <!-- Guide export SharePoint -->
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;margin-bottom:10px">COMMENT EXPORTER DEPUIS SHAREPOINT</div>
+        <div class="guide-step">
+          <div class="step-num">1</div>
+          <div class="step-txt">Ouvrez votre liste SharePoint dans le navigateur</div>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">2</div>
+          <div class="step-txt">Cliquez sur <strong>⬇ Exporter → Exporter vers Excel</strong> (barre d'outils en haut de la liste)</div>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">3</div>
+          <div class="step-txt">Enregistrez le fichier .xlsx téléchargé, puis importez-le ici</div>
+        </div>
+      </div>
+
+      <div id="spActions" style="display:none;margin-top:10px;display:flex;gap:8px;display:none">
+        <button class="btn btn-sp btn-sm" style="flex:1" onclick="document.getElementById('spFileInput').click()">↻ Réimporter</button>
+        <button class="btn btn-danger btn-sm" style="flex:1;margin-top:0" onclick="clearSP()">✕ Effacer</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">📋 Prise de poste</span>
+        <span class="badge ba" id="shiftBadge">—</span>
+      </div>
+      <button class="btn btn-ai" id="briefingBtn" onclick="genBriefing()"><span>✦</span> Générer le briefing IA</button>
+    </div>
+
+    <div id="briefingOut" style="display:none">
+      <div class="card">
+        <div class="ai-tag"><span class="ai-dot"></span> ANALYSE IA — PRISE DE POSTE</div>
+        <div class="ai-out" id="briefingTxt"></div>
+      </div>
+    </div>
+
+    <div class="section-label">État du parc</div>
+    <div class="card"><div id="parcList"><div class="empty"><div class="empty-icon">🚆</div>Aucun matériel.</div></div></div>
+
+    <div class="section-label">Interventions de la veille</div>
+    <div class="card"><div id="yList"><div class="empty"><div class="empty-icon">📁</div>Aucune hier.</div></div></div>
+
+    <div class="section-label">Interventions du jour</div>
+    <div class="card"><div id="tList"><div class="empty"><div class="empty-icon">📝</div>Aucune aujourd'hui.</div></div></div>
+  </div>
+
+  <!-- SAISIE -->
+  <div class="tab" id="tab-saisie">
+    <div class="card">
+      <div class="card-header"><span class="card-title">✏️ Intervention</span></div>
+      <div class="form-group"><label>N° Train / Matériel *</label><input type="text" id="ivTrain" placeholder="ex: Z50123"></div>
+      <div class="form-group"><label>Catégorie *</label>
+        <select id="ivCat">
+          <option value="">— Sélectionner —</option>
+          <option>Panne électrique</option><option>Panne mécanique</option><option>Défaut portes</option>
+          <option>Défaut freinage</option><option>Climatisation</option><option>Signalisation / ATESS</option>
+          <option>Incident voyageurs</option><option>Contrôle / Révision</option><option>Reprise de dépannage</option><option>Autre</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Description *</label><textarea id="ivDesc" placeholder="Détails..."></textarea></div>
+      <div class="form-group"><label>Résultat</label>
+        <select id="ivRes">
+          <option value="résolu">✅ Résolu</option><option value="en cours">⚠️ En cours</option>
+          <option value="récidive">🔄 Récidive</option><option value="hors service">🔴 Hors service</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Durée (min)</label><input type="number" id="ivDur" placeholder="45" min="0"></div>
+      <button class="btn btn-primary" onclick="saveIV()">Enregistrer l'intervention</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">🚆 État matériel</span></div>
+      <div class="form-group"><label>Matériel *</label><input type="text" id="pTrain" placeholder="ex: Z50123"></div>
+      <div class="form-group"><label>Statut</label>
+        <select id="pStatus">
+          <option value="opérationnel">✅ Opérationnel</option>
+          <option value="surveillance">⚠️ En surveillance</option>
+          <option value="hors service">🔴 Hors service</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Note</label><input type="text" id="pNote" placeholder="ex: Défaut freinage connu"></div>
+      <button class="btn btn-primary" onclick="saveParc()">Mettre à jour le parc</button>
+    </div>
+    <!-- IMPORT HISTORIQUE -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">📂 Import historique</span></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">Importez un fichier Excel ou CSV existant dans l'historique des interventions. EXCALIBUR vous laisse choisir quelle colonne correspond à quel champ.</div>
+      <div class="drop-zone" id="ivDropZone" onclick="document.getElementById('ivFileInput').click()" ondragover="onIvDrag(event,true)" ondragleave="onIvDrag(event,false)" ondrop="onIvDrop(event)" style="margin-top:0;border-color:rgba(245,158,11,.3)">
+        <div class="drop-zone-icon">📥</div>
+        <div class="drop-zone-txt"><strong>Glisser ou sélectionner un fichier</strong></div>
+        <div class="drop-zone-sub">.xlsx · .xls · .csv</div>
+      </div>
+      <input type="file" id="ivFileInput" accept=".xlsx,.xls,.csv" onchange="loadIvFile(this.files[0])">
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">⚠️ Zone danger</span></div>
+      <button class="btn btn-danger" onclick="clearAll()">🗑 Effacer toutes les données</button>
+    </div>
+  </div>
+
+  <!-- RECHERCHE -->
+  <div class="tab" id="tab-recherche">
+    <div class="card">
+      <div class="ai-tag"><span class="ai-dot"></span> ASSISTANT DOCUMENTAIRE IA</div>
+      <div class="form-group"><textarea id="searchQ" placeholder="Ex: procédure dépose bogie Z50000, Art R2221-1, test frein à main..." rows="3"></textarea></div>
+      <button class="btn btn-ai" id="searchBtn" onclick="doSearch()"><span>✦</span> Rechercher & analyser</button>
+    </div>
+    <div id="searchOut" style="display:none">
+      <div class="card">
+        <div class="ai-tag"><span class="ai-dot"></span> RÉSULTAT</div>
+        <div class="ai-out" id="searchTxt"></div>
+      </div>
+    </div>
+    <div class="section-label">Accès rapide</div>
+    <div class="card"><div id="docQuick"><div class="empty"><div class="empty-icon">📚</div>Ajoutez des docs dans l'onglet Docs.</div></div></div>
+  </div>
+
+  <!-- DOCS -->
+  <div class="tab" id="tab-docs">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">📚 Bibliothèque</span>
+        <button class="btn btn-primary btn-sm" onclick="openDocModal()">+ Ajouter</button>
+      </div>
+      <div id="docList"><div class="empty"><div class="empty-icon">📄</div>Aucun document enregistré.</div></div>
+    </div>
+    <div class="section-label">Accès téléphone</div>
+    <div class="card">
+      <div class="info-box">
+        <strong>📱 UTILISER SUR TÉLÉPHONE</strong><br><br>
+        Envoyez ce fichier HTML par WhatsApp ou mail sur votre téléphone, ouvrez-le dans Chrome mobile. Fonctionne identiquement — importez l'export SharePoint depuis votre téléphone de la même façon.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('briefing',this)"><span class="icon">📋</span>BRIEFING</button>
+  <button class="nav-btn" onclick="switchTab('saisie',this)"><span class="icon">✏️</span>SAISIE</button>
+  <button class="nav-btn" onclick="switchTab('recherche',this)"><span class="icon">🔍</span>RECHERCHE</button>
+  <button class="nav-btn" onclick="switchTab('docs',this)"><span class="icon">📚</span>DOCS</button>
+</nav>
+
+<!-- MODAL DOC -->
+<div class="modal-overlay" id="docModal" style="display:none" onclick="closeDocModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">AJOUTER UN DOCUMENT</span>
+      <button class="close-btn" onclick="closeDocModal()">✕</button>
+    </div>
+    <div class="form-group"><label>Titre *</label><input type="text" id="dTitle" placeholder="ex: Procédure dépose bogie Z2"></div>
+    <div class="form-group"><label>Type</label>
+      <select id="dType">
+        <option value="procédure">Procédure technique</option>
+        <option value="réglementation">Référence réglementaire</option>
+        <option value="note">Note personnelle</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Référence</label><input type="text" id="dRef" placeholder="ex: NT-TM-2024-012"></div>
+    <div class="form-group"><label>Contenu *</label><textarea id="dContent" rows="6" placeholder="Copiez ou résumez..."></textarea></div>
+    <div class="form-group"><label>Tags (virgule)</label><input type="text" id="dTags" placeholder="ex: bogie, Z50000, freinage"></div>
+    <button class="btn btn-primary" onclick="saveDoc()">Enregistrer</button>
+  </div>
+</div>
+
+<!-- MODAL DOC VUE -->
+<div class="modal-overlay" id="viewModal" style="display:none" onclick="closeView(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="vTitle">—</span>
+      <button class="close-btn" onclick="closeView()">✕</button>
+    </div>
+    <div id="vRef" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:8px"></div>
+    <div id="vTags" class="doc-tags" style="margin-bottom:12px"></div>
+    <div style="font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;background:var(--surface2);border-radius:7px;padding:12px;max-height:300px;overflow-y:auto" id="vContent"></div>
+    <button class="btn btn-danger" style="margin-top:12px" onclick="deleteDoc()">🗑 Supprimer</button>
+  </div>
+</div>
+
+<script>
+// UTILS
+const today=()=>new Date().toISOString().split('T')[0];
+const yesterday=()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().split('T')[0];};
+const uid=()=>Math.random().toString(36).substr(2,9);
+const get=(k,d=[])=>{try{return JSON.parse(localStorage.getItem(k))??d;}catch{return d;}};
+const set=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+function toast(msg,bg='var(--green)'){
+  const t=document.createElement('div');t.className='toast';t.style.background=bg;
+  t.style.color=(bg==='var(--green)'||bg==='#10b981')?'#0a0c10':'#fff';
+  t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2600);
+}
+
+// CLOCK
+function tick(){
+  const n=new Date();
+  document.getElementById('hDate').textContent=n.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+  document.getElementById('hTime').textContent=n.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const h=n.getHours(),b=document.getElementById('shiftBadge');
+  if(h>=6&&h<14){b.textContent='MATIN';b.className='badge bb';}
+  else if(h>=14&&h<22){b.textContent='APM';b.className='badge ba';}
+  else{b.textContent='NUIT';b.className='badge bb';}
+}
+setInterval(tick,1000);tick();
+
+// TABS
+function switchTab(name,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');
+  if(name==='briefing')renderBriefing();
+  if(name==='docs')renderDocs();
+  if(name==='recherche')renderQuick();
+}
+
+// DRAG & DROP
+function onDrag(e,active){e.preventDefault();document.getElementById('dropZone').classList.toggle('drag',active);}
+function onDrop(e){e.preventDefault();onDrag(e,false);const f=e.dataTransfer.files[0];if(f)importFile(f);}
+
+// SHAREPOINT IMPORT
+const SP_SKIP=new Set(['ID','Modified','Created','Author','Editor','_UIVersionString','ContentType','Attachments','Edit','DocIcon','LinkTitleNoMenu','LinkTitle','ItemChildCount','FolderChildCount']);
+
+async function importFile(file){
+  if(!file)return;
+  const ext=file.name.split('.').pop().toLowerCase();
+  try{
+    const buf=await file.arrayBuffer();
+    const wb=XLSX.read(buf,{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+    if(!rows.length){toast('⚠ Fichier vide ou format non reconnu','#ef4444');return;}
+
+    // Clean rows — remove SharePoint system columns
+    const cleaned=rows.map(row=>{
+      const out={};
+      Object.entries(row).forEach(([k,v])=>{
+        if(!SP_SKIP.has(k)&&!k.startsWith('_')&&v!==''&&v!==null){out[k]=String(v);}
+      });
+      return out;
+    }).filter(r=>Object.keys(r).length>0);
+
+    set('spData',{rows:cleaned,file:file.name,at:new Date().toISOString()});
+    renderSP(cleaned,file.name);
+    toast(`✓ ${cleaned.length} lignes importées`);
+  }catch(e){
+    toast('⚠ Erreur lecture fichier : '+e.message,'#ef4444');
+  }
+}
+
+function renderSP(rows,fname){
+  const badge=document.getElementById('spBadge'),dot=document.getElementById('spDot'),
+        meta=document.getElementById('spMeta'),actions=document.getElementById('spActions'),
+        content=document.getElementById('spContent');
+
+  badge.textContent=`${rows.length} LIGNES`;badge.className='badge bg';
+  dot.className='sp-dot ok';
+  meta.style.display='block';
+  meta.textContent=`${fname} · importé ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
+  actions.style.display='flex';
+
+  // Show drop zone small + table data
+  const cols=rows.length?Object.keys(rows[0]):[];
+  content.innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <div class="drop-zone" onclick="document.getElementById('spFileInput').click()" style="flex:1;padding:10px;flex-direction:row;gap:8px">
+        <span style="font-size:16px">📥</span>
+        <span style="font-size:11px;color:var(--text2)">Réimporter un nouveau fichier</span>
+      </div>
+    </div>
+    ${rows.slice(0,10).map(row=>`
+      <div class="sp-item">
+        ${Object.entries(row).slice(0,6).map(([k,v])=>`
+          <div class="sp-field">
+            <span class="sp-key">${k}</span>
+            <span class="sp-val">${String(v).substring(0,100)}</span>
+          </div>`).join('')}
+      </div>`).join('')}
+    ${rows.length>10?`<div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;padding:8px">... et ${rows.length-10} lignes supplémentaires</div>`:''}
+  `;
+}
+
+function clearSP(){
+  if(!confirm('Effacer les données SharePoint importées ?'))return;
+  localStorage.removeItem('spData');
+  location.reload();
+}
+
+// INTERVENTIONS
+function saveIV(){
+  const t=document.getElementById('ivTrain').value.trim(),c=document.getElementById('ivCat').value,
+        d=document.getElementById('ivDesc').value.trim(),r=document.getElementById('ivRes').value,
+        dur=parseInt(document.getElementById('ivDur').value)||0;
+  if(!t||!c||!d){toast('⚠ Champs obligatoires manquants','#ef4444');return;}
+  const list=get('iv');
+  list.push({id:uid(),date:today(),timestamp:new Date().toISOString(),trainNum:t,category:c,description:d,result:r,duration:dur});
+  set('iv',list);
+  ['ivTrain','ivDesc','ivDur'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ivCat').value='';
+  toast('✓ Intervention enregistrée');
+}
+
+// PARC
+function saveParc(){
+  const t=document.getElementById('pTrain').value.trim();
+  if(!t){toast('⚠ Indiquez le matériel','#ef4444');return;}
+  const p=get('parc',{});
+  p[t]={status:document.getElementById('pStatus').value,note:document.getElementById('pNote').value.trim(),updated:new Date().toISOString()};
+  set('parc',p);document.getElementById('pTrain').value='';document.getElementById('pNote').value='';
+  renderParc();toast('✓ Parc mis à jour');
+}
+function removeParc(t){if(!confirm(`Retirer ${t} ?`))return;const p=get('parc',{});delete p[t];set('parc',p);renderParc();}
+function clearAll(){if(!confirm('Effacer TOUTES les données ?'))return;['iv','parc','docs','spData'].forEach(k=>localStorage.removeItem(k));location.reload();}
+
+// RENDER
+function renderBriefing(){renderParc();renderY();renderT();}
+const sb=s=>s==='opérationnel'?'bg':s==='surveillance'?'ba':'br';
+const rb=r=>r==='résolu'?'bg':r==='en cours'?'ba':r==='récidive'?'bb':'br';
+
+function renderParc(){
+  const p=get('parc',{}),entries=Object.entries(p),el=document.getElementById('parcList');
+  if(!entries.length){el.innerHTML='<div class="empty"><div class="empty-icon">🚆</div>Aucun matériel.</div>';return;}
+  el.innerHTML=entries.map(([t,d])=>`
+    <div class="train-item">
+      <div><div class="train-num">${t}</div>${d.note?`<div class="train-note">${d.note}</div>`:''}</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span class="badge ${sb(d.status)}">${d.status.toUpperCase()}</span>
+        <button class="del-btn" onclick="removeParc('${t}')">×</button>
+      </div>
+    </div>`).join('');
+}
+function renderY(){
+  const list=get('iv').filter(i=>i.date===yesterday()),el=document.getElementById('yList');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">📁</div>Aucune hier.</div>';return;}
+  el.innerHTML=list.map(i=>`
+    <div class="iv-item">
+      <div class="iv-head">
+        <div><div class="iv-train">${i.trainNum}</div><div class="iv-cat">${i.category}${i.duration?` · ${i.duration} min`:''}</div></div>
+        <span class="badge ${rb(i.result)}">${i.result.toUpperCase()}</span>
+      </div>
+      <div class="iv-desc">${i.description}</div>
+    </div>`).join('');
+}
+function renderT(){
+  const list=get('iv').filter(i=>i.date===today()),el=document.getElementById('tList');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">📝</div>Aucune aujourd\'hui.</div>';return;}
+  el.innerHTML=list.map(i=>`
+    <div class="iv-item">
+      <div class="iv-head">
+        <div><div class="iv-train">${i.trainNum}</div><div class="iv-cat">${i.category}${i.duration?` · ${i.duration} min`:''}</div></div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="badge ${rb(i.result)}">${i.result.toUpperCase()}</span>
+          <button class="del-btn" onclick="delIV('${i.id}')">×</button>
+        </div>
+      </div>
+      <div class="iv-desc">${i.description}</div>
+    </div>`).join('');
+}
+function delIV(id){if(!confirm('Supprimer ?'))return;set('iv',get('iv').filter(i=>i.id!==id));renderBriefing();}
+
+// AI BRIEFING
+async function genBriefing(){
+  const btn=document.getElementById('briefingBtn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Analyse...';
+  const yL=get('iv').filter(i=>i.date===yesterday()),tL=get('iv').filter(i=>i.date===today()),
+        p=get('parc',{}),spD=get('spData',null);
+
+  const spSec=spD?.rows?.length
+    ?`\nDONNÉES SHAREPOINT — "${spD.file}" (${spD.rows.length} lignes, importé ${new Date(spD.at).toLocaleString('fr-FR')}):\n`+
+      spD.rows.slice(0,15).map(row=>'- '+Object.entries(row).slice(0,6).map(([k,v])=>`${k}: ${String(v).substring(0,60)}`).join(' | ')).join('\n')
+    :'\nSHAREPOINT: Aucun fichier importé aujourd\'hui.';
+
+  const ctx=`INTERVENTIONS VEILLE (${yesterday()}):\n${yL.length?yL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}${i.duration?` (${i.duration}min)`:''}`).join('\n'):'Aucune.'}\n\nINTERVENTIONS JOUR (${today()}):\n${tL.length?tL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}`).join('\n'):'Aucune.'}\n\nÉTAT DU PARC:\n${Object.entries(p).length?Object.entries(p).map(([t,d])=>`- ${t}: ${d.status.toUpperCase()}${d.note?` — ${d.note}`:''}`).join('\n'):'Aucun.'}${spSec}`;
+
+  const txt=await callAI(
+    'Tu es un assistant de maintenance ferroviaire SNCF. Génère des briefings de prise de poste concis, clairs, professionnels. Intègre les données SharePoint importées. Priorité aux points critiques (hors service, récidives, en cours).',
+    `Briefing prise de poste:\n${ctx}\n\nStructure:\n1) ⚠️ POINTS CRITIQUES\n2) 🔗 DONNÉES SHAREPOINT ÉQUIPE\n3) 🚆 ÉTAT DU PARC\n4) 📁 SYNTHÈSE INTERVENTIONS VEILLE\n5) ✅ RECOMMANDATIONS JOURNÉE`
+  );
+  if(txt){document.getElementById('briefingTxt').textContent=txt;document.getElementById('briefingOut').style.display='block';}
+  btn.disabled=false;btn.innerHTML='<span>✦</span> Générer le briefing IA';
+}
+
+// AI SEARCH
+async function doSearch(){
+  const q=document.getElementById('searchQ').value.trim();
+  if(!q){toast('⚠ Saisissez une recherche','#ef4444');return;}
+  const btn=document.getElementById('searchBtn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Recherche...';
+  const docs=get('docs'),ctx=docs.length?docs.map(d=>`[${d.type.toUpperCase()}]${d.ref?` Réf:${d.ref}`:''} "${d.title}"\n${d.content}`).join('\n\n---\n\n'):'Bibliothèque vide.';
+  const txt=await callAI(
+    'Tu es un assistant documentaire expert en maintenance ferroviaire SNCF. Utilise les documents personnels fournis en priorité. Cite les références (code des transports, EPSF, UIC/EN) quand tu les connais. Réponds de façon précise et professionnelle.',
+    `BIBLIOTHÈQUE:\n${ctx}\n\nRECHERCHE: ${q}`
+  );
+  if(txt){document.getElementById('searchTxt').textContent=txt;document.getElementById('searchOut').style.display='block';}
+  btn.disabled=false;btn.innerHTML='<span>✦</span> Rechercher & analyser';
+}
+
+// DOCS
+function renderDocs(){
+  const docs=get('docs'),el=document.getElementById('docList');
+  if(!docs.length){el.innerHTML='<div class="empty"><div class="empty-icon">📄</div>Aucun document.</div>';return;}
+  const tb=t=>t==='procédure'?'bb':t==='réglementation'?'ba':'bg';
+  el.innerHTML=docs.map((d,i)=>`
+    <div class="doc-item" onclick="viewDoc(${i})">
+      ${d.ref?`<div class="doc-ref">${d.ref}</div>`:''}
+      <div class="doc-title">${d.title}</div>
+      <div class="doc-tags" style="margin-top:5px">
+        <span class="badge ${tb(d.type)}">${d.type.toUpperCase()}</span>
+        ${(d.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function renderQuick(){
+  const docs=get('docs'),el=document.getElementById('docQuick');
+  if(!docs.length){el.innerHTML='<div class="empty"><div class="empty-icon">📚</div>Ajoutez des docs dans l\'onglet Docs.</div>';return;}
+  const tb=t=>t==='procédure'?'bb':t==='réglementation'?'ba':'bg';
+  el.innerHTML=docs.slice(0,8).map((d,i)=>`
+    <div class="doc-item" onclick="viewDoc(${i})">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="badge ${tb(d.type)}">${d.type.slice(0,3).toUpperCase()}</span>
+        <span style="font-size:13px;flex:1">${d.title}</span>
+        ${d.ref?`<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${d.ref}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+function openDocModal(){document.getElementById('docModal').style.display='flex';}
+function closeDocModal(e){
+  if(!e||e.target===document.getElementById('docModal')){
+    document.getElementById('docModal').style.display='none';
+    ['dTitle','dRef','dContent','dTags'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('dType').value='procédure';
+  }
+}
+function saveDoc(){
+  const t=document.getElementById('dTitle').value.trim(),c=document.getElementById('dContent').value.trim();
+  if(!t||!c){toast('⚠ Titre et contenu requis','#ef4444');return;}
+  const docs=get('docs');
+  docs.unshift({id:uid(),title:t,type:document.getElementById('dType').value,ref:document.getElementById('dRef').value.trim(),content:c,tags:document.getElementById('dTags').value.split(',').map(x=>x.trim()).filter(Boolean),date:today()});
+  set('docs',docs);closeDocModal();renderDocs();toast('✓ Document enregistré');
+}
+let vIdx=null;
+function viewDoc(i){
+  const d=get('docs')[i];vIdx=i;const tb=t=>t==='procédure'?'bb':t==='réglementation'?'ba':'bg';
+  document.getElementById('vTitle').textContent=d.title;
+  document.getElementById('vRef').textContent=d.ref||'';
+  document.getElementById('vTags').innerHTML=`<span class="badge ${tb(d.type)}">${d.type.toUpperCase()}</span>${(d.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}`;
+  document.getElementById('vContent').textContent=d.content;
+  document.getElementById('viewModal').style.display='flex';
+}
+function closeView(e){if(!e||e.target===document.getElementById('viewModal'))document.getElementById('viewModal').style.display='none';}
+function deleteDoc(){
+  if(vIdx===null||!confirm('Supprimer ?'))return;
+  const docs=get('docs');docs.splice(vIdx,1);set('docs',docs);closeView();renderDocs();toast('Supprimé','#ef4444');
+}
+
+// IMPORT HISTORIQUE
+let ivImportRows=[];
+
+function onIvDrag(e,a){e.preventDefault();document.getElementById('ivDropZone').classList.toggle('drag',a);}
+function onIvDrop(e){e.preventDefault();onIvDrag(e,false);const f=e.dataTransfer.files[0];if(f)loadIvFile(f);}
+
+async function loadIvFile(file){
+  if(!file)return;
+  try{
+    const buf=await file.arrayBuffer();
+    const wb=XLSX.read(buf,{type:'array',cellDates:true});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
+    if(!rows.length){toast('⚠ Fichier vide','#ef4444');return;}
+    ivImportRows=rows;
+    openIvMap(rows,file.name);
+  }catch(e){toast('⚠ Erreur lecture : '+e.message,'#ef4444');}
+}
+
+function openIvMap(rows,fname){
+  const cols=Object.keys(rows[0]);
+  const none='<option value="">— Ignorer —</option>';
+  const opts=cols.map(c=>`<option value="${c}">${c}</option>`).join('');
+
+  // Auto-detect common column names
+  const find=(...names)=>cols.find(c=>names.some(n=>c.toLowerCase().includes(n.toLowerCase())))||'';
+
+  ['mapTrain','mapCat','mapDesc','mapResult','mapDur','mapDate'].forEach(id=>document.getElementById(id).innerHTML=none+opts);
+
+  // Set auto-detected values
+  const auto={
+    mapTrain:find('train','matériel','materiel','engin','rame','numéro','numero','n°'),
+    mapCat:find('catégorie','categorie','category','type','nature'),
+    mapDesc:find('description','desc','détail','detail','commentaire','observation','libellé','libelle'),
+    mapResult:find('résultat','resultat','result','statut','status','état','etat'),
+    mapDur:find('durée','duree','duration','temps','time','min'),
+    mapDate:find('date','jour','day'),
+  };
+  Object.entries(auto).forEach(([id,val])=>{if(val)document.getElementById(id).value=val;});
+
+  // Preview
+  const preview=rows.slice(0,3).map(r=>Object.entries(r).slice(0,4).map(([k,v])=>`${k}: ${String(v).substring(0,30)}`).join('  ·  ')).join('\n');
+  document.getElementById('ivMapPreview').textContent=`📄 ${fname} — ${rows.length} lignes\n\nAperçu :\n${preview}`;
+  document.getElementById('ivMapCount').textContent=`${rows.length} ligne(s) à importer`;
+  document.getElementById('ivMapModal').style.display='flex';
+}
+
+function closeIvMap(e){if(!e||e.target===document.getElementById('ivMapModal'))document.getElementById('ivMapModal').style.display='none';}
+
+function confirmImport(){
+  const mTrain=document.getElementById('mapTrain').value;
+  const mDesc=document.getElementById('mapDesc').value;
+  if(!mTrain||!mDesc){toast('⚠ Colonne Train et Description obligatoires','#ef4444');return;}
+
+  const mCat=document.getElementById('mapCat').value;
+  const mResult=document.getElementById('mapResult').value;
+  const mDur=document.getElementById('mapDur').value;
+  const mDate=document.getElementById('mapDate').value;
+
+  const RESULT_MAP={'résolu':'résolu','ok':'résolu','done':'résolu','terminé':'résolu','termine':'résolu',
+    'en cours':'en cours','ongoing':'en cours','progress':'en cours','wip':'en cours',
+    'récidive':'récidive','recidive':'récidive','repeat':'récidive',
+    'hors service':'hors service','hs':'hors service','ko':'hors service','out':'hors service'};
+
+  const existing=get('iv');
+  let imported=0,skipped=0;
+
+  ivImportRows.forEach(row=>{
+    const trainNum=String(row[mTrain]||'').trim();
+    const description=String(row[mDesc]||'').trim();
+    if(!trainNum&&!description){skipped++;return;}
+
+    // Parse date
+    let date=today();
+    if(mDate&&row[mDate]){
+      const raw=String(row[mDate]).trim();
+      // Try various formats
+      const d=new Date(raw);
+      if(!isNaN(d.getTime()))date=d.toISOString().split('T')[0];
+      else{
+        // Try DD/MM/YYYY
+        const m=raw.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
+        if(m){const y=m[3].length===2?'20'+m[3]:m[3];date=`${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;}
+      }
+    }
+
+    // Parse result
+    let result='résolu';
+    if(mResult&&row[mResult]){
+      const raw=String(row[mResult]).toLowerCase().trim();
+      result=RESULT_MAP[raw]||'résolu';
+    }
+
+    // Parse duration
+    let duration=0;
+    if(mDur&&row[mDur]){const n=parseInt(String(row[mDur]).replace(/[^0-9]/g,''));if(!isNaN(n))duration=n;}
+
+    existing.push({
+      id:uid(),
+      date,
+      timestamp:new Date(date).toISOString(),
+      trainNum:trainNum||'—',
+      category:mCat&&row[mCat]?String(row[mCat]).trim():'Import',
+      description:description||'—',
+      result,
+      duration
+    });
+    imported++;
+  });
+
+  set('iv',existing);
+  closeIvMap();
+  renderBriefing();
+  toast(`✓ ${imported} intervention(s) importée(s)${skipped?` (${skipped} ignorées)`:''}`);
+}
+
+// API KEY & PROVIDER
+function getProvider(){return sessionStorage.getItem('excalibur_provider')||'gemini';}
+function getApiKey(){return sessionStorage.getItem('excalibur_key')||'';}
+
+function updateProviderUI(){
+  const p=document.getElementById('aiProvider').value;
+  document.getElementById('geminiInfo').style.display=p==='gemini'?'block':'none';
+  document.getElementById('anthropicInfo').style.display=p==='anthropic'?'block':'none';
+  document.getElementById('keyLabel').textContent=p==='gemini'?'Clé API Google (commence par AIza...)':'Clé API Anthropic (commence par sk-ant-...)';
+  document.getElementById('apiKeyInput').placeholder=p==='gemini'?'AIzaSy...':'sk-ant-api03-...';
+}
+
+function openKeyModal(){
+  const k=getApiKey(),p=getProvider();
+  document.getElementById('aiProvider').value=p;
+  updateProviderUI();
+  document.getElementById('apiKeyInput').value=k?'••••••••••••••••':'';
+  const s=document.getElementById('keyStatus');
+  if(k){s.style.display='block';s.style.color='var(--green)';s.textContent=`✓ Clé ${p==='gemini'?'Gemini':'Anthropic'} enregistrée`;}
+  else{s.style.display='block';s.style.color='var(--red)';s.textContent='⚠ Aucune clé — fonctions IA inactives';}
+  document.getElementById('keyModal').style.display='flex';
+}
+function closeKeyModal(e){if(!e||e.target===document.getElementById('keyModal'))document.getElementById('keyModal').style.display='none';}
+
+function saveApiKey(){
+  const v=document.getElementById('apiKeyInput').value.trim();
+  const p=document.getElementById('aiProvider').value;
+  if(!v||v.includes('•')){toast('⚠ Saisissez une clé valide','#ef4444');return;}
+  if(p==='anthropic'&&!v.startsWith('sk-ant-')){toast('⚠ La clé Anthropic doit commencer par sk-ant-','#ef4444');return;}
+  if(p==='gemini'&&!v.startsWith('AIza')){toast('⚠ La clé Gemini doit commencer par AIza','#ef4444');return;}
+  sessionStorage.setItem('excalibur_key',v);
+  sessionStorage.setItem('excalibur_provider',p);
+  document.getElementById('keyBtn').style.color='var(--green)';
+  closeKeyModal();
+  toast(`✓ Clé ${p==='gemini'?'Gemini (gratuit)':'Anthropic'} enregistrée`);
+}
+function clearApiKey(){
+  sessionStorage.removeItem('excalibur_key');sessionStorage.removeItem('excalibur_provider');
+  document.getElementById('keyBtn').style.color='';
+  closeKeyModal();toast('Clé effacée','#ef4444');
+}
+function checkKey(){const k=getApiKey();if(!k){openKeyModal();return false;}return k;}
+
+async function callAI(system,userMsg){
+  const key=checkKey();if(!key)return null;
+  const provider=getProvider();
+  try{
+    let res,txt;
+    if(provider==='gemini'){
+      res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          system_instruction:{parts:[{text:system}]},
+          contents:[{role:'user',parts:[{text:userMsg}]}],
+          generationConfig:{maxOutputTokens:1024}
+        })
+      });
+      if(!res.ok){const e=await res.json();throw new Error(e.error?.message||`HTTP ${res.status}`);}
+      const d=await res.json();
+      txt=d.candidates?.[0]?.content?.parts?.[0]?.text||'Réponse vide.';
+    } else {
+      res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1024,system,messages:[{role:'user',content:userMsg}]})
+      });
+      if(!res.ok){const e=await res.json();throw new Error(e.error?.message||`HTTP ${res.status}`);}
+      const d=await res.json();
+      txt=d.content?.[0]?.text||'Réponse vide.';
+    }
+    return txt;
+  }catch(e){
+    if(e.message.includes('401')||e.message.includes('API_KEY')||e.message.includes('auth')){
+      toast('⚠ Clé invalide — vérifiez votre clé 🔑','#ef4444');
+      sessionStorage.removeItem('excalibur_key');
+    } else {
+      toast('⚠ Erreur IA : '+e.message.substring(0,60),'#ef4444');
+    }
+    return null;
+  }
+}
+
+// INIT
+renderBriefing();
+// Restore cached SP data
+const cachedSP=get('spData',null);
+if(cachedSP?.rows){renderSP(cachedSP.rows,cachedSP.file);}
+</script>
+<!-- MODAL IMPORT MAPPING -->
+<div class="modal-overlay" id="ivMapModal" style="display:none" onclick="closeIvMap(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📂 MAPPER LES COLONNES</span>
+      <button class="close-btn" onclick="closeIvMap()">✕</button>
+    </div>
+    <div id="ivMapPreview" style="background:var(--surface2);border-radius:7px;padding:10px;margin-bottom:14px;font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.8"></div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Associez chaque champ EXCALIBUR à la colonne correspondante dans votre fichier :</div>
+    <div class="form-group"><label>🚆 N° Train / Matériel *</label><select id="mapTrain"></select></div>
+    <div class="form-group"><label>🗂 Catégorie</label><select id="mapCat"></select></div>
+    <div class="form-group"><label>📝 Description *</label><select id="mapDesc"></select></div>
+    <div class="form-group"><label>✅ Résultat</label><select id="mapResult"></select></div>
+    <div class="form-group"><label>⏱ Durée (min)</label><select id="mapDur"></select></div>
+    <div class="form-group"><label>📅 Date (laisser vide = aujourd'hui)</label><select id="mapDate"></select></div>
+    <div id="ivMapCount" style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:12px"></div>
+    <button class="btn btn-primary" onclick="confirmImport()">✓ Importer dans l'historique</button>
+  </div>
+</div>
+
+</body>
