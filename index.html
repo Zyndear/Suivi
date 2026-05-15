@@ -246,6 +246,17 @@
     background: var(--accent3); color: #fff; font-size: 9px; font-weight: 700;
     flex-shrink: 0;
   }
+
+  /* ---- MORE MENU BUTTON ---- */
+  .more-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; padding: 14px 8px; border-radius: 12px;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; font-family: 'OpenDyslexic', sans-serif;
+    -webkit-tap-highlight-color: transparent; transition: all .15s;
+  }
+  .more-btn:active { transform: scale(.95); }
+  .more-btn.active { border-color: var(--accent); color: var(--accent); }
   .td-card {
     background: var(--surface2); border: 1px solid var(--border);
     border-radius: 10px; padding: 16px 18px; margin-bottom: 12px;
@@ -462,16 +473,17 @@
   </header>
 
   <nav class="desktop-nav">
-    <button class="tab active" onclick="showTab('dashboard', this)">📊 Tableau de bord</button>
+    <button class="tab active" onclick="showTab('dashboard', this)">📊 Bilan</button>
     <button class="tab" onclick="showTab('add', this)">➕ Ajouter</button>
     <button class="tab" onclick="showTab('history', this)">📋 Historique</button>
-    <button class="tab" onclick="showTab('td', this)">🎫 Tickets / TD</button>
-    <button class="tab" onclick="showTab('set', this)">⏱ Heures SET</button>
+    <button class="tab" onclick="showTab('td', this)">🎫 TD</button>
+    <button class="tab" onclick="showTab('set', this)">⏱ SET</button>
     <button class="tab" onclick="showTab('innov', this)">💡 Innovations</button>
+    <button class="tab" onclick="showTab('chef', this)">👔 Remontées</button>
     <button class="tab" onclick="showTab('entretien', this)">🎯 Entretien</button>
   </nav>
 
-  <!-- BARRE MOBILE BAS -->
+  <!-- BARRE MOBILE BAS : 4 fixes + bouton Plus -->
   <nav class="mobile-nav">
     <div class="mobile-nav-inner">
       <button class="mob-tab active" id="mob-dashboard" onclick="showTab('dashboard', this)">
@@ -486,16 +498,39 @@
         <span class="mob-icon">➕</span>
         <span class="mob-label">Ajouter</span>
       </button>
-      <button class="mob-tab" id="mob-set" onclick="showTab('set', this)">
-        <span class="mob-icon">⏱</span>
-        <span class="mob-label">SET</span>
+      <button class="mob-tab" id="mob-td" onclick="showTab('td', this)">
+        <span class="mob-icon">🎫</span>
+        <span class="mob-label">TD</span>
       </button>
-      <button class="mob-tab" id="mob-innov" onclick="showTab('innov', this)">
-        <span class="mob-icon">💡</span>
-        <span class="mob-label">Innov</span>
+      <button class="mob-tab" id="mob-more" onclick="toggleMoreMenu()">
+        <span class="mob-icon">☰</span>
+        <span class="mob-label">Plus</span>
       </button>
     </div>
   </nav>
+
+  <!-- Menu "Plus" sur mobile -->
+  <div id="moreMenuOverlay" onclick="closeMoreMenu()" style="display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.5)"></div>
+  <div id="moreMenu" style="display:none;position:fixed;bottom:72px;left:0;right:0;z-index:251;background:var(--surface);border-top:2px solid var(--border);border-radius:20px 20px 0 0;padding:16px 12px;box-shadow:0 -8px 32px rgba(0,0,0,.4)">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <button class="more-btn" id="mob-set" onclick="showTab('set',this);closeMoreMenu()">
+        <span style="font-size:24px">⏱</span>
+        <span style="font-size:11px">Heures SET</span>
+      </button>
+      <button class="more-btn" id="mob-innov" onclick="showTab('innov',this);closeMoreMenu()">
+        <span style="font-size:24px">💡</span>
+        <span style="font-size:11px">Innovations</span>
+      </button>
+      <button class="more-btn" id="mob-chef" onclick="showTab('chef',this);closeMoreMenu()">
+        <span style="font-size:24px">👔</span>
+        <span style="font-size:11px">Remontées</span>
+      </button>
+      <button class="more-btn" id="mob-entretien" onclick="showTab('entretien',this);closeMoreMenu()">
+        <span style="font-size:24px">🎯</span>
+        <span style="font-size:11px">Entretien</span>
+      </button>
+    </div>
+  </div>
 
   <!-- SYNC BAR Google -->
   <div class="sync-bar" id="syncBar">
@@ -687,6 +722,15 @@
         <div class="form-full">
           <label>Impact / Ce que j'ai appris</label>
           <textarea id="f-impact" placeholder="Impact mesurable, satisfaction, apprentissage..."></textarea>
+        </div>
+        <div class="form-full">
+          <label>👔 Remontée chef liée (facultatif)</label>
+          <select id="f-remontee-chef" style="width:100%">
+            <option value="">— Aucune remontée —</option>
+            <option value="Félicitation">🌟 Félicitation reçue</option>
+            <option value="Remarque">💬 Remarque reçue</option>
+            <option value="Avertissement">⚠️ Avertissement reçu</option>
+          </select>
         </div>
         <div class="form-full">
           <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;cursor:pointer;transition:border-color .2s;" id="clpBox" onclick="toggleCheck('f-clp');document.getElementById('clpBox').style.borderColor=document.getElementById('f-clp').checked?'var(--accent)':''">
@@ -989,6 +1033,57 @@
     </div>
   </div>
 
+  <!-- REMONTÉES CHEF -->
+  <div class="view" id="view-chef">
+    <div class="kpi-row" id="chefKpiRow"></div>
+    <div class="card">
+      <div class="card-title">👔 Nouvelle remontée</div>
+      <div class="form-grid">
+        <div>
+          <label>Date</label>
+          <input type="date" id="chef-date">
+        </div>
+        <div>
+          <label>Catégorie</label>
+          <select id="chef-cat">
+            <option value="Félicitation">🌟 Félicitation</option>
+            <option value="Remarque">💬 Remarque</option>
+            <option value="Avertissement">⚠️ Avertissement</option>
+            <option value="Objectif">🎯 Objectif fixé</option>
+            <option value="Retour entretien">📋 Retour entretien</option>
+          </select>
+        </div>
+        <div class="form-full">
+          <label>Description de la remontée</label>
+          <textarea id="chef-desc" placeholder="Ce que le chef a dit, le contexte, la situation concernée..."></textarea>
+        </div>
+        <div class="form-full">
+          <label>Intervention / contexte lié</label>
+          <input type="text" id="chef-context" placeholder="Ex : intervention du 12/05, train AGC 830042...">
+        </div>
+        <div class="form-full">
+          <label>Ma réponse / action engagée</label>
+          <textarea id="chef-action" placeholder="Ce que j'ai fait ou compte faire suite à cette remontée..."></textarea>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveChef()">Enregistrer</button>
+        <button class="btn btn-ghost" onclick="clearChefForm()">Effacer</button>
+      </div>
+      <div id="chefMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Mes remontées</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <button class="btn btn-primary" id="cf-all" onclick="renderChef('all')" style="padding:7px 14px;font-size:12px">Tout</button>
+        <button class="btn btn-ghost" id="cf-Félicitation" onclick="renderChef('Félicitation')" style="padding:7px 14px;font-size:12px">🌟 Félicitations</button>
+        <button class="btn btn-ghost" id="cf-Remarque" onclick="renderChef('Remarque')" style="padding:7px 14px;font-size:12px">💬 Remarques</button>
+        <button class="btn btn-ghost" id="cf-Avertissement" onclick="renderChef('Avertissement')" style="padding:7px 14px;font-size:12px">⚠️ Avertissements</button>
+      </div>
+      <div id="chefList"></div>
+    </div>
+  </div>
+
   <!-- ENTRETIEN -->
   <div class="view" id="view-entretien">
     <div class="card">
@@ -1031,6 +1126,7 @@ function showTab(id, triggerEl) {
   if (id === 'td') { renderTDKpis(); renderTD(); }
   if (id === 'set') { renderSETKpis(); renderSET(); }
   if (id === 'innov') { renderInnovKpis(); renderInnov('all'); }
+  if (id === 'chef') { renderChefKpis(); renderChef('all'); }
   if (id === 'entretien') renderEntretien();
 }
 
@@ -1060,6 +1156,7 @@ function saveIntervention() {
     duration: parseInt(document.getElementById('f-duration').value) || 0,
     skills: document.getElementById('f-skills').value.split(',').map(s=>s.trim()).filter(Boolean),
     impact: document.getElementById('f-impact').value.trim(),
+    remonteeChef: document.getElementById('f-remontee-chef').value,
   };
   data.unshift(item);
   saveData(data);
@@ -1089,6 +1186,7 @@ function clearForm() {
   document.getElementById('nonTermineWrap').style.display = 'none';
   document.getElementById('f-clp').checked = false;
   document.getElementById('clpBox').style.borderColor = '';
+  document.getElementById('f-remontee-chef').value = '';
 }
 
 function toggleRecidive() {
@@ -2262,6 +2360,133 @@ function renderInnov(filter) {
 }
 
 // ======================================================
+// ---- REMONTÉES CHEF ----
+// ======================================================
+function getChefs() { return JSON.parse(localStorage.getItem('remontees_chef') || '[]'); }
+function saveChefs(d) { localStorage.setItem('remontees_chef', JSON.stringify(d)); }
+
+document.getElementById('chef-date').value = new Date().toISOString().split('T')[0];
+
+function saveChef() {
+  const desc = document.getElementById('chef-desc').value.trim();
+  if (!desc) { document.getElementById('chefMsg').textContent = '⚠ Renseignez une description.'; return; }
+  const items = getChefs();
+  items.unshift({
+    id: Date.now(),
+    date: document.getElementById('chef-date').value,
+    cat: document.getElementById('chef-cat').value,
+    desc,
+    context: document.getElementById('chef-context').value.trim(),
+    action: document.getElementById('chef-action').value.trim()
+  });
+  saveChefs(items);
+  document.getElementById('chefMsg').textContent = '✅ Remontée enregistrée !';
+  setTimeout(() => document.getElementById('chefMsg').textContent = '', 2500);
+  clearChefForm();
+  renderChefKpis(); renderChef('all');
+}
+
+function clearChefForm() {
+  ['chef-desc','chef-context','chef-action'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('chef-cat').value = 'Félicitation';
+  document.getElementById('chef-date').value = new Date().toISOString().split('T')[0];
+}
+
+function deleteChef(id) {
+  if (!confirm('Supprimer cette remontée ?')) return;
+  saveChefs(getChefs().filter(c => c.id !== id));
+  renderChefKpis(); renderChef('all');
+}
+
+function renderChefKpis() {
+  const all = getChefs();
+  const year = new Date().getFullYear();
+  const ty = all.filter(c => new Date(c.date).getFullYear() === year);
+  const nb = (cat) => ty.filter(c=>c.cat===cat).length;
+  const kpis = [
+    { label: 'Félicitations ' + year, val: nb('Félicitation'), sub: 'reçues', color: 'var(--success)' },
+    { label: 'Remarques ' + year,     val: nb('Remarque'),     sub: 'reçues', color: 'var(--warn)' },
+    { label: 'Avertissements ' + year,val: nb('Avertissement'),sub: 'reçus',  color: 'var(--danger)' },
+    { label: 'Total historique',       val: all.length,         sub: 'remontées', color: 'var(--muted)' },
+  ];
+  document.getElementById('chefKpiRow').innerHTML = kpis.map(k => `
+    <div class="kpi">
+      <div class="kpi-accent" style="background:${k.color}"></div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-val" style="color:${k.color}">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+}
+
+function chefCatStyle(cat) {
+  if (cat==='Félicitation')  return 'border-left-color:var(--success)';
+  if (cat==='Remarque')      return 'border-left-color:var(--warn)';
+  if (cat==='Avertissement') return 'border-left-color:var(--danger)';
+  if (cat==='Objectif')      return 'border-left-color:var(--accent3)';
+  return 'border-left-color:var(--accent)';
+}
+function chefCatBadge(cat) {
+  const map = {
+    'Félicitation':   'background:rgba(0,229,160,.15);color:var(--success);border:1px solid rgba(0,229,160,.3)',
+    'Remarque':       'background:rgba(255,193,7,.15);color:var(--warn);border:1px solid rgba(255,193,7,.3)',
+    'Avertissement':  'background:rgba(255,77,106,.15);color:var(--danger);border:1px solid rgba(255,77,106,.3)',
+    'Objectif':       'background:rgba(124,111,255,.15);color:var(--accent3);border:1px solid rgba(124,111,255,.3)',
+    'Retour entretien':'background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2)',
+  };
+  const icon = { 'Félicitation':'🌟','Remarque':'💬','Avertissement':'⚠️','Objectif':'🎯','Retour entretien':'📋' };
+  return `<span class="badge" style="${map[cat]||''}">${icon[cat]||''} ${cat}</span>`;
+}
+
+function renderChef(filter) {
+  ['all','Félicitation','Remarque','Avertissement'].forEach(f => {
+    const btn = document.getElementById('cf-' + f);
+    if (btn) btn.className = 'btn ' + (filter===f ? 'btn-primary' : 'btn-ghost');
+  });
+  let items = getChefs();
+  if (filter !== 'all') items = items.filter(c => c.cat === filter);
+  if (!items.length) {
+    document.getElementById('chefList').innerHTML = '<div class="empty"><div class="empty-icon">👔</div><div class="empty-text">Aucune remontée pour ce filtre.</div></div>';
+    return;
+  }
+  document.getElementById('chefList').innerHTML = items.map(c => `
+    <div class="hist-card" style="margin-bottom:12px;border-left:3px solid;${chefCatStyle(c.cat)}">
+      <div class="hist-card-top">
+        <div style="flex:1">
+          ${chefCatBadge(c.cat)}
+          <div class="hist-card-title" style="margin-top:6px">${c.desc}</div>
+        </div>
+        <div class="hist-card-date">${new Date(c.date).toLocaleDateString('fr-FR')}</div>
+      </div>
+      ${c.context ? `<div style="font-size:12px;color:var(--muted);margin-top:6px">📎 ${c.context}</div>` : ''}
+      ${c.action ? `
+        <div onclick="toggleDesc('chef-action-${c.id}')" style="font-size:12px;color:var(--accent);cursor:pointer;margin-top:8px">
+          ✍️ Ma réponse <span id="chef-arr-${c.id}">▼</span>
+        </div>
+        <div id="chef-action-${c.id}" style="display:none;margin-top:6px;padding:10px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:13px;line-height:1.7">${c.action}</div>
+      ` : ''}
+      <div class="hist-card-footer" style="margin-top:10px">
+        <span></span>
+        <button class="btn btn-danger" onclick="deleteChef(${c.id})" style="padding:8px 14px;font-size:12px">Supprimer</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---- MORE MENU (mobile) ----
+function toggleMoreMenu() {
+  const menu = document.getElementById('moreMenu');
+  const overlay = document.getElementById('moreMenuOverlay');
+  const isOpen = menu.style.display !== 'none';
+  menu.style.display = isOpen ? 'none' : 'block';
+  overlay.style.display = isOpen ? 'none' : 'block';
+}
+function closeMoreMenu() {
+  document.getElementById('moreMenu').style.display = 'none';
+  document.getElementById('moreMenuOverlay').style.display = 'none';
+}
+
+// ======================================================
 // ---- GOOGLE DRIVE SYNC (avec chiffrement) ----
 // ======================================================
 const G_CLIENT_ID = '';
@@ -2394,7 +2619,8 @@ async function gSaveData() {
       interventions: getData(),
       tickets: getTDs(),
       set_sessions: getSETs(),
-      innovations: getInnovs()
+      innovations: getInnovs(),
+      remontees_chef: getChefs()
     });
 
     // Chiffrement AES-256
@@ -2466,10 +2692,8 @@ async function gLoadData() {
     const newT = mergeById(getTDs(), payload.tickets || []);
     const newS = mergeById(getSETs(), payload.set_sessions || []);
     const newV = mergeById(getInnovs(), payload.innovations || []);
-    saveData(newI);
-    saveTDs(newT);
-    saveSETs(newS);
-    saveInnovs(newV);
+    const newC = mergeById(getChefs(), payload.remontees_chef || []);
+    saveData(newI); saveTDs(newT); saveSETs(newS); saveInnovs(newV); saveChefs(newC);
 
     const mod = payload.savedAt ? new Date(payload.savedAt).toLocaleString('fr-FR') : '?';
     setSyncStatus('🔐 Déchiffré — ' + newI.length + ' interventions · ' + newT.length + ' tickets · ' + newS.length + ' SET · ' + newV.length + ' innovations (cloud du ' + mod + ')', true);
