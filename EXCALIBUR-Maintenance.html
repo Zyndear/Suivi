@@ -131,16 +131,24 @@ select option{background:#181c24}
     <div class="form-group">
       <label>Fournisseur IA</label>
       <select id="aiProvider" onchange="updateProviderUI()">
+        <option value="groq">Groq — GRATUIT ✓ (recommandé)</option>
         <option value="gemini">Google Gemini — GRATUIT ✓</option>
         <option value="anthropic">Anthropic Claude — Payant</option>
       </select>
     </div>
 
+    <!-- Groq info -->
+    <div id="groqInfo" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.75;margin-bottom:12px">
+      <strong style="color:var(--green);font-family:var(--mono);font-size:10px">✓ GROQ — 100% GRATUIT — 14 400 req/jour</strong><br><br>
+      👉 <strong style="color:var(--text)">console.groq.com</strong> → Sign up (compte Google ou email)<br>→ <strong>API Keys → Create API Key</strong><br><br>
+      La clé commence par <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:10px">gsk_</code>
+    </div>
+
     <!-- Gemini info -->
-    <div id="geminiInfo" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.75;margin-bottom:12px">
-      <strong style="color:var(--green);font-family:var(--mono);font-size:10px">✓ GOOGLE GEMINI — 100% GRATUIT</strong><br><br>
-      <strong>1 500 requêtes/jour</strong> gratuites, sans carte bancaire.<br><br>
-      👉 <strong style="color:var(--text)">aistudio.google.com</strong> → Se connecter avec votre compte Google → <strong>Get API key</strong> → Create API key
+    <div id="geminiInfo" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.75;margin-bottom:12px;display:none">
+      <strong style="color:var(--green);font-family:var(--mono);font-size:10px">✓ GOOGLE GEMINI — 100% GRATUIT — 1 500 req/jour</strong><br><br>
+      👉 <strong style="color:var(--text)">aistudio.google.com</strong> → Get API key → Create API key<br><br>
+      ⚠ Utilisez un compte Gmail personnel (pas pro/Workspace)
     </div>
 
     <!-- Anthropic info -->
@@ -757,10 +765,13 @@ function getApiKey(){return sessionStorage.getItem('excalibur_key')||'';}
 
 function updateProviderUI(){
   const p=document.getElementById('aiProvider').value;
+  document.getElementById('groqInfo').style.display=p==='groq'?'block':'none';
   document.getElementById('geminiInfo').style.display=p==='gemini'?'block':'none';
   document.getElementById('anthropicInfo').style.display=p==='anthropic'?'block':'none';
-  document.getElementById('keyLabel').textContent=p==='gemini'?'Clé API Google (commence par AIza...)':'Clé API Anthropic (commence par sk-ant-...)';
-  document.getElementById('apiKeyInput').placeholder=p==='gemini'?'AIzaSy...':'sk-ant-api03-...';
+  const labels={groq:'Clé API Groq (commence par gsk_...)',gemini:'Clé API Google (commence par AIza...)',anthropic:'Clé API Anthropic (commence par sk-ant-...)'};
+  const placeholders={groq:'gsk_...',gemini:'AIzaSy...',anthropic:'sk-ant-api03-...'};
+  document.getElementById('keyLabel').textContent=labels[p];
+  document.getElementById('apiKeyInput').placeholder=placeholders[p];
 }
 
 function openKeyModal(){
@@ -769,7 +780,8 @@ function openKeyModal(){
   updateProviderUI();
   document.getElementById('apiKeyInput').value=k?'••••••••••••••••':'';
   const s=document.getElementById('keyStatus');
-  if(k){s.style.display='block';s.style.color='var(--green)';s.textContent=`✓ Clé ${p==='gemini'?'Gemini':'Anthropic'} enregistrée`;}
+  const names={groq:'Groq',gemini:'Gemini',anthropic:'Anthropic'};
+  if(k){s.style.display='block';s.style.color='var(--green)';s.textContent=`✓ Clé ${names[p]||p} enregistrée`;}
   else{s.style.display='block';s.style.color='var(--red)';s.textContent='⚠ Aucune clé — fonctions IA inactives';}
   document.getElementById('keyModal').style.display='flex';
 }
@@ -781,11 +793,13 @@ function saveApiKey(){
   if(!v||v.includes('•')){toast('⚠ Saisissez une clé valide','#ef4444');return;}
   if(p==='anthropic'&&!v.startsWith('sk-ant-')){toast('⚠ La clé Anthropic doit commencer par sk-ant-','#ef4444');return;}
   if(p==='gemini'&&!v.startsWith('AIza')){toast('⚠ La clé Gemini doit commencer par AIza','#ef4444');return;}
+  if(p==='groq'&&!v.startsWith('gsk_')){toast('⚠ La clé Groq doit commencer par gsk_','#ef4444');return;}
   sessionStorage.setItem('excalibur_key',v);
   sessionStorage.setItem('excalibur_provider',p);
   document.getElementById('keyBtn').style.color='var(--green)';
   closeKeyModal();
-  toast(`✓ Clé ${p==='gemini'?'Gemini (gratuit)':'Anthropic'} enregistrée`);
+  const names={groq:'Groq (gratuit)',gemini:'Gemini (gratuit)',anthropic:'Anthropic'};
+  toast(`✓ Clé ${names[p]} enregistrée`);
 }
 function clearApiKey(){
   sessionStorage.removeItem('excalibur_key');sessionStorage.removeItem('excalibur_provider');
@@ -799,7 +813,20 @@ async function callAI(system,userMsg){
   const provider=getProvider();
   try{
     let res,txt;
-    if(provider==='gemini'){
+    if(provider==='groq'){
+      res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+        body:JSON.stringify({
+          model:'llama-3.1-70b-versatile',
+          messages:[{role:'system',content:system},{role:'user',content:userMsg}],
+          max_tokens:1024
+        })
+      });
+      if(!res.ok){const e=await res.json();throw new Error(e.error?.message||`HTTP ${res.status}`);}
+      const d=await res.json();
+      txt=d.choices?.[0]?.message?.content||'Réponse vide.';
+    } else if(provider==='gemini'){
       res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -824,11 +851,11 @@ async function callAI(system,userMsg){
     }
     return txt;
   }catch(e){
-    if(e.message.includes('401')||e.message.includes('API_KEY')||e.message.includes('auth')){
+    if(e.message.includes('401')||e.message.includes('invalid_api_key')||e.message.includes('API_KEY')){
       toast('⚠ Clé invalide — vérifiez votre clé 🔑','#ef4444');
       sessionStorage.removeItem('excalibur_key');
     } else {
-      toast('⚠ Erreur IA : '+e.message.substring(0,60),'#ef4444');
+      toast('⚠ '+e.message.substring(0,80),'#ef4444');
     }
     return null;
   }
