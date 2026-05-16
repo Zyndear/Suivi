@@ -177,38 +177,31 @@ select option{background:#181c24}
     <div class="sp-card">
       <div class="sp-row">
         <div class="sp-title">🔗 SharePoint</div>
-        <span id="spBadge" class="badge bp" style="font-size:9px">AUCUN FICHIER</span>
+        <span id="spBadge" class="badge bp" style="font-size:9px">VIDE</span>
       </div>
       <div id="spMeta" class="sp-meta" style="display:none"></div>
-      <div id="spContent">
-        <div class="drop-zone" id="dropZone" onclick="document.getElementById('spFileInput').click()" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
-          <div class="drop-zone-icon">📥</div>
-          <div class="drop-zone-txt"><strong>Importer le fichier SharePoint</strong><br>Cliquez ou glissez votre export Excel/CSV</div>
-          <div class="drop-zone-sub">.xlsx · .xls · .csv — données stockées localement</div>
+
+      <textarea id="spPaste" rows="4" placeholder="Collez ici n'importe quel contenu copié depuis SharePoint (liste, tableau, texte...)&#10;&#10;Sur mobile : ouvrez votre liste SharePoint → appuyez longuement sur le texte → Tout sélectionner → Copier → Collez ici" oninput="onSPPaste()" style="font-size:12px;line-height:1.6;border-color:rgba(139,92,246,.3)"></textarea>
+
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn btn-sp btn-sm" style="flex:1" onclick="saveSPText()">💾 Enregistrer</button>
+        <button class="btn btn-danger btn-sm" style="flex:1;margin-top:0" onclick="clearSP()">✕ Effacer</button>
+      </div>
+
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;margin-bottom:10px">SUR MOBILE — COMMENT COPIER DEPUIS SHAREPOINT</div>
+        <div class="guide-step"><div class="step-num">1</div><div class="step-txt">Ouvrez votre liste SharePoint dans Chrome mobile</div></div>
+        <div class="guide-step"><div class="step-num">2</div><div class="step-txt">Appuyez longuement sur n'importe quel texte → <strong>Tout sélectionner</strong></div></div>
+        <div class="guide-step"><div class="step-num">3</div><div class="step-txt">Appuyez sur <strong>Copier</strong>, revenez dans EXCALIBUR et collez dans la zone ci-dessus</div></div>
+      </div>
+
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;margin-bottom:8px">SUR PC — IMPORTER UN FICHIER EXCEL/CSV</div>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('spFileInput').click()" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)" style="margin-top:0;padding:12px">
+          <div class="drop-zone-icon" style="font-size:20px">📥</div>
+          <div class="drop-zone-txt" style="font-size:12px">Cliquez ou glissez un fichier Excel/CSV</div>
         </div>
         <input type="file" id="spFileInput" accept=".xlsx,.xls,.csv" onchange="importFile(this.files[0])">
-      </div>
-
-      <!-- Guide export SharePoint -->
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;margin-bottom:10px">COMMENT EXPORTER DEPUIS SHAREPOINT</div>
-        <div class="guide-step">
-          <div class="step-num">1</div>
-          <div class="step-txt">Ouvrez votre liste SharePoint dans le navigateur</div>
-        </div>
-        <div class="guide-step">
-          <div class="step-num">2</div>
-          <div class="step-txt">Cliquez sur <strong>⬇ Exporter → Exporter vers Excel</strong> (barre d'outils en haut de la liste)</div>
-        </div>
-        <div class="guide-step">
-          <div class="step-num">3</div>
-          <div class="step-txt">Enregistrez le fichier .xlsx téléchargé, puis importez-le ici</div>
-        </div>
-      </div>
-
-      <div id="spActions" style="display:none;margin-top:10px;display:flex;gap:8px;display:none">
-        <button class="btn btn-sp btn-sm" style="flex:1" onclick="document.getElementById('spFileInput').click()">↻ Réimporter</button>
-        <button class="btn btn-danger btn-sm" style="flex:1;margin-top:0" onclick="clearSP()">✕ Effacer</button>
       </div>
     </div>
 
@@ -861,11 +854,69 @@ async function callAI(system,userMsg){
   }
 }
 
+// SHAREPOINT — PASTE TEXT
+function onSPPaste(){
+  const v=document.getElementById('spPaste').value.trim();
+  const badge=document.getElementById('spBadge');
+  if(v){badge.textContent=`${v.length} CAR.`;badge.className='badge ba';}
+  else{badge.textContent='VIDE';badge.className='badge bp';}
+}
+function saveSPText(){
+  const v=document.getElementById('spPaste').value.trim();
+  if(!v){toast('⚠ Rien à enregistrer','#ef4444');return;}
+  set('spData',{text:v,at:new Date().toISOString(),type:'paste'});
+  const el=document.getElementById('spMeta');
+  el.style.display='block';
+  el.textContent=`Enregistré ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})} · ${v.length} caractères`;
+  document.getElementById('spBadge').textContent='ENREGISTRÉ';
+  document.getElementById('spBadge').className='badge bg';
+  document.getElementById('spDot').className='sp-dot ok';
+  toast('✓ Données SharePoint enregistrées');
+}
+function clearSP(){
+  if(!confirm('Effacer les données SharePoint ?'))return;
+  localStorage.removeItem('spData');
+  document.getElementById('spPaste').value='';
+  document.getElementById('spMeta').style.display='none';
+  document.getElementById('spBadge').textContent='VIDE';
+  document.getElementById('spBadge').className='badge bp';
+  document.getElementById('spDot').className='sp-dot';
+  toast('Effacé','#ef4444');
+}
+function onDrag(e,a){e.preventDefault();document.getElementById('dropZone').classList.toggle('drag',a);}
+function onDrop(e){e.preventDefault();onDrag(e,false);const f=e.dataTransfer.files[0];if(f)importFile(f);}
+async function importFile(file){
+  if(!file)return;
+  try{
+    const buf=await file.arrayBuffer();
+    const wb=XLSX.read(buf,{type:'array',cellDates:true});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
+    if(!rows.length){toast('⚠ Fichier vide','#ef4444');return;}
+    const txt=rows.slice(0,30).map(row=>Object.entries(row).filter(([,v])=>v).map(([k,v])=>`${k}: ${String(v).substring(0,80)}`).join(' | ')).join('\n');
+    document.getElementById('spPaste').value=txt;
+    set('spData',{text:txt,file:file.name,at:new Date().toISOString(),type:'file'});
+    onSPPaste();
+    const el=document.getElementById('spMeta');el.style.display='block';
+    el.textContent=`${file.name} · ${rows.length} lignes`;
+    document.getElementById('spBadge').textContent=`${rows.length} LIGNES`;
+    document.getElementById('spBadge').className='badge bg';
+    document.getElementById('spDot').className='sp-dot ok';
+    toast(`✓ ${rows.length} lignes importées`);
+  }catch(e){toast('⚠ Erreur : '+e.message,'#ef4444');}
+}
+
 // INIT
 renderBriefing();
-// Restore cached SP data
 const cachedSP=get('spData',null);
-if(cachedSP?.rows){renderSP(cachedSP.rows,cachedSP.file);}
+if(cachedSP?.text){
+  document.getElementById('spPaste').value=cachedSP.text;
+  document.getElementById('spBadge').textContent='ENREGISTRÉ';
+  document.getElementById('spBadge').className='badge bg';
+  document.getElementById('spDot').className='sp-dot ok';
+  const el=document.getElementById('spMeta');el.style.display='block';
+  el.textContent=`Dernière sauvegarde : ${new Date(cachedSP.at).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
+}
 </script>
 <!-- MODAL IMPORT MAPPING -->
 <div class="modal-overlay" id="ivMapModal" style="display:none" onclick="closeIvMap(event)">
