@@ -164,6 +164,8 @@ select option{background:#181c24}
     </div>
     <div id="keyStatus" style="font-family:var(--mono);font-size:10px;margin-bottom:12px;display:none"></div>
     <button class="btn btn-primary" onclick="saveApiKey()">Enregistrer la clé</button>
+    <button class="btn btn-secondary" onclick="testConnection()" style="margin-top:8px">🔍 Tester la connexion</button>
+    <div id="testResult" style="display:none;margin-top:10px;background:var(--surface2);border-radius:7px;padding:12px;font-family:var(--mono);font-size:11px;line-height:1.7;word-break:break-all"></div>
     <button class="btn btn-danger" onclick="clearApiKey()" style="margin-top:8px">Effacer la clé</button>
   </div>
 </div>
@@ -549,10 +551,9 @@ async function genBriefing(){
   const yL=get('iv').filter(i=>i.date===yesterday()),tL=get('iv').filter(i=>i.date===today()),
         p=get('parc',{}),spD=get('spData',null);
 
-  const spSec=spD?.rows?.length
-    ?`\nDONNÉES SHAREPOINT — "${spD.file}" (${spD.rows.length} lignes, importé ${new Date(spD.at).toLocaleString('fr-FR')}):\n`+
-      spD.rows.slice(0,15).map(row=>'- '+Object.entries(row).slice(0,6).map(([k,v])=>`${k}: ${String(v).substring(0,60)}`).join(' | ')).join('\n')
-    :'\nSHAREPOINT: Aucun fichier importé aujourd\'hui.';
+  const spSec=spD?.text
+    ?`\nDONNÉES SHAREPOINT (${new Date(spD.at).toLocaleString('fr-FR')}):\n${spD.text.substring(0,2000)}`
+    :'\nSHAREPOINT: Aucune donnée.';
 
   const ctx=`INTERVENTIONS VEILLE (${yesterday()}):\n${yL.length?yL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}${i.duration?` (${i.duration}min)`:''}`).join('\n'):'Aucune.'}\n\nINTERVENTIONS JOUR (${today()}):\n${tL.length?tL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}`).join('\n'):'Aucune.'}\n\nÉTAT DU PARC:\n${Object.entries(p).length?Object.entries(p).map(([t,d])=>`- ${t}: ${d.status.toUpperCase()}${d.note?` — ${d.note}`:''}`).join('\n'):'Aucun.'}${spSec}`;
 
@@ -753,7 +754,7 @@ function confirmImport(){
 }
 
 // API KEY & PROVIDER
-function getProvider(){return sessionStorage.getItem('excalibur_provider')||'gemini';}
+function getProvider(){return sessionStorage.getItem('excalibur_provider')||'groq';}
 function getApiKey(){return sessionStorage.getItem('excalibur_key')||'';}
 
 function updateProviderUI(){
@@ -794,6 +795,50 @@ function saveApiKey(){
   const names={groq:'Groq (gratuit)',gemini:'Gemini (gratuit)',anthropic:'Anthropic'};
   toast(`✓ Clé ${names[p]} enregistrée`);
 }
+async function testConnection(){
+  const v=document.getElementById('apiKeyInput').value.trim();
+  const p=document.getElementById('aiProvider').value;
+  const key=(v&&!v.includes('•'))?v:getApiKey();
+  const el=document.getElementById('testResult');
+  el.style.display='block';
+  el.style.color='var(--text2)';
+  el.textContent='⏳ Test en cours...';
+  if(!key){el.style.color='var(--red)';el.textContent='⚠ Aucune clé à tester.';return;}
+  try{
+    let res;
+    if(p==='groq'){
+      res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:'Dis juste OK'}],max_tokens:5})
+      });
+    } else if(p==='gemini'){
+      res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{role:'user',parts:[{text:'Dis juste OK'}]}],generationConfig:{maxOutputTokens:5}})
+      });
+    } else {
+      res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:5,messages:[{role:'user',content:'Dis juste OK'}]})
+      });
+    }
+    const data=await res.json();
+    if(res.ok){
+      el.style.color='var(--green)';
+      el.textContent='✓ Connexion réussie ! La clé fonctionne.';
+    } else {
+      el.style.color='var(--red)';
+      el.textContent='✗ Erreur '+res.status+' : '+(data.error?.message||JSON.stringify(data).substring(0,200));
+    }
+  }catch(e){
+    el.style.color='var(--red)';
+    el.textContent='✗ Erreur réseau : '+e.message;
+  }
+}
+
 function clearApiKey(){
   sessionStorage.removeItem('excalibur_key');sessionStorage.removeItem('excalibur_provider');
   document.getElementById('keyBtn').style.color='';
@@ -811,7 +856,7 @@ async function callAI(system,userMsg){
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
         body:JSON.stringify({
-          model:'llama-3.1-70b-versatile',
+          model:'llama-3.3-70b-versatile',
           messages:[{role:'system',content:system},{role:'user',content:userMsg}],
           max_tokens:1024
         })
