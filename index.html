@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Mes Interventions</title>
-
+ 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00e5a0">
@@ -28,9 +28,9 @@
     font-weight: 700;
     font-style: normal;
   }
-
+ 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
   :root {
     --bg: #0b0f1a;
     --surface: #111827;
@@ -45,7 +45,7 @@
     --danger: #ff4d6a;
     --warn: #ffc107;
   }
-
+ 
   body {
     background: var(--bg);
     color: var(--text);
@@ -57,7 +57,7 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
-
+ 
   /* ---- GRID BG ---- */
   body::before {
     content: '';
@@ -70,9 +70,9 @@
     pointer-events: none;
     z-index: 0;
   }
-
+ 
   .app { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
-
+ 
   /* ---- HEADER ---- */
   header {
     display: flex; align-items: flex-end; justify-content: space-between;
@@ -91,7 +91,7 @@
     background: var(--surface2); border: 1px solid var(--border);
     padding: 6px 14px; border-radius: 20px; font-size: 11px; color: var(--muted);
   }
-
+ 
   /* ---- NAV ---- */
   nav { display: flex; gap: 4px; margin-bottom: 28px; flex-wrap: wrap; }
   .tab {
@@ -101,12 +101,12 @@
   }
   .tab:hover { color: var(--text); border-color: var(--accent); }
   .tab.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 500; }
-
+ 
   /* ---- VIEWS ---- */
   .view { display: none; }
   .view.active { display: block; animation: fadeIn .3s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
+ 
   /* ---- KPI ROW ---- */
   .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
   .kpi {
@@ -123,7 +123,7 @@
   }
   .kpi-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
   .kpi-accent { position: absolute; top: 0; right: 0; width: 4px; height: 100%; }
-
+ 
   /* ---- FORM ---- */
   .card {
     background: var(--surface); border: 1px solid var(--border);
@@ -135,7 +135,7 @@
     margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
   }
   .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
+ 
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .form-full { grid-column: 1 / -1; }
   label { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 7px; line-height: 1.6; }
@@ -149,7 +149,7 @@
   input:focus, select:focus, textarea:focus { border-color: var(--accent); }
   textarea { resize: vertical; min-height: 80px; }
   select option { background: var(--surface2); }
-
+ 
   .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
   .btn {
     padding: 11px 22px; border-radius: 8px; border: none; cursor: pointer;
@@ -162,7 +162,7 @@
   .btn-ghost:hover { border-color: var(--text); color: var(--text); }
   .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
   .btn-danger:hover { background: var(--danger); color: #fff; }
-
+ 
   /* ---- RESULT BADGE ---- */
   .badge {
     display: inline-block; padding: 4px 11px; border-radius: 20px;
@@ -172,7 +172,7 @@
   .badge-danger { background: rgba(255,77,106,.15); color: var(--danger); border: 1px solid rgba(255,77,106,.3); }
   .badge-warn { background: rgba(255,193,7,.15); color: var(--warn); border: 1px solid rgba(255,193,7,.3); }
   .badge-info { background: rgba(124,111,255,.15); color: var(--accent3); border: 1px solid rgba(124,111,255,.3); }
-
+ 
   /* ---- TABLE ---- */
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.7; }
@@ -185,7 +185,7 @@
   tr:hover td { background: rgba(0,229,160,.03); }
   .td-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 13px; }
   .td-sub { color: var(--muted); font-size: 11px; margin-top: 2px; }
-
+ 
   /* ---- CHART BARS ---- */
   .chart-row { display: flex; flex-direction: column; gap: 10px; }
   .bar-item { display: flex; align-items: center; gap: 12px; }
@@ -193,7 +193,7 @@
   .bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(.4,0,.2,1); }
   .bar-val { width: 40px; text-align: right; font-size: 11px; color: var(--text); flex-shrink: 0; }
-
+ 
   /* ---- ENTRETIEN ---- */
   .insight-block {
     background: var(--surface2); border-left: 3px solid var(--accent);
@@ -201,19 +201,19 @@
   }
   .insight-label { font-size: 10px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
   .insight-text { font-size: 14px; line-height: 1.9; color: var(--text); }
-
+ 
   .stat-highlight {
     display: inline-block;
     background: linear-gradient(135deg, rgba(0,229,160,.2), rgba(0,229,160,.05));
     border: 1px solid rgba(0,229,160,.3); border-radius: 8px;
     padding: 2px 10px; color: var(--accent); font-weight: 500;
   }
-
+ 
   /* ---- EMPTY ---- */
   .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
   .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .5; }
   .empty-text { font-size: 13px; }
-
+ 
   /* ---- PROGRESS RING ---- */
   .ring-wrap { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; justify-content: center; padding: 20px; }
   .ring-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -226,7 +226,7 @@
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
   }
-
+ 
   /* ---- SYNC BAR ---- */
   .sync-bar {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
@@ -237,7 +237,7 @@
   .sync-bar-label { color: var(--muted); letter-spacing: 1px; font-size: 10px; text-transform: uppercase; margin-right: 4px; }
   .sync-status { font-size: 11px; color: var(--muted); margin-left: auto; }
   .sync-status.ok { color: var(--success); }
-
+ 
   /* ---- COLLEAGUE SELECT ---- */
   .colleague-select-wrap { position: relative; }
   .colleague-avatar {
@@ -246,7 +246,7 @@
     background: var(--accent3); color: #fff; font-size: 9px; font-weight: 700;
     flex-shrink: 0;
   }
-
+ 
   /* ---- MORE MENU BUTTON ---- */
   .more-btn {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -272,20 +272,20 @@
   .td-deadline { font-size: 10px; color: var(--muted); }
   .td-deadline.overdue { color: var(--danger); }
   .td-deadline.soon { color: var(--warn); }
-
+ 
   /* priority colors */
   .prio-Critique { background: rgba(255,77,106,.15); color: var(--danger); border: 1px solid rgba(255,77,106,.3); }
   .prio-Haute { background: rgba(255,107,53,.15); color: var(--accent2); border: 1px solid rgba(255,107,53,.3); }
   .prio-Moyenne { background: rgba(255,193,7,.15); color: var(--warn); border: 1px solid rgba(255,193,7,.3); }
   .prio-Basse { background: rgba(0,229,160,.15); color: var(--success); border: 1px solid rgba(0,229,160,.3); }
-
+ 
   /* status colors */
   .status-Ouvert { background: rgba(124,111,255,.15); color: var(--accent3); border: 1px solid rgba(124,111,255,.3); }
   .status-En-cours { background: rgba(255,193,7,.15); color: var(--warn); border: 1px solid rgba(255,193,7,.3); }
   .status-En-attente { background: rgba(107,127,163,.15); color: var(--muted); border: 1px solid rgba(107,127,163,.3); }
   .status-Résolu { background: rgba(0,229,160,.15); color: var(--success); border: 1px solid rgba(0,229,160,.3); }
   .status-Fermé { background: rgba(31,45,69,.5); color: var(--muted); border: 1px solid var(--border); }
-
+ 
   /* timeline */
   .timeline { display: flex; flex-direction: column; gap: 0; margin-top: 12px; }
   .tl-item { display: flex; gap: 14px; position: relative; }
@@ -300,12 +300,12 @@
   .tl-body { flex: 1; padding-bottom: 16px; }
   .tl-date { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
   .tl-text { font-size: 13px; line-height: 1.7; }
-
+ 
   /* ==============================
      MOBILE FIRST — BARRE DU BAS
      ============================== */
   nav.desktop-nav { display: flex; gap: 4px; margin-bottom: 28px; flex-wrap: wrap; }
-
+ 
   .mobile-nav {
     display: none;
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
@@ -333,7 +333,7 @@
   .mob-tab .mob-label { font-size: 10px; line-height: 1.2; text-align: center; }
   .mob-tab.active { color: var(--accent); }
   .mob-tab.active .mob-icon { filter: drop-shadow(0 0 6px var(--accent)); }
-
+ 
   .mob-add-btn {
     position: relative; top: -14px;
     width: 64px; height: 64px; border-radius: 50%;
@@ -348,7 +348,7 @@
   }
   .mob-add-btn:active { transform: scale(.91); }
   .mob-add-btn .mob-icon { font-size: 28px; line-height: 1; }
-
+ 
   /* ---- HISTORY CARDS (mobile) ---- */
   .hist-card {
     background: var(--surface2); border: 1px solid var(--border);
@@ -361,7 +361,7 @@
   .hist-card-desc { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
   .hist-card-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
   .hist-card-footer { display: flex; justify-content: space-between; align-items: center; }
-
+ 
   /* ---- BOTTOM SHEET (modal tickets) ---- */
   .bottom-sheet-overlay {
     display: none; position: fixed; inset: 0;
@@ -382,14 +382,14 @@
     border-radius: 2px; margin: 14px auto 0;
   }
   .bottom-sheet-inner { padding: 16px 18px 32px; }
-
+ 
   @media (max-width: 700px) {
     html { -webkit-text-size-adjust: 100%; }
     body { font-size: 16px; }
-
+ 
     /* Padding app : compte la barre du bas 72px + safe area */
     .app { padding: 10px 14px 90px; }
-
+ 
     /* Header COMPACT : juste une ligne fine */
     header {
       flex-direction: row; align-items: center; justify-content: space-between;
@@ -398,23 +398,23 @@
     .logo-tag { display: none; }
     .logo-title { font-size: 17px; }
     .date-pill { font-size: 10px; padding: 4px 9px; white-space: nowrap; flex-shrink: 0; }
-
+ 
     nav.desktop-nav { display: none; }
     .mobile-nav { display: block; }
-
+ 
     .sync-bar { padding: 7px 12px; gap: 6px; }
     .sync-bar-label { display: none; }
     .sync-status { font-size: 10px; margin-left: 0; }
-
+ 
     .kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
     .kpi { padding: 12px 10px; border-radius: 10px; }
     .kpi-val { font-size: 24px; }
     .kpi-label { font-size: 9px; }
     .kpi-sub { font-size: 9px; }
-
+ 
     .card { padding: 14px 12px; border-radius: 12px; margin-bottom: 12px; }
     .card-title { font-size: 12px; margin-bottom: 12px; }
-
+ 
     .form-grid { grid-template-columns: 1fr; gap: 12px; }
     .form-full { grid-column: 1; }
     label { font-size: 12px; margin-bottom: 6px; }
@@ -425,37 +425,37 @@
       min-height: 52px;
     }
     textarea { min-height: 90px; }
-
+ 
     .btn-row { flex-direction: column; gap: 10px; margin-top: 16px; }
     .btn-row .btn { width: 100%; padding: 16px; font-size: 15px; border-radius: 12px; text-align: center; }
-
+ 
     /* Historique : cache le tableau, montre les cartes */
     .history-table-desktop { display: none !important; }
     .history-cards-mobile { display: block !important; }
-
+ 
     .td-card { padding: 14px; border-radius: 10px; }
     .td-card-header { flex-wrap: wrap; gap: 6px; }
-
+ 
     .bar-label { width: 80px; font-size: 10px; }
     .bar-val { font-size: 10px; }
     .ring-wrap { gap: 12px; padding: 8px; }
-
+ 
     .insight-block { padding: 12px; }
     .insight-text { font-size: 13px; }
-
+ 
     #chartsGrid { grid-template-columns: 1fr !important; }
     #repriseColleagueWrap { padding: 12px; }
-
+ 
     /* Filtres historique en colonne */
     #view-history .card:first-child > div { flex-direction: column; align-items: stretch; gap: 10px; }
     #view-history select { min-height: 48px; font-size: 16px; }
-
+ 
     /* Cache l'ancien modal, montre le bottom sheet */
     #tdModal { display: none !important; }
-
+ 
     .empty { padding: 36px 14px; }
     .empty-icon { font-size: 36px; }
-
+ 
     #gAuthArea { gap: 6px; flex-wrap: wrap; }
     #gAuthArea .btn { padding: 10px 12px; font-size: 12px; }
   }
@@ -463,7 +463,7 @@
 </head>
 <body>
 <div class="app">
-
+ 
   <header>
     <div class="logo">
       <span class="logo-tag">// Tracker Pro</span>
@@ -471,7 +471,7 @@
     </div>
     <div class="date-pill" id="currentDate"></div>
   </header>
-
+ 
   <nav class="desktop-nav">
     <button class="tab active" onclick="showTab('dashboard', this)">📊 Bilan</button>
     <button class="tab" onclick="showTab('add', this)">➕ Ajouter</button>
@@ -482,7 +482,7 @@
     <button class="tab" onclick="showTab('chef', this)">👔 Remontées</button>
     <button class="tab" onclick="showTab('entretien', this)">🎯 Entretien</button>
   </nav>
-
+ 
   <!-- BARRE MOBILE BAS : 4 fixes + bouton Plus -->
   <nav class="mobile-nav">
     <div class="mobile-nav-inner">
@@ -508,7 +508,7 @@
       </button>
     </div>
   </nav>
-
+ 
   <!-- Menu "Plus" sur mobile -->
   <div id="moreMenuOverlay" onclick="closeMoreMenu()" style="display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.5)"></div>
   <div id="moreMenu" style="display:none;position:fixed;bottom:72px;left:0;right:0;z-index:251;background:var(--surface);border-top:2px solid var(--border);border-radius:20px 20px 0 0;padding:16px 12px;box-shadow:0 -8px 32px rgba(0,0,0,.4)">
@@ -531,7 +531,7 @@
       </button>
     </div>
   </div>
-
+ 
   <!-- SYNC BAR Google -->
   <div class="sync-bar" id="syncBar">
     <span class="sync-bar-label">☁️ Google Drive</span>
@@ -546,11 +546,11 @@
     </div>
     <span class="sync-status" id="syncStatus">Non connecté</span>
   </div>
-
+ 
   <!-- DASHBOARD -->
   <div class="view active" id="view-dashboard">
     <div class="kpi-row" id="kpiRow"></div>
-
+ 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap;" id="chartsGrid">
       <div class="card" style="grid-column:1/-1">
         <div class="card-title">✅ Objectif CLP</div>
@@ -582,15 +582,44 @@
       </div>
     </div>
   </div>
-
+ 
   <!-- ADD -->
   <div class="view" id="view-add">
+ 
+    <!-- MODÈLES RAPIDES -->
+    <div class="card" style="padding:14px 16px">
+      <div class="card-title" style="margin-bottom:10px">⚡ Modèles rapides</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center" id="templatesList">
+        <span style="font-size:12px;color:var(--muted)">Aucun modèle — enregistrez une intervention comme modèle pour la retrouver ici.</span>
+      </div>
+    </div>
+ 
+    <!-- DERNIÈRE SAISIE -->
+    <div id="lastUsedBar" style="display:none;margin-bottom:12px">
+      <div class="card" style="padding:12px 16px;border-color:var(--accent3)">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:10px;color:var(--accent3);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">🕐 Dernière saisie</div>
+            <div style="font-size:13px;font-weight:700" id="lastUsedTitle"></div>
+            <div style="font-size:11px;color:var(--muted)" id="lastUsedMeta"></div>
+          </div>
+          <button class="btn btn-ghost" onclick="reutiliserDerniere()" style="color:var(--accent3);border-color:var(--accent3);padding:8px 16px;font-size:12px">
+            🔄 Réutiliser
+          </button>
+        </div>
+      </div>
+    </div>
+ 
     <div class="card">
       <div class="card-title">Nouvelle intervention</div>
       <div class="form-grid">
         <div>
           <label>Date</label>
           <input type="date" id="f-date">
+        </div>
+        <div>
+          <label>Heure</label>
+          <input type="time" id="f-time">
         </div>
         <div>
           <label>Catégorie</label>
@@ -744,12 +773,13 @@
       </div>
       <div class="btn-row">
         <button class="btn btn-primary" onclick="saveIntervention()">Enregistrer</button>
+        <button class="btn btn-ghost" onclick="saveAsTemplate()" style="color:var(--accent3);border-color:var(--accent3)">⭐ Enregistrer comme modèle</button>
         <button class="btn btn-ghost" onclick="clearForm()">Effacer</button>
       </div>
     </div>
     <div id="formMsg" style="font-size:12px;color:var(--accent);margin-top:8px;padding-left:4px;"></div>
   </div>
-
+ 
   <!-- HISTORY -->
   <div class="view" id="view-history">
     <div class="card">
@@ -794,13 +824,13 @@
       <div class="history-cards-mobile" id="historyCards" style="display:none"></div>
     </div>
   </div>
-
+ 
   <!-- TICKETS / TD -->
   <div class="view" id="view-td">
-
+ 
     <!-- KPI TD -->
     <div class="kpi-row" id="tdKpiRow"></div>
-
+ 
     <!-- Formulaire création TD -->
     <div class="card" id="tdFormCard">
       <div class="card-title">🎫 Nouveau ticket / TD</div>
@@ -863,7 +893,7 @@
       </div>
       <div id="tdFormMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
     </div>
-
+ 
     <!-- Filtres + liste -->
     <div class="card">
       <div class="card-title">Mes tickets</div>
@@ -904,7 +934,7 @@
       </div>
       <div id="tdList"></div>
     </div>
-
+ 
     <!-- Modal suivi ticket (desktop) -->
     <div id="tdModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;overflow-y:auto;padding:20px;">
       <div style="max-width:640px;margin:40px auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;">
@@ -912,7 +942,7 @@
         <div id="tdModalContent"></div>
       </div>
     </div>
-
+ 
     <!-- Bottom sheet ticket (mobile) -->
     <div class="bottom-sheet-overlay" id="tdSheetOverlay" onclick="closeTDModal()"></div>
     <div class="bottom-sheet" id="tdSheet">
@@ -922,13 +952,13 @@
         <div id="tdSheetContent"></div>
       </div>
     </div>
-
+ 
   </div>
-
+ 
   <!-- HEURES SET -->
   <div class="view" id="view-set">
     <div class="kpi-row" id="setKpiRow"></div>
-
+ 
     <!-- Formulaire ajout SET -->
     <div class="card">
       <div class="card-title">⏱ Nouvelle session SET</div>
@@ -956,18 +986,18 @@
       </div>
       <div id="setMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
     </div>
-
+ 
     <!-- Liste des sessions SET -->
     <div class="card">
       <div class="card-title">Mes sessions SET</div>
       <div id="setList"></div>
     </div>
   </div>
-
+ 
   <!-- INNOVATIONS & PRÉCURSEURS -->
   <div class="view" id="view-innov">
     <div class="kpi-row" id="innovKpiRow"></div>
-
+ 
     <!-- Formulaire -->
     <div class="card">
       <div class="card-title">💡 Nouvelle entrée</div>
@@ -1020,7 +1050,7 @@
       </div>
       <div id="innovMsg" style="font-size:12px;color:var(--accent);margin-top:8px;"></div>
     </div>
-
+ 
     <!-- Liste -->
     <div class="card">
       <div class="card-title">Mes innovations & précurseurs</div>
@@ -1032,7 +1062,7 @@
       <div id="innovList"></div>
     </div>
   </div>
-
+ 
   <!-- REMONTÉES CHEF -->
   <div class="view" id="view-chef">
     <div class="kpi-row" id="chefKpiRow"></div>
@@ -1083,7 +1113,7 @@
       <div id="chefList"></div>
     </div>
   </div>
-
+ 
   <!-- ENTRETIEN -->
   <div class="view" id="view-entretien">
     <div class="card">
@@ -1091,9 +1121,9 @@
       <div id="entretienContent"></div>
     </div>
   </div>
-
+ 
 </div>
-
+ 
 <script>
 // ---- DATA ----
 function getData() {
@@ -1102,17 +1132,25 @@ function getData() {
 function saveData(d) {
   localStorage.setItem('interventions', JSON.stringify(d));
 }
-
+ 
 // ---- INIT ----
 document.getElementById('currentDate').textContent = new Date().toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-
+ 
+function initFormDateTime() {
+  const now = new Date();
+  document.getElementById('f-date').value = now.toISOString().split('T')[0];
+  document.getElementById('f-time').value = now.toTimeString().slice(0, 5);
+}
+initFormDateTime();
+ 
+// Rafraîchit l'heure si on revient sur l'onglet Ajouter
 function showTab(id, triggerEl) {
+  if (id === 'add') { initFormDateTime(); renderTemplates(); showLastUsed(); }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.mob-tab, .mob-add-btn').forEach(t => t.classList.remove('active'));
   document.getElementById('view-' + id).classList.add('active');
-
+ 
   // Sync desktop nav
   document.querySelectorAll('.tab').forEach(t => {
     if (t.getAttribute('onclick') && t.getAttribute('onclick').includes("'" + id + "'")) t.classList.add('active');
@@ -1120,7 +1158,7 @@ function showTab(id, triggerEl) {
   // Sync mobile nav
   const mobEl = document.getElementById('mob-' + id);
   if (mobEl) mobEl.classList.add('active');
-
+ 
   if (id === 'dashboard') renderDashboard();
   if (id === 'history') renderHistory();
   if (id === 'td') { renderTDKpis(); renderTD(); }
@@ -1129,7 +1167,7 @@ function showTab(id, triggerEl) {
   if (id === 'chef') { renderChefKpis(); renderChef('all'); }
   if (id === 'entretien') renderEntretien();
 }
-
+ 
 // ---- SAVE ----
 function saveIntervention() {
   const title = document.getElementById('f-title').value.trim();
@@ -1138,6 +1176,7 @@ function saveIntervention() {
   const item = {
     id: Date.now(),
     date: document.getElementById('f-date').value,
+    heure: document.getElementById('f-time').value,
     cat: document.getElementById('f-cat').value,
     train: document.getElementById('f-train').value.trim(),
     serie: document.getElementById('f-serie').value,
@@ -1160,12 +1199,13 @@ function saveIntervention() {
   };
   data.unshift(item);
   saveData(data);
+  saveLastUsed(item);
   document.getElementById('formMsg').textContent = '✅ Intervention enregistrée !';
   setTimeout(() => document.getElementById('formMsg').textContent = '', 2500);
   clearForm();
-  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+  initFormDateTime();
 }
-
+ 
 function clearForm() {
   ['f-title','f-desc','f-skills','f-impact','f-duration','f-train'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f-result').value = 'Réussi';
@@ -1188,20 +1228,138 @@ function clearForm() {
   document.getElementById('clpBox').style.borderColor = '';
   document.getElementById('f-remontee-chef').value = '';
 }
-
+ 
+// ---- MODÈLES & DERNIÈRE SAISIE ----
+function getTemplates() { return JSON.parse(localStorage.getItem('form_templates') || '[]'); }
+function saveTemplates(t) { localStorage.setItem('form_templates', JSON.stringify(t)); }
+ 
+function getFormData() {
+  return {
+    cat:              document.getElementById('f-cat').value,
+    serie:            document.getElementById('f-serie').value,
+    title:            document.getElementById('f-title').value.trim(),
+    train:            document.getElementById('f-train').value.trim(),
+    colleague:        document.getElementById('f-colleague').value,
+    desc:             document.getElementById('f-desc').value.trim(),
+    result:           document.getElementById('f-result').value,
+    duration:         document.getElementById('f-duration').value,
+    skills:           document.getElementById('f-skills').value,
+    impact:           document.getElementById('f-impact').value.trim(),
+    clp:              document.getElementById('f-clp').checked,
+    reprise:          document.getElementById('f-reprise').checked,
+    repriseColleague: document.getElementById('f-reprise-colleague').value,
+    recidive:         document.getElementById('f-recidive').checked,
+    recidiveMotif:    document.getElementById('f-recidive-motif').value,
+    remonteeChef:     document.getElementById('f-remontee-chef').value,
+  };
+}
+ 
+function applyFormData(d) {
+  document.getElementById('f-cat').value       = d.cat || 'Technique';
+  document.getElementById('f-serie').value     = d.serie || '';
+  document.getElementById('f-title').value     = d.title || '';
+  document.getElementById('f-train').value     = d.train || '';
+  document.getElementById('f-colleague').value = d.colleague || '';
+  document.getElementById('f-desc').value      = d.desc || '';
+  document.getElementById('f-result').value    = d.result || 'Réussi';
+  document.getElementById('f-duration').value  = d.duration || '';
+  document.getElementById('f-skills').value    = d.skills || '';
+  document.getElementById('f-impact').value    = d.impact || '';
+  document.getElementById('f-clp').checked     = d.clp || false;
+  document.getElementById('clpBox').style.borderColor = d.clp ? 'var(--accent)' : '';
+  document.getElementById('f-reprise').checked = d.reprise || false;
+  document.getElementById('repriseColleagueWrap').style.display = d.reprise ? 'block' : 'none';
+  document.getElementById('repriseBox').style.borderColor = d.reprise ? 'var(--accent2)' : '';
+  document.getElementById('f-reprise-colleague').value = d.repriseColleague || '';
+  document.getElementById('f-recidive').checked = d.recidive || false;
+  document.getElementById('recidiveMotifWrap').style.display = d.recidive ? 'block' : 'none';
+  document.getElementById('recidiveBox').style.borderColor = d.recidive ? 'var(--danger)' : '';
+  document.getElementById('f-recidive-motif').value = d.recidiveMotif || '';
+  document.getElementById('f-remontee-chef').value = d.remonteeChef || '';
+  toggleNonTermineMotif();
+}
+ 
+// Sauvegarder comme modèle
+function saveAsTemplate() {
+  const title = document.getElementById('f-title').value.trim();
+  const nom = prompt('Nom du modèle :', title || 'Nouveau modèle');
+  if (!nom) return;
+  const templates = getTemplates();
+  templates.push({ id: Date.now(), nom, data: getFormData() });
+  saveTemplates(templates);
+  renderTemplates();
+  document.getElementById('formMsg').textContent = '⭐ Modèle "' + nom + '" enregistré !';
+  setTimeout(() => document.getElementById('formMsg').textContent = '', 2500);
+}
+ 
+function deleteTemplate(id) {
+  saveTemplates(getTemplates().filter(t => t.id !== id));
+  renderTemplates();
+}
+ 
+function applyTemplate(id) {
+  const t = getTemplates().find(t => t.id === id);
+  if (!t) return;
+  applyFormData(t.data);
+  initFormDateTime();
+  document.getElementById('formMsg').textContent = '⚡ Modèle "' + t.nom + '" appliqué !';
+  setTimeout(() => document.getElementById('formMsg').textContent = '', 2000);
+}
+ 
+function renderTemplates() {
+  const templates = getTemplates();
+  const el = document.getElementById('templatesList');
+  if (!templates.length) {
+    el.innerHTML = '<span style="font-size:12px;color:var(--muted)">Aucun modèle — remplissez le formulaire et cliquez ⭐ pour en créer un.</span>';
+    return;
+  }
+  el.innerHTML = templates.map(t => `
+    <div style="display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px">
+      <button onclick="applyTemplate(${t.id})" style="background:none;border:none;color:var(--accent3);cursor:pointer;font-family:'OpenDyslexic',sans-serif;font-size:13px;font-weight:700;padding:0">${t.nom}</button>
+      <button onclick="deleteTemplate(${t.id})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:11px;padding:0 2px" title="Supprimer">✕</button>
+    </div>
+  `).join('');
+}
+ 
+// Dernière saisie
+function saveLastUsed(item) {
+  localStorage.setItem('last_used_form', JSON.stringify(getFormData()));
+  localStorage.setItem('last_used_meta', JSON.stringify({ title: item.title, cat: item.cat, serie: item.serie, date: item.date }));
+}
+ 
+function showLastUsed() {
+  const raw = localStorage.getItem('last_used_form');
+  const meta = localStorage.getItem('last_used_meta');
+  const bar = document.getElementById('lastUsedBar');
+  if (!raw || !meta) { bar.style.display = 'none'; return; }
+  const m = JSON.parse(meta);
+  bar.style.display = 'block';
+  document.getElementById('lastUsedTitle').textContent = m.title || '—';
+  document.getElementById('lastUsedMeta').textContent = [m.cat, m.serie, m.date ? new Date(m.date).toLocaleDateString('fr-FR') : ''].filter(Boolean).join(' · ');
+}
+ 
+function reutiliserDerniere() {
+  const raw = localStorage.getItem('last_used_form');
+  if (!raw) return;
+  applyFormData(JSON.parse(raw));
+  initFormDateTime();
+  document.getElementById('formMsg').textContent = '🔄 Dernière saisie restaurée !';
+  setTimeout(() => document.getElementById('formMsg').textContent = '', 2000);
+}
+ 
 function toggleRecidive() {
   const cb = document.getElementById('f-recidive');
   cb.checked = !cb.checked;
   document.getElementById('recidiveMotifWrap').style.display = cb.checked ? 'block' : 'none';
   document.getElementById('recidiveBox').style.borderColor = cb.checked ? 'var(--danger)' : '';
 }
-
+ 
 function toggleNonTermineMotif() {
   const result = document.getElementById('f-result').value;
   const show = ['Partiel','En cours','Échoué'].includes(result);
   document.getElementById('nonTermineWrap').style.display = show ? 'block' : 'none';
 }
-
+ 
 function toggleReprise() {
   const cb = document.getElementById('f-reprise');
   cb.checked = !cb.checked;
@@ -1210,12 +1368,12 @@ function toggleReprise() {
   wrap.style.display = cb.checked ? 'block' : 'none';
   box.style.borderColor = cb.checked ? 'var(--accent2)' : '';
 }
-
+ 
 function toggleCheck(id) {
   const el = document.getElementById(id);
   el.checked = !el.checked;
 }
-
+ 
 function toggleDesc(id) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -1228,14 +1386,14 @@ function toggleDesc(id) {
     if (arrow) arrow.textContent = isOpen ? '▼' : '▲';
   }
 }
-
+ 
 function deleteItem(id) {
   if (!confirm('Supprimer cette intervention ?')) return;
   saveData(getData().filter(d => d.id !== id));
   renderHistory();
   renderDashboard();
 }
-
+ 
 // ---- DASHBOARD ----
 function renderDashboard() {
   const data = getData();
@@ -1247,15 +1405,15 @@ function renderDashboard() {
   const totalMin = data.reduce((a,d) => a + (d.duration||0), 0);
   const txReussite = total ? Math.round((reussi / total) * 100) : 0;
   const txPartiel = total ? Math.round(((reussi+partiel) / total) * 100) : 0;
-
+ 
   const currentYear = new Date().getFullYear();
   const clpTotal = data.filter(d=>d.clp && new Date(d.date).getFullYear() === currentYear).length;
   const clpObjectif = 30;
   const clpPct = Math.min(Math.round((clpTotal/clpObjectif)*100), 100);
-
+ 
   const reprises = data.filter(d=>d.reprise).length;
   const txRepriseDash = total ? Math.round((reprises/total)*100) : 0;
-
+ 
   // KPI
   const kpis = [
     { label: 'Total interventions', val: total, sub: 'depuis le début', color: 'var(--accent3)' },
@@ -1275,7 +1433,7 @@ function renderDashboard() {
       <div class="kpi-sub">${k.sub}</div>
     </div>
   `).join('');
-
+ 
   // Barre de progression CLP
   const clpColor = clpPct >= 100 ? 'var(--success)' : clpPct >= 60 ? 'var(--warn)' : 'var(--danger)';
   document.getElementById('clpProgress').innerHTML = `
@@ -1291,7 +1449,7 @@ function renderDashboard() {
       <span>${clpObjectif - clpTotal > 0 ? (clpObjectif - clpTotal) + ' CLP restants cette année' : '✅ Objectif annuel atteint !'}</span>
     </div>
   `;
-
+ 
   // Barre SET dans dashboard
   const setSessions = getSETs().filter(s => new Date(s.date).getFullYear() === currentYear);
   const setHTotal = setSessions.reduce((a,s) => a + (s.hours||0), 0);
@@ -1312,7 +1470,7 @@ function renderDashboard() {
       <span>${setPct}% de l'objectif 20%</span>
     </div>
   `;
-
+ 
   // Barre Innovations & Précurseurs dans dashboard
   const innovs = getInnovs().filter(i => new Date(i.date).getFullYear() === currentYear);
   const nbInnov = innovs.filter(i=>i.type==='Innovation').length;
@@ -1336,7 +1494,7 @@ function renderDashboard() {
     </div>
     <div style="font-size:11px;color:var(--muted);text-align:right">${precPct >= 100 ? '✅ Objectif précurseurs atteint !' : (precObjectif - nbPrec) + ' précurseur(s) restant(s)'}</div>
   `;
-
+ 
   // Rings
   const rings = [
     { label: 'Réussi', pct: txReussite, color: 'var(--success)' },
@@ -1359,7 +1517,7 @@ function renderDashboard() {
       <div class="ring-label">${rg.label}</div>
     </div>
   `).join('');
-
+ 
   // Cat chart
   const cats = {};
   data.forEach(d => { cats[d.cat] = (cats[d.cat]||0)+1; });
@@ -1372,7 +1530,7 @@ function renderDashboard() {
       <div class="bar-val">${v}</div>
     </div>
   `).join('') : '<div class="empty"><div class="empty-text">Aucune donnée</div></div>';
-
+ 
   // Graphique par série de train
   const withSerie = data.filter(d => d.serie && d.serie !== '');
   const series = {};
@@ -1391,7 +1549,7 @@ function renderDashboard() {
           </div>`;
       }).join('')
     : '<div style="color:var(--muted);font-size:12px;padding:8px">Renseignez la série lors de vos saisies pour voir la répartition.</div>';
-
+ 
   // Month stats
   const now = new Date();
   const thisMonth = data.filter(d => {
@@ -1407,7 +1565,7 @@ function renderDashboard() {
     </div>
   ` : '<div class="empty"><div class="empty-text">Aucune intervention ce mois</div></div>';
 }
-
+ 
 // ---- HISTORY ----
 function filterData() {
   let data = getData();
@@ -1428,14 +1586,14 @@ function filterData() {
   if (cat !== 'all') data = data.filter(d => d.cat === cat);
   return data;
 }
-
+ 
 function resultBadge(r) {
   if (r === 'Réussi') return '<span class="badge badge-success">Réussi</span>';
   if (r === 'Partiel') return '<span class="badge badge-warn">Partiel</span>';
   if (r === 'Échoué') return '<span class="badge badge-danger">Échoué</span>';
   return '<span class="badge badge-info">En cours</span>';
 }
-
+ 
 function renderHistory() {
   const data = filterData();
   if (!data.length) {
@@ -1487,7 +1645,7 @@ function renderHistory() {
       </tbody>
     </table>
   `;
-
+ 
   // ---- VERSION MOBILE EN CARTES ----
   const isMobile = window.innerWidth <= 700;
   const cardsEl = document.getElementById('historyCards');
@@ -1541,7 +1699,7 @@ function renderHistory() {
     cardsEl.style.display = 'none';
   }
 }
-
+ 
 // ---- ENTRETIEN ----
 function renderEntretien() {
   const data = getData();
@@ -1557,17 +1715,17 @@ function renderEntretien() {
   const txPositif = Math.round(((reussi+partiel)/total)*100);
   const totalMin = data.reduce((a,d)=>a+(d.duration||0),0);
   const totalH = Math.round(totalMin/60);
-
+ 
   // Skills
   const skillsCount = {};
   data.forEach(d=>d.skills.forEach(s=>{ skillsCount[s]=(skillsCount[s]||0)+1; }));
   const topSkills = Object.entries(skillsCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
-
+ 
   // Cats
   const cats = {};
   data.forEach(d=>{ cats[d.cat]=(cats[d.cat]||0)+1; });
   const topCat = Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
-
+ 
   // Month evolution
   const months = {};
   data.forEach(d => {
@@ -1577,19 +1735,19 @@ function renderEntretien() {
     if (d.result==='Réussi') months[key].reussi++;
   });
   const sortedMonths = Object.entries(months).sort((a,b)=>a[0].localeCompare(b[0]));
-
+ 
   // Best intervention
   const bestItems = data.filter(d=>d.result==='Réussi'&&d.impact).slice(0,3);
-
+ 
   const reprises = data.filter(d=>d.reprise).length;
   const recidives = data.filter(d=>d.recidive).length;
   const trainsUniques = [...new Set(data.filter(d=>d.train).map(d=>d.train))].length;
   const txReprise = total ? Math.round((reprises/total)*100) : 0;
   const txRecidive = total ? Math.round((recidives/total)*100) : 0;
-
+ 
   document.getElementById('entretienContent').innerHTML = `
     <div style="display:flex;flex-direction:column;gap:16px">
-
+ 
       <div class="insight-block">
         <div class="insight-label">📌 Mon bilan chiffré</div>
         <div class="insight-text">
@@ -1601,7 +1759,7 @@ function renderEntretien() {
           ${trainsUniques > 0 ? `J'ai intervenu sur <span class="stat-highlight">${trainsUniques} trains distincts</span>.` : ''}
         </div>
       </div>
-
+ 
       ${reprises > 0 || recidives > 0 ? `
       <div class="insight-block" style="border-left-color:var(--accent2)">
         <div class="insight-label" style="color:var(--accent2)">🔁 Reprises & récidives</div>
@@ -1620,7 +1778,7 @@ function renderEntretien() {
           ${recidives > 0 ? `<span class="stat-highlight" style="background:rgba(255,77,106,.15);border-color:rgba(255,77,106,.4);color:var(--danger)">${recidives} récidives</span> identifiées et tracées (${txRecidive}%) — démarche de suivi qualité et d'analyse des causes racines.` : `<span style="color:var(--success)">✅ Aucune récidive enregistrée</span> — fiabilité des réparations effectuées.`}
         </div>
       </div>` : ''}
-
+ 
       ${topCat ? `
       <div class="insight-block" style="border-left-color:var(--accent2)">
         <div class="insight-label" style="color:var(--accent2)">💼 Ma spécialité principale</div>
@@ -1629,7 +1787,7 @@ function renderEntretien() {
           avec <span class="stat-highlight">${topCat[1]} interventions</span>.
         </div>
       </div>` : ''}
-
+ 
       ${topSkills.length ? `
       <div class="insight-block" style="border-left-color:var(--accent3)">
         <div class="insight-label" style="color:var(--accent3)">🧠 Mes compétences mobilisées</div>
@@ -1638,7 +1796,7 @@ function renderEntretien() {
           ${topSkills.map(([s,c])=>`<span class="badge badge-info">${s} <strong style="color:#fff">(×${c})</strong></span>`).join('')}
         </div>
       </div>` : ''}
-
+ 
       ${sortedMonths.length > 1 ? `
       <div class="insight-block" style="border-left-color:var(--warn)">
         <div class="insight-label" style="color:var(--warn)">📈 Mon évolution mois par mois</div>
@@ -1654,7 +1812,7 @@ function renderEntretien() {
           }).join('')}
         </div>
       </div>` : ''}
-
+ 
       ${bestItems.length ? `
       <div class="insight-block" style="border-left-color:var(--success)">
         <div class="insight-label" style="color:var(--success)">🏆 Mes impacts concrets (à citer en entretien)</div>
@@ -1673,7 +1831,7 @@ function renderEntretien() {
           </div>
         `).join('')}
       </div>` : ''}
-
+ 
       <div class="insight-block" style="border-left-color:var(--accent)">
         <div class="insight-label">💬 Formulation suggérée pour l'entretien</div>
         <div class="insight-text" style="font-style:italic;color:var(--muted)">
@@ -1685,17 +1843,17 @@ function renderEntretien() {
           ${topCat ? `Je suis particulièrement actif sur les missions de type <strong style="color:var(--text)">${topCat[0]}</strong>.` : ''}"
         </div>
       </div>
-
+ 
     </div>
   `;
 }
-
+ 
 // ---- CLÔTURER UNE INTERVENTION ----
 function cloturerIntervention(id) {
   const data = getData();
   const item = data.find(d => d.id === id);
   if (!item) return;
-
+ 
   // Petit formulaire de clôture inline
   const motif = prompt(
     '✅ Clôturer l\'intervention\n\n' +
@@ -1703,23 +1861,23 @@ function cloturerIntervention(id) {
     'Résolution finale (facultatif) :'
   );
   if (motif === null) return; // annulé
-
+ 
   item.result = 'Réussi';
   item.nonTermineMotif = '';
   item.nonTermineDetail = '';
   item.clotureLe = new Date().toISOString().split('T')[0];
   item.clotureNote = motif.trim();
-
+ 
   saveData(data);
   renderHistory();
   renderDashboard();
 }
-
+ 
 // ---- EXPORT EXCEL (SheetJS) ----
 function exportExcel() {
   const data = filterData();
   if (!data.length) { alert('Aucune donnée à exporter.'); return; }
-
+ 
   // Chargement dynamique de SheetJS
   if (!window.XLSX) {
     const s = document.createElement('script');
@@ -1730,7 +1888,7 @@ function exportExcel() {
     _doExportExcel(data);
   }
 }
-
+ 
 function _doExportExcel(data) {
   const rows = data.map(d => {
     const skills = d.skills || [];
@@ -1761,15 +1919,15 @@ function _doExportExcel(data) {
       'Impact':                  d.impact || '',
     };
   });
-
+ 
   const ws = XLSX.utils.json_to_sheet(rows);
-
+ 
   // Largeur des colonnes automatique
   const colWidths = Object.keys(rows[0] || {}).map(k => ({
     wch: Math.max(k.length, ...rows.map(r => String(r[k] || '').length), 10)
   }));
   ws['!cols'] = colWidths;
-
+ 
   // Style en-têtes (fond vert, gras)
   const range = XLSX.utils.decode_range(ws['!ref']);
   for (let C = range.s.c; C <= range.e.c; C++) {
@@ -1782,19 +1940,19 @@ function _doExportExcel(data) {
       };
     }
   }
-
+ 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Interventions');
   XLSX.writeFile(wb, 'interventions_' + new Date().toISOString().split('T')[0] + '.xlsx');
 }
-
+ 
 // ---- TD DATA ----
 function getTDs() { return JSON.parse(localStorage.getItem('tickets') || '[]'); }
 function saveTDs(d) { localStorage.setItem('tickets', JSON.stringify(d)); }
-
+ 
 // ---- TD INIT ----
 document.getElementById('td-date').value = new Date().toISOString().split('T')[0];
-
+ 
 // ---- SAVE TD ----
 function saveTD() {
   const title = document.getElementById('td-title').value.trim();
@@ -1829,7 +1987,7 @@ function saveTD() {
   renderTD();
   renderTDKpis();
 }
-
+ 
 function clearTDForm() {
   ['td-title','td-desc','td-requester','td-skills','td-deadline'].forEach(id => {
     const el = document.getElementById(id);
@@ -1841,7 +1999,7 @@ function clearTDForm() {
   document.getElementById('td-type').value = 'Incident';
   document.getElementById('td-date').value = new Date().toISOString().split('T')[0];
 }
-
+ 
 // ---- TD KPIS ----
 function renderTDKpis() {
   const tds = getTDs();
@@ -1852,7 +2010,7 @@ function renderTDKpis() {
   const txResol = total ? Math.round((resolus/total)*100) : 0;
   const now = new Date();
   const enRetard = tds.filter(t => t.deadline && new Date(t.deadline) < now && t.status !== 'Résolu' && t.status !== 'Fermé').length;
-
+ 
   const kpis = [
     { label: 'Total tickets', val: total, sub: 'créés', color: 'var(--accent3)' },
     { label: 'Ouverts', val: ouverts, sub: 'à traiter', color: 'var(--warn)' },
@@ -1869,17 +2027,17 @@ function renderTDKpis() {
     </div>
   `).join('');
 }
-
+ 
 // ---- RENDER TD LIST ----
 function statusClass(s) { return 'status-' + s.replace(' ','-'); }
-
+ 
 function priorityIcon(p) {
   if (p==='Critique') return '🔴';
   if (p==='Haute') return '🟠';
   if (p==='Moyenne') return '🟡';
   return '🟢';
 }
-
+ 
 function deadlineLabel(deadline, status) {
   if (!deadline || status === 'Résolu' || status === 'Fermé') return '';
   const now = new Date(); now.setHours(0,0,0,0);
@@ -1890,7 +2048,7 @@ function deadlineLabel(deadline, status) {
   if (diff <= 3) return `<span class="td-deadline soon">⏳ Dans ${diff}j</span>`;
   return `<span class="td-deadline">📅 ${dl.toLocaleDateString('fr-FR')}</span>`;
 }
-
+ 
 function renderTD() {
   let tds = getTDs();
   const filterStatus = document.getElementById('td-filter-status').value;
@@ -1899,12 +2057,12 @@ function renderTD() {
   if (filterStatus !== 'all') tds = tds.filter(t => t.status === filterStatus);
   if (filterPrio !== 'all') tds = tds.filter(t => t.priority === filterPrio);
   if (filterType !== 'all') tds = tds.filter(t => t.type === filterType);
-
+ 
   if (!tds.length) {
     document.getElementById('tdList').innerHTML = '<div class="empty"><div class="empty-icon">🎫</div><div class="empty-text">Aucun ticket pour ces filtres.</div></div>';
     return;
   }
-
+ 
   document.getElementById('tdList').innerHTML = tds.map(t => `
     <div class="td-card" onclick="openTDModal(${t.id})">
       <div class="td-card-header">
@@ -1926,7 +2084,7 @@ function renderTD() {
     </div>
   `).join('');
 }
-
+ 
 // ---- MODAL / BOTTOM SHEET TICKET DETAIL ----
 function buildTDContent(t) {
   const id = t.id;
@@ -1944,7 +2102,7 @@ function buildTDContent(t) {
       ${t.desc ? `<div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:14px">${t.desc}</div>` : ''}
       ${t.skills.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${t.skills.map(s=>`<span class="badge badge-info">${s}</span>`).join('')}</div>` : ''}
     </div>
-
+ 
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px">
       <div style="font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">⚡ Changer le statut</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
@@ -1967,7 +2125,7 @@ function buildTDContent(t) {
         <button class="btn btn-danger" onclick="deleteTD(${id})" style="min-height:50px">Supprimer</button>
       </div>
     </div>
-
+ 
     <div>
       <div style="font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">📋 Historique</div>
       <div class="timeline">
@@ -1984,7 +2142,7 @@ function buildTDContent(t) {
     </div>
   `;
 }
-
+ 
 function openTDModal(id) {
   const tds = getTDs();
   const t = tds.find(x => x.id === id);
@@ -2002,7 +2160,7 @@ function openTDModal(id) {
     document.body.style.overflow = 'hidden';
   }
 }
-
+ 
 function closeTDModal() {
   document.getElementById('tdModal').style.display = 'none';
   const sheet = document.getElementById('tdSheet');
@@ -2011,11 +2169,11 @@ function closeTDModal() {
   overlay.classList.remove('open');
   document.body.style.overflow = '';
 }
-
+ 
 document.getElementById('tdModal').addEventListener('click', function(e) {
   if (e.target === this) closeTDModal();
 });
-
+ 
 function updateTDStatus(id, newStatus) {
   const tds = getTDs();
   const t = tds.find(x => x.id === id);
@@ -2030,7 +2188,7 @@ function updateTDStatus(id, newStatus) {
   if (window.innerWidth <= 700) document.getElementById('tdSheetContent').innerHTML = html;
   else document.getElementById('tdModalContent').innerHTML = html;
 }
-
+ 
 function addTDNote(id) {
   const noteEl = document.getElementById('td-note-' + id);
   const note = noteEl ? noteEl.value.trim() : '';
@@ -2045,18 +2203,18 @@ function addTDNote(id) {
   if (window.innerWidth <= 700) document.getElementById('tdSheetContent').innerHTML = html;
   else document.getElementById('tdModalContent').innerHTML = html;
 }
-
+ 
 function resolveTD(id) {
   updateTDStatus(id, 'Résolu');
 }
-
+ 
 function deleteTD(id) {
   if (!confirm('Supprimer ce ticket ?')) return;
   saveTDs(getTDs().filter(t => t.id !== id));
   closeTDModal();
   renderTD(); renderTDKpis();
 }
-
+ 
 // ---- EXPORT TD CSV ----
 function exportTDCSV() {
   let tds = getTDs();
@@ -2073,11 +2231,11 @@ function exportTDCSV() {
   a.download = 'tickets_td_' + new Date().toISOString().split('T')[0] + '.csv';
   a.click();
 }
-
+ 
 // ======================================================
 // ---- CHIFFREMENT AES-256 (Web Crypto API natif) ----
 // ======================================================
-
+ 
 // Dérive une clé AES-256-GCM à partir d'un mot de passe
 async function deriveKey(password, salt) {
   const enc = new TextEncoder();
@@ -2092,7 +2250,7 @@ async function deriveKey(password, salt) {
     ['encrypt', 'decrypt']
   );
 }
-
+ 
 // Chiffre une chaîne JSON → base64
 async function chiffrer(jsonStr, password) {
   const enc = new TextEncoder();
@@ -2111,7 +2269,7 @@ async function chiffrer(jsonStr, password) {
   buf.set(new Uint8Array(encrypted), 28);
   return btoa(String.fromCharCode(...buf));
 }
-
+ 
 // Déchiffre un base64 → chaîne JSON
 async function dechiffrer(base64, password) {
   const buf  = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
@@ -2122,7 +2280,7 @@ async function dechiffrer(base64, password) {
   const dec  = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
   return new TextDecoder().decode(dec);
 }
-
+ 
 // Demande et mémorise le mot de passe (sessionStorage = effacé à la fermeture)
 function getPassword(action) {
   const saved = sessionStorage.getItem('crypto_pwd');
@@ -2138,19 +2296,19 @@ function getPassword(action) {
   sessionStorage.setItem('crypto_pwd', pwd);
   return pwd;
 }
-
+ 
 function clearPassword() {
   sessionStorage.removeItem('crypto_pwd');
 }
-
+ 
 // ======================================================
 // ---- HEURES SET ----
 // ======================================================
 function getSETs() { return JSON.parse(localStorage.getItem('set_sessions') || '[]'); }
 function saveSETs(d) { localStorage.setItem('set_sessions', JSON.stringify(d)); }
-
+ 
 document.getElementById('set-date').value = new Date().toISOString().split('T')[0];
-
+ 
 function saveSET() {
   const hours = parseFloat(document.getElementById('set-hours').value);
   if (!hours || hours <= 0) { document.getElementById('setMsg').textContent = '⚠ Renseignez une durée.'; return; }
@@ -2168,20 +2326,20 @@ function saveSET() {
   clearSETForm();
   renderSETKpis(); renderSET();
 }
-
+ 
 function clearSETForm() {
   document.getElementById('set-hours').value = '';
   document.getElementById('set-desc').value = '';
   document.getElementById('set-train').value = '';
   document.getElementById('set-date').value = new Date().toISOString().split('T')[0];
 }
-
+ 
 function deleteSET(id) {
   if (!confirm('Supprimer cette session SET ?')) return;
   saveSETs(getSETs().filter(s => s.id !== id));
   renderSETKpis(); renderSET(); renderDashboard();
 }
-
+ 
 function renderSETKpis() {
   const all = getSETs();
   const year = new Date().getFullYear();
@@ -2202,7 +2360,7 @@ function renderSETKpis() {
     </div>
   `).join('');
 }
-
+ 
 function renderSET() {
   const sessions = getSETs();
   if (!sessions.length) {
@@ -2223,15 +2381,15 @@ function renderSET() {
     </div>
   `).join('');
 }
-
+ 
 // ======================================================
 // ---- INNOVATIONS & PRÉCURSEURS ----
 // ======================================================
 function getInnovs() { return JSON.parse(localStorage.getItem('innovations') || '[]'); }
 function saveInnovs(d) { localStorage.setItem('innovations', JSON.stringify(d)); }
-
+ 
 document.getElementById('innov-date').value = new Date().toISOString().split('T')[0];
-
+ 
 function saveInnov() {
   const title = document.getElementById('innov-title').value.trim();
   if (!title) { document.getElementById('innovMsg').textContent = '⚠ Renseignez un titre.'; return; }
@@ -2252,7 +2410,7 @@ function saveInnov() {
   clearInnovForm();
   renderInnovKpis(); renderInnov('all'); renderDashboard();
 }
-
+ 
 function clearInnovForm() {
   ['innov-title','innov-desc','innov-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('innov-type').value = 'Innovation';
@@ -2260,13 +2418,13 @@ function clearInnovForm() {
   document.getElementById('innov-impact').value = 'Moyen';
   document.getElementById('innov-date').value = new Date().toISOString().split('T')[0];
 }
-
+ 
 function deleteInnov(id) {
   if (!confirm('Supprimer cette entrée ?')) return;
   saveInnovs(getInnovs().filter(i => i.id !== id));
   renderInnovKpis(); renderInnov('all'); renderDashboard();
 }
-
+ 
 function updateInnovStatus(id, newStatus) {
   const innovs = getInnovs();
   const item = innovs.find(i => i.id === id);
@@ -2275,7 +2433,7 @@ function updateInnovStatus(id, newStatus) {
   saveInnovs(innovs);
   renderInnov('all');
 }
-
+ 
 function renderInnovKpis() {
   const all = getInnovs();
   const year = new Date().getFullYear();
@@ -2298,7 +2456,7 @@ function renderInnovKpis() {
     </div>
   `).join('');
 }
-
+ 
 function innovStatusBadge(s) {
   const map = {
     'Proposé':   'background:rgba(124,111,255,.15);color:var(--accent3);border:1px solid rgba(124,111,255,.3)',
@@ -2309,22 +2467,22 @@ function innovStatusBadge(s) {
   };
   return `<span class="badge" style="${map[s]||''}">${s}</span>`;
 }
-
+ 
 function renderInnov(filter) {
   // Highlight active filter button
   ['all','Innovation','Précurseur'].forEach(f => {
     const btn = document.getElementById('filter-' + f);
     if (btn) btn.className = 'btn ' + (filter === f ? 'btn-primary' : 'btn-ghost');
   });
-
+ 
   let items = getInnovs();
   if (filter !== 'all') items = items.filter(i => i.type === filter);
-
+ 
   if (!items.length) {
     document.getElementById('innovList').innerHTML = '<div class="empty"><div class="empty-icon">💡</div><div class="empty-text">Aucune entrée pour ce filtre.</div></div>';
     return;
   }
-
+ 
   document.getElementById('innovList').innerHTML = items.map(i => `
     <div class="hist-card" style="margin-bottom:12px;border-left:3px solid ${i.type==='Innovation'?'var(--accent3)':'var(--warn)'}">
       <div class="hist-card-top">
@@ -2358,15 +2516,15 @@ function renderInnov(filter) {
     </div>
   `).join('');
 }
-
+ 
 // ======================================================
 // ---- REMONTÉES CHEF ----
 // ======================================================
 function getChefs() { return JSON.parse(localStorage.getItem('remontees_chef') || '[]'); }
 function saveChefs(d) { localStorage.setItem('remontees_chef', JSON.stringify(d)); }
-
+ 
 document.getElementById('chef-date').value = new Date().toISOString().split('T')[0];
-
+ 
 function saveChef() {
   const desc = document.getElementById('chef-desc').value.trim();
   if (!desc) { document.getElementById('chefMsg').textContent = '⚠ Renseignez une description.'; return; }
@@ -2385,19 +2543,19 @@ function saveChef() {
   clearChefForm();
   renderChefKpis(); renderChef('all');
 }
-
+ 
 function clearChefForm() {
   ['chef-desc','chef-context','chef-action'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('chef-cat').value = 'Félicitation';
   document.getElementById('chef-date').value = new Date().toISOString().split('T')[0];
 }
-
+ 
 function deleteChef(id) {
   if (!confirm('Supprimer cette remontée ?')) return;
   saveChefs(getChefs().filter(c => c.id !== id));
   renderChefKpis(); renderChef('all');
 }
-
+ 
 function renderChefKpis() {
   const all = getChefs();
   const year = new Date().getFullYear();
@@ -2418,7 +2576,7 @@ function renderChefKpis() {
     </div>
   `).join('');
 }
-
+ 
 function chefCatStyle(cat) {
   if (cat==='Félicitation')  return 'border-left-color:var(--success)';
   if (cat==='Remarque')      return 'border-left-color:var(--warn)';
@@ -2437,7 +2595,7 @@ function chefCatBadge(cat) {
   const icon = { 'Félicitation':'🌟','Remarque':'💬','Avertissement':'⚠️','Objectif':'🎯','Retour entretien':'📋' };
   return `<span class="badge" style="${map[cat]||''}">${icon[cat]||''} ${cat}</span>`;
 }
-
+ 
 function renderChef(filter) {
   ['all','Félicitation','Remarque','Avertissement'].forEach(f => {
     const btn = document.getElementById('cf-' + f);
@@ -2472,7 +2630,7 @@ function renderChef(filter) {
     </div>
   `).join('');
 }
-
+ 
 // ---- MORE MENU (mobile) ----
 function toggleMoreMenu() {
   const menu = document.getElementById('moreMenu');
@@ -2485,19 +2643,19 @@ function closeMoreMenu() {
   document.getElementById('moreMenu').style.display = 'none';
   document.getElementById('moreMenuOverlay').style.display = 'none';
 }
-
+ 
 // ======================================================
 // ---- GOOGLE DRIVE SYNC (avec chiffrement) ----
 // ======================================================
 const G_CLIENT_ID = '';
 const G_SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
 const G_FILE_NAME = 'suivi_pro_encrypted.bin';
-
+ 
 let gTokenClient = null;
 let gAccessToken = null;
 let gFileId = null;
 let gIsReady = false;
-
+ 
 function loadGoogleScript() {
   return new Promise(resolve => {
     if (window.google && window.google.accounts) { resolve(); return; }
@@ -2507,7 +2665,7 @@ function loadGoogleScript() {
     document.head.appendChild(s);
   });
 }
-
+ 
 function loadGapiScript() {
   return new Promise(resolve => {
     if (window.gapi) { resolve(); return; }
@@ -2517,7 +2675,7 @@ function loadGapiScript() {
     document.head.appendChild(s);
   });
 }
-
+ 
 async function gSignIn() {
   const clientId = localStorage.getItem('g_client_id') || '';
   if (!clientId) {
@@ -2534,7 +2692,7 @@ async function gSignIn() {
     }
     localStorage.setItem('g_client_id', id);
   }
-
+ 
   // Demander le mot de passe dès la connexion
   const hasPwd = sessionStorage.getItem('crypto_pwd');
   if (!hasPwd) {
@@ -2543,7 +2701,7 @@ async function gSignIn() {
     if (!pwd) { setSyncStatus('❌ Mot de passe requis'); return; }
     if (isFirst) localStorage.setItem('g_pwd_set', '1');
   }
-
+ 
   setSyncStatus('⏳ Connexion en cours…');
   try {
     await loadGoogleScript();
@@ -2567,7 +2725,7 @@ async function gSignIn() {
     setSyncStatus('❌ ' + (e.message || 'Erreur connexion'));
   }
 }
-
+ 
 async function onGSignedIn() {
   document.getElementById('btnSignIn').style.display = 'none';
   document.getElementById('btnSignOut').style.display = '';
@@ -2577,7 +2735,7 @@ async function onGSignedIn() {
   await gFindOrCreateFile();
   await gLoadData();
 }
-
+ 
 function gSignOut() {
   if (gAccessToken) google.accounts.oauth2.revoke(gAccessToken);
   gAccessToken = null; gFileId = null; gIsReady = false;
@@ -2588,7 +2746,7 @@ function gSignOut() {
   document.getElementById('btnLoad').style.display = 'none';
   setSyncStatus('Déconnecté — session chiffrée fermée');
 }
-
+ 
 async function gFindOrCreateFile() {
   const res = await gapi.client.drive.files.list({
     spaces: 'appDataFolder',
@@ -2605,12 +2763,12 @@ async function gFindOrCreateFile() {
     setSyncStatus('🔐 Connecté — aucun fichier encore', true);
   }
 }
-
+ 
 async function gSaveData() {
   if (!gIsReady) { setSyncStatus('❌ Non connecté'); return; }
   const pwd = getPassword('save');
   if (!pwd) { setSyncStatus('❌ Mot de passe requis'); return; }
-
+ 
   setSyncStatus('⏳ Chiffrement et sauvegarde…');
   try {
     const jsonStr = JSON.stringify({
@@ -2622,15 +2780,15 @@ async function gSaveData() {
       innovations: getInnovs(),
       remontees_chef: getChefs()
     });
-
+ 
     // Chiffrement AES-256
     const encrypted = await chiffrer(jsonStr, pwd);
-
+ 
     const boundary = '-------suivi314159';
     const metadata = JSON.stringify({ name: G_FILE_NAME, parents: ['appDataFolder'] });
-
+ 
     let url, method, body, headers = { 'Authorization': 'Bearer ' + gAccessToken };
-
+ 
     if (gFileId) {
       url = `https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`;
       method = 'PATCH';
@@ -2642,7 +2800,7 @@ async function gSaveData() {
       body = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metadata}\r\n--${boundary}\r\nContent-Type: text/plain\r\n\r\n${encrypted}\r\n--${boundary}--`;
       headers['Content-Type'] = `multipart/related; boundary="${boundary}"`;
     }
-
+ 
     const r = await fetch(url, { method, headers, body });
     const json = await r.json();
     if (json.id) gFileId = json.id;
@@ -2652,7 +2810,7 @@ async function gSaveData() {
     setSyncStatus('❌ Erreur : ' + e.message);
   }
 }
-
+ 
 async function gLoadData() {
   if (!gIsReady || !gFileId) {
     setSyncStatus(gIsReady ? '🔐 Connecté — aucune donnée cloud' : '❌ Non connecté');
@@ -2660,7 +2818,7 @@ async function gLoadData() {
   }
   const pwd = getPassword('load');
   if (!pwd) { setSyncStatus('❌ Mot de passe requis'); return; }
-
+ 
   setSyncStatus('⏳ Chargement et déchiffrement…');
   try {
     const r = await fetch(
@@ -2668,7 +2826,7 @@ async function gLoadData() {
       { headers: { 'Authorization': 'Bearer ' + gAccessToken } }
     );
     const encrypted = await r.text();
-
+ 
     let payload;
     try {
       const jsonStr = await dechiffrer(encrypted, pwd);
@@ -2678,23 +2836,23 @@ async function gLoadData() {
       setSyncStatus('❌ Mot de passe incorrect ou données corrompues');
       return;
     }
-
+ 
     if (!payload.interventions && !payload.tickets) throw new Error('Format invalide');
-
+ 
     const mergeById = (existing, incoming) => {
       const map = {};
       existing.forEach(x => map[x.id] = x);
       (incoming||[]).forEach(x => map[x.id] = x);
       return Object.values(map).sort((a,b) => b.id - a.id);
     };
-
+ 
     const newI = mergeById(getData(), payload.interventions || []);
     const newT = mergeById(getTDs(), payload.tickets || []);
     const newS = mergeById(getSETs(), payload.set_sessions || []);
     const newV = mergeById(getInnovs(), payload.innovations || []);
     const newC = mergeById(getChefs(), payload.remontees_chef || []);
     saveData(newI); saveTDs(newT); saveSETs(newS); saveInnovs(newV); saveChefs(newC);
-
+ 
     const mod = payload.savedAt ? new Date(payload.savedAt).toLocaleString('fr-FR') : '?';
     setSyncStatus('🔐 Déchiffré — ' + newI.length + ' interventions · ' + newT.length + ' tickets · ' + newS.length + ' SET · ' + newV.length + ' innovations (cloud du ' + mod + ')', true);
     renderDashboard(); renderHistory(); renderTD(); renderTDKpis();
@@ -2702,23 +2860,23 @@ async function gLoadData() {
     setSyncStatus('❌ Erreur : ' + e.message);
   }
 }
-
+ 
 function setSyncStatus(msg, ok=false) {
   const el = document.getElementById('syncStatus');
   el.textContent = msg;
   el.className = 'sync-status' + (ok ? ' ok' : '');
 }
-
+ 
 function updateSyncStatus() {
   const i = getData().length;
   const t = getTDs().length;
   if (!gIsReady) setSyncStatus('💾 ' + i + ' intervention' + (i>1?'s':'') + ' · ' + t + ' ticket' + (t>1?'s':'') + ' (local)');
 }
-
+ 
 // ---- INITIAL RENDER ----
 renderDashboard();
 updateSyncStatus();
-
+ 
 // ---- SERVICE WORKER ----
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
