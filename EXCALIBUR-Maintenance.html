@@ -550,18 +550,50 @@ function delIV(id){if(!confirm('Supprimer ?'))return;set('iv',get('iv').filter(i
 // AI BRIEFING
 async function genBriefing(){
   const btn=document.getElementById('briefingBtn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Analyse...';
-  const yL=get('iv').filter(i=>i.date===yesterday()),tL=get('iv').filter(i=>i.date===today()),
-        p=get('parc',{}),spD=get('spData',null);
+  const allIV=get('iv');
+  const yL=allIV.filter(i=>i.date===yesterday());
+  const tL=allIV.filter(i=>i.date===today());
+  const p=get('parc',{});
+  const spD=get('spData',null);
+
+  // Historique : toutes les interventions hors aujourd'hui et hier, triées par date décroissante
+  const histL=allIV
+    .filter(i=>i.date!==today()&&i.date!==yesterday())
+    .sort((a,b)=>b.date.localeCompare(a.date));
+
+  // Résumé historique : regroupé par matériel avec récidives
+  const histByTrain={};
+  histL.forEach(i=>{
+    if(!histByTrain[i.trainNum]) histByTrain[i.trainNum]={count:0,categories:[],results:[],dates:[]};
+    histByTrain[i.trainNum].count++;
+    if(!histByTrain[i.trainNum].categories.includes(i.category)) histByTrain[i.trainNum].categories.push(i.category);
+    if(!histByTrain[i.trainNum].results.includes(i.result)) histByTrain[i.trainNum].results.push(i.result);
+    histByTrain[i.trainNum].dates.push(i.date);
+  });
+
+  const histSec=histL.length>0
+    ?`\nHISTORIQUE COMPLET (${histL.length} interventions sur ${Object.keys(histByTrain).length} matériels):\n`+
+      Object.entries(histByTrain).slice(0,20).map(([train,d])=>
+        `- ${train}: ${d.count} intervention(s) — ${d.categories.join(', ')} — Statuts: ${d.results.join('/')} — Dernière: ${d.dates[0]}`
+      ).join('\n')+
+      (histL.length>0?`\n\nDÉTAIL DERNIÈRES INTERVENTIONS:\n`+histL.slice(0,15).map(i=>
+        `- [${i.date}] [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}${i.duration?` (${i.duration}min)`:''}`
+      ).join('\n'):'')
+    :'\nHISTORIQUE: Aucune donnée historique.';
 
   const spSec=spD?.text
     ?`\nDONNÉES SHAREPOINT (${new Date(spD.at).toLocaleString('fr-FR')}):\n${spD.text.substring(0,2000)}`
     :'\nSHAREPOINT: Aucune donnée.';
 
-  const ctx=`INTERVENTIONS VEILLE (${yesterday()}):\n${yL.length?yL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}${i.duration?` (${i.duration}min)`:''}`).join('\n'):'Aucune.'}\n\nINTERVENTIONS JOUR (${today()}):\n${tL.length?tL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}`).join('\n'):'Aucune.'}\n\nÉTAT DU PARC:\n${Object.entries(p).length?Object.entries(p).map(([t,d])=>`- ${t}: ${d.status.toUpperCase()}${d.note?` — ${d.note}`:''}`).join('\n'):'Aucun.'}${spSec}`;
+  const ctx=
+    `INTERVENTIONS VEILLE (${yesterday()}):\n${yL.length?yL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}${i.duration?` (${i.duration}min)`:''}`).join('\n'):'Aucune.'}\n\n`+
+    `INTERVENTIONS JOUR (${today()}):\n${tL.length?tL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}`).join('\n'):'Aucune.'}\n\n`+
+    `ÉTAT DU PARC:\n${Object.entries(p).length?Object.entries(p).map(([t,d])=>`- ${t}: ${d.status.toUpperCase()}${d.note?` — ${d.note}`:''}`).join('\n'):'Aucun.'}`+
+    histSec+spSec;
 
   const txt=await callAI(
-    'Tu es un assistant de maintenance ferroviaire SNCF. Génère des briefings de prise de poste concis, clairs, professionnels. Intègre les données SharePoint importées. Priorité aux points critiques (hors service, récidives, en cours).',
-    `Briefing prise de poste:\n${ctx}\n\nStructure:\n1) ⚠️ POINTS CRITIQUES\n2) 🔗 DONNÉES SHAREPOINT ÉQUIPE\n3) 🚆 ÉTAT DU PARC\n4) 📁 SYNTHÈSE INTERVENTIONS VEILLE\n5) ✅ RECOMMANDATIONS JOURNÉE`
+    'Tu es un assistant de maintenance ferroviaire SNCF. Génère des briefings de prise de poste concis, clairs, professionnels. Analyse l\'historique complet pour détecter les récidives et pannes fréquentes par matériel. Intègre les données SharePoint. Priorité aux points critiques.',
+    `Briefing prise de poste:\n${ctx}\n\nStructure:\n1) ⚠️ POINTS CRITIQUES\n2) 🔁 RÉCIDIVES & PANNES FRÉQUENTES (basé sur l'historique)\n3) 🔗 DONNÉES SHAREPOINT ÉQUIPE\n4) 🚆 ÉTAT DU PARC\n5) 📁 SYNTHÈSE INTERVENTIONS VEILLE\n6) ✅ RECOMMANDATIONS JOURNÉE`
   );
   if(txt){document.getElementById('briefingTxt').textContent=txt;document.getElementById('briefingOut').style.display='block';}
   btn.disabled=false;btn.innerHTML='<span>✦</span> Générer le briefing IA';
