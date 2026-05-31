@@ -586,6 +586,17 @@
   <!-- ADD -->
   <div class="view" id="view-add">
 
+    <!-- IMPORT IA DEPUIS TEXTE COPIÉ -->
+    <div class="card" style="border-color:var(--accent);padding:16px">
+      <div class="card-title" style="margin-bottom:12px">🤖 Import automatique — Coller depuis SharePoint</div>
+      <textarea id="pasteInput" placeholder="Colle ici ton texte SharePoint (rapport, compte-rendu...) et l'IA remplit le formulaire automatiquement." style="min-height:100px;border-color:var(--accent);background:rgba(0,229,160,.04)"></textarea>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-primary" onclick="analyserTexte()" id="btnAnalyser">🤖 Analyser et remplir</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('pasteInput').value=''">Effacer</button>
+      </div>
+      <div id="iaMsg" style="font-size:12px;margin-top:8px;min-height:18px"></div>
+    </div>
+
     <!-- MODÈLES RAPIDES -->
     <div class="card" style="padding:14px 16px">
       <div class="card-title" style="margin-bottom:10px">⚡ Modèles rapides</div>
@@ -1345,6 +1356,110 @@ function reutiliserDerniere() {
   initFormDateTime();
   document.getElementById('formMsg').textContent = '🔄 Dernière saisie restaurée !';
   setTimeout(() => document.getElementById('formMsg').textContent = '', 2000);
+}
+
+// ======================================================
+// ---- IMPORT IA DEPUIS TEXTE SHAREPOINT ----
+// ======================================================
+async function analyserTexte() {
+  const texte = document.getElementById('pasteInput').value.trim();
+  if (!texte) { setIAMsg('⚠ Colle d\'abord un texte à analyser.', 'warn'); return; }
+
+  const btn = document.getElementById('btnAnalyser');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyse en cours…';
+  setIAMsg('⏳ L\'IA analyse ton texte…', 'info');
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `Tu es un assistant qui extrait des informations d'interventions ferroviaires SNCF depuis des textes copiés d'un SharePoint.
+Réponds UNIQUEMENT en JSON valide, sans balises markdown, sans texte avant ou après.
+Voici le format exact à retourner :
+{
+  "titre": "titre court de l'intervention",
+  "train": "numéro de train ou rame (ex: Z55531)",
+  "serie": "série du matériel parmi : AGC, R2N, ZTER, Autre — déduis-la du numéro si possible (Z5xxxx = ZTER, B8xxxx = AGC, etc.)",
+  "cat": "catégorie parmi : Technique, Conseil, Formation, Urgence, Projet, Autre",
+  "desc": "description complète de l'intervention",
+  "result": "résultat parmi : Réussi, Partiel, Échoué, En cours — déduis-le du contexte",
+  "duration": nombre_en_minutes_ou_null,
+  "skills": ["compétence1", "compétence2"],
+  "impact": "résultat final ou constat",
+  "reprise": true_ou_false,
+  "clp": true_ou_false,
+  "date": "YYYY-MM-DD si trouvée sinon null",
+  "heure": "HH:MM si trouvée sinon null"
+}
+Interprète les champs du format SNCF :
+- S: = Symptôme → utilise pour desc
+- C: = Cause → ajoute à desc
+- D: = Dépannage effectué → ajoute à desc
+- R: = Résultat → utilise pour impact et result
+- J+1 5H = heure d'intervention
+- Les noms en majuscule au début = agent concerné, ignore-les
+- DDS, essais, panto, pantographe → skills techniques
+- Si R: contient "ok" ou "RAS" → result = Réussi
+- Si durée en mn est mentionnée → duration = cette valeur`,
+        messages: [{ role: 'user', content: texte }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content?.[0]?.text || '';
+
+    let parsed;
+    try {
+      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    } catch(e) {
+      setIAMsg('❌ L\'IA n\'a pas pu structurer la réponse. Réessaie.', 'error');
+      return;
+    }
+
+    // Applique les données extraites au formulaire
+    if (parsed.titre)  document.getElementById('f-title').value    = parsed.titre;
+    if (parsed.train)  document.getElementById('f-train').value    = parsed.train;
+    if (parsed.serie)  document.getElementById('f-serie').value    = parsed.serie || '';
+    if (parsed.cat)    document.getElementById('f-cat').value      = parsed.cat;
+    if (parsed.desc)   document.getElementById('f-desc').value     = parsed.desc;
+    if (parsed.result) document.getElementById('f-result').value   = parsed.result;
+    if (parsed.duration) document.getElementById('f-duration').value = parsed.duration;
+    if (parsed.skills) document.getElementById('f-skills').value   = (parsed.skills || []).join(', ');
+    if (parsed.impact) document.getElementById('f-impact').value   = parsed.impact;
+    if (parsed.date)   document.getElementById('f-date').value     = parsed.date;
+    if (parsed.heure)  document.getElementById('f-time').value     = parsed.heure;
+    if (parsed.clp) {
+      document.getElementById('f-clp').checked = true;
+      document.getElementById('clpBox').style.borderColor = 'var(--accent)';
+    }
+    if (parsed.reprise) {
+      document.getElementById('f-reprise').checked = true;
+      document.getElementById('repriseColleagueWrap').style.display = 'block';
+      document.getElementById('repriseBox').style.borderColor = 'var(--accent2)';
+    }
+    toggleNonTermineMotif();
+
+    // Vide la zone de collage
+    document.getElementById('pasteInput').value = '';
+
+    setIAMsg('✅ Formulaire pré-rempli ! Vérifie et complète si besoin.', 'ok');
+
+  } catch(e) {
+    setIAMsg('❌ Erreur réseau : ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🤖 Analyser et remplir';
+  }
+}
+
+function setIAMsg(msg, type) {
+  const el = document.getElementById('iaMsg');
+  el.textContent = msg;
+  el.style.color = type === 'ok' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : type === 'warn' ? 'var(--warn)' : 'var(--muted)';
 }
 
 function toggleRecidive() {
