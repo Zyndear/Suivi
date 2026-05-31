@@ -214,6 +214,7 @@ select option{background:#181c24}
         <span class="card-title">📋 Prise de poste</span>
         <span class="badge ba" id="shiftBadge">—</span>
       </div>
+      <div id="historyCount" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px;text-align:center"></div>
       <button class="btn btn-ai" id="briefingBtn" onclick="genBriefing()"><span>✦</span> Générer le briefing IA</button>
     </div>
 
@@ -489,6 +490,62 @@ function saveIV(){
   toast('✓ Intervention enregistrée');
 }
 
+// =================== INDEXEDDB (historique lourd) ===================
+let _ivdb=null;
+async function openIVDB(){
+  if(_ivdb)return _ivdb;
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open('excalibur_history',1);
+    req.onupgradeneeded=e=>{
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains('iv')){
+        const s=db.createObjectStore('iv',{keyPath:'id'});
+        s.createIndex('date','date',{unique:false});
+        s.createIndex('trainNum','trainNum',{unique:false});
+      }
+    };
+    req.onsuccess=e=>{_ivdb=e.target.result;res(_ivdb);};
+    req.onerror=()=>rej(req.error);
+  });
+}
+async function dbAddMany(items,onProgress){
+  const db=await openIVDB();
+  const CHUNK=500;
+  let done=0;
+  for(let i=0;i<items.length;i+=CHUNK){
+    await new Promise((res,rej)=>{
+      const tx=db.transaction('iv','readwrite');
+      const s=tx.objectStore('iv');
+      items.slice(i,i+CHUNK).forEach(item=>s.put(item));
+      tx.oncomplete=()=>{done+=Math.min(CHUNK,items.length-i);if(onProgress)onProgress(done,items.length);res();};
+      tx.onerror=()=>rej(tx.error);
+    });
+  }
+}
+async function dbGetAll(){
+  const db=await openIVDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction('iv','readonly');
+    const req=tx.objectStore('iv').getAll();
+    req.onsuccess=()=>res(req.result||[]);
+    req.onerror=()=>rej(req.error);
+  });
+}
+async function dbCount(){
+  try{const db=await openIVDB();return new Promise(res=>{const r=db.transaction('iv','readonly').objectStore('iv').count();r.onsuccess=()=>res(r.result);r.onerror=()=>res(0);});}catch{return 0;}
+}
+async function dbClear(){
+  const db=await openIVDB();
+  return new Promise(res=>{const tx=db.transaction('iv','readwrite');tx.objectStore('iv').clear();tx.oncomplete=res;});
+}
+async function updateHistoryCount(){
+  const n=await dbCount();
+  const ls=get('iv').length;
+  const total=n+ls;
+  const el=document.getElementById('historyCount');
+  if(el)el.textContent=total>0?`${total.toLocaleString('fr-FR')} interventions en base`:'Aucun historique';
+}
+
 // PARC
 function saveParc(){
   const t=document.getElementById('pTrain').value.trim();
@@ -499,7 +556,13 @@ function saveParc(){
   renderParc();toast('✓ Parc mis à jour');
 }
 function removeParc(t){if(!confirm(`Retirer ${t} ?`))return;const p=get('parc',{});delete p[t];set('parc',p);renderParc();}
-function clearAll(){if(!confirm('Effacer TOUTES les données ?'))return;['iv','parc','docs','spData'].forEach(k=>localStorage.removeItem(k));location.reload();}
+async function clearAll(){
+  if(!confirm('Effacer TOUTES les données (localStorage + historique) ?'))return;
+  ['iv','parc','docs','spData'].forEach(k=>localStorage.removeItem(k));
+  await dbClear();
+  renderBriefing();updateHistoryCount();
+  toast('Effacé','#ef4444');
+}
 
 // RENDER
 function renderBriefing(){renderParc();renderY();renderT();}
@@ -550,50 +613,54 @@ function delIV(id){if(!confirm('Supprimer ?'))return;set('iv',get('iv').filter(i
 // AI BRIEFING
 async function genBriefing(){
   const btn=document.getElementById('briefingBtn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Analyse...';
-  const allIV=get('iv');
-  const yL=allIV.filter(i=>i.date===yesterday());
-  const tL=allIV.filter(i=>i.date===today());
+
+  const lsIV=get('iv');
+  const yL=lsIV.filter(i=>i.date===yesterday());
+  const tL=lsIV.filter(i=>i.date===today());
   const p=get('parc',{});
   const spD=get('spData',null);
 
-  // Historique : toutes les interventions hors aujourd'hui et hier, triées par date décroissante
-  const histL=allIV
-    .filter(i=>i.date!==today()&&i.date!==yesterday())
-    .sort((a,b)=>b.date.localeCompare(a.date));
+  // Lire l'historique depuis IndexedDB
+  let dbIV=[];
+  try{ dbIV=await dbGetAll(); }catch(e){}
 
-  // Résumé historique : regroupé par matériel avec récidives
-  const histByTrain={};
-  histL.forEach(i=>{
-    if(!histByTrain[i.trainNum]) histByTrain[i.trainNum]={count:0,categories:[],results:[],dates:[]};
-    histByTrain[i.trainNum].count++;
-    if(!histByTrain[i.trainNum].categories.includes(i.category)) histByTrain[i.trainNum].categories.push(i.category);
-    if(!histByTrain[i.trainNum].results.includes(i.result)) histByTrain[i.trainNum].results.push(i.result);
-    histByTrain[i.trainNum].dates.push(i.date);
+  // Combiner localStorage + IndexedDB pour l'historique (hors aujourd'hui/hier)
+  const allHist=[...lsIV,...dbIV].filter(i=>i.date!==today()&&i.date!==yesterday());
+
+  // Regrouper par matériel
+  const byTrain={};
+  allHist.forEach(i=>{
+    if(!byTrain[i.trainNum])byTrain[i.trainNum]={count:0,cats:[],results:[],last:''};
+    byTrain[i.trainNum].count++;
+    if(!byTrain[i.trainNum].cats.includes(i.category))byTrain[i.trainNum].cats.push(i.category);
+    if(!byTrain[i.trainNum].results.includes(i.result))byTrain[i.trainNum].results.push(i.result);
+    if(i.date>byTrain[i.trainNum].last)byTrain[i.trainNum].last=i.date;
   });
 
-  const histSec=histL.length>0
-    ?`\nHISTORIQUE COMPLET (${histL.length} interventions sur ${Object.keys(histByTrain).length} matériels):\n`+
-      Object.entries(histByTrain).slice(0,20).map(([train,d])=>
-        `- ${train}: ${d.count} intervention(s) — ${d.categories.join(', ')} — Statuts: ${d.results.join('/')} — Dernière: ${d.dates[0]}`
-      ).join('\n')+
-      (histL.length>0?`\n\nDÉTAIL DERNIÈRES INTERVENTIONS:\n`+histL.slice(0,15).map(i=>
-        `- [${i.date}] [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}${i.duration?` (${i.duration}min)`:''}`
-      ).join('\n'):'')
-    :'\nHISTORIQUE: Aucune donnée historique.';
+  // Top pannes récurrentes
+  const topTrains=Object.entries(byTrain).sort((a,b)=>b[1].count-a[1].count).slice(0,15);
+
+  const histSec=allHist.length>0
+    ?`\nHISTORIQUE (${allHist.length.toLocaleString('fr-FR')} interventions — ${Object.keys(byTrain).length} matériels):\n`+
+      topTrains.map(([t,d])=>`- ${t}: ${d.count}x — ${d.cats.join('/')} — ${d.results.join('/')} — dernière: ${d.last}`).join('\n')+
+      `\n\nDERNIÈRES INTERVENTIONS:\n`+
+      [...allHist].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,12)
+        .map(i=>`- [${i.date}] [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}${i.duration?` (${i.duration}min)`:''}`).join('\n')
+    :'\nHISTORIQUE: Aucune donnée.';
 
   const spSec=spD?.text
-    ?`\nDONNÉES SHAREPOINT (${new Date(spD.at).toLocaleString('fr-FR')}):\n${spD.text.substring(0,2000)}`
+    ?`\nSHAREPOINT (${new Date(spD.at).toLocaleString('fr-FR')}):\n${spD.text.substring(0,2000)}`
     :'\nSHAREPOINT: Aucune donnée.';
 
   const ctx=
     `INTERVENTIONS VEILLE (${yesterday()}):\n${yL.length?yL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}${i.duration?` (${i.duration}min)`:''}`).join('\n'):'Aucune.'}\n\n`+
-    `INTERVENTIONS JOUR (${today()}):\n${tL.length?tL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}`).join('\n'):'Aucune.'}\n\n`+
+    `INTERVENTIONS AUJOURD'HUI (${today()}):\n${tL.length?tL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}`).join('\n'):'Aucune.'}\n\n`+
     `ÉTAT DU PARC:\n${Object.entries(p).length?Object.entries(p).map(([t,d])=>`- ${t}: ${d.status.toUpperCase()}${d.note?` — ${d.note}`:''}`).join('\n'):'Aucun.'}`+
     histSec+spSec;
 
   const txt=await callAI(
-    'Tu es un assistant de maintenance ferroviaire SNCF. Génère des briefings de prise de poste concis, clairs, professionnels. Analyse l\'historique complet pour détecter les récidives et pannes fréquentes par matériel. Intègre les données SharePoint. Priorité aux points critiques.',
-    `Briefing prise de poste:\n${ctx}\n\nStructure:\n1) ⚠️ POINTS CRITIQUES\n2) 🔁 RÉCIDIVES & PANNES FRÉQUENTES (basé sur l'historique)\n3) 🔗 DONNÉES SHAREPOINT ÉQUIPE\n4) 🚆 ÉTAT DU PARC\n5) 📁 SYNTHÈSE INTERVENTIONS VEILLE\n6) ✅ RECOMMANDATIONS JOURNÉE`
+    'Tu es un assistant de maintenance ferroviaire SNCF. Génère des briefings de prise de poste concis, clairs et professionnels. Analyse l\'historique pour détecter récidives et pannes fréquentes. Intègre les données SharePoint. Priorité aux points critiques.',
+    `Briefing prise de poste:\n${ctx}\n\nStructure:\n1) ⚠️ POINTS CRITIQUES\n2) 🔁 RÉCIDIVES & PANNES FRÉQUENTES (analyse historique)\n3) 🔗 DONNÉES SHAREPOINT\n4) 🚆 ÉTAT DU PARC\n5) 📁 SYNTHÈSE VEILLE\n6) ✅ RECOMMANDATIONS`
   );
   if(txt){document.getElementById('briefingTxt').textContent=txt;document.getElementById('briefingOut').style.display='block';}
   btn.disabled=false;btn.innerHTML='<span>✦</span> Générer le briefing IA';
@@ -720,71 +787,57 @@ function openIvMap(rows,fname){
 
 function closeIvMap(e){if(!e||e.target===document.getElementById('ivMapModal'))document.getElementById('ivMapModal').style.display='none';}
 
-function confirmImport(){
+async function confirmImport(){
   const mTrain=document.getElementById('mapTrain').value;
   const mDesc=document.getElementById('mapDesc').value;
   if(!mTrain||!mDesc){toast('⚠ Colonne Train et Description obligatoires','#ef4444');return;}
 
-  const mCat=document.getElementById('mapCat').value;
-  const mResult=document.getElementById('mapResult').value;
-  const mDur=document.getElementById('mapDur').value;
-  const mDate=document.getElementById('mapDate').value;
+  const mCat=document.getElementById('mapCat').value,mResult=document.getElementById('mapResult').value,
+        mDur=document.getElementById('mapDur').value,mDate=document.getElementById('mapDate').value;
 
   const RESULT_MAP={'résolu':'résolu','ok':'résolu','done':'résolu','terminé':'résolu','termine':'résolu',
     'en cours':'en cours','ongoing':'en cours','progress':'en cours','wip':'en cours',
     'récidive':'récidive','recidive':'récidive','repeat':'récidive',
     'hors service':'hors service','hs':'hors service','ko':'hors service','out':'hors service'};
 
-  const existing=get('iv');
-  let imported=0,skipped=0;
-
+  // Build items
+  const items=[];let skipped=0;
   ivImportRows.forEach(row=>{
     const trainNum=String(row[mTrain]||'').trim();
     const description=String(row[mDesc]||'').trim();
     if(!trainNum&&!description){skipped++;return;}
-
-    // Parse date
     let date=today();
     if(mDate&&row[mDate]){
       const raw=String(row[mDate]).trim();
-      // Try various formats
       const d=new Date(raw);
       if(!isNaN(d.getTime()))date=d.toISOString().split('T')[0];
-      else{
-        // Try DD/MM/YYYY
-        const m=raw.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
-        if(m){const y=m[3].length===2?'20'+m[3]:m[3];date=`${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;}
-      }
+      else{const m=raw.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);if(m){const y=m[3].length===2?'20'+m[3]:m[3];date=`${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;}}
     }
-
-    // Parse result
     let result='résolu';
-    if(mResult&&row[mResult]){
-      const raw=String(row[mResult]).toLowerCase().trim();
-      result=RESULT_MAP[raw]||'résolu';
-    }
-
-    // Parse duration
+    if(mResult&&row[mResult]){const raw=String(row[mResult]).toLowerCase().trim();result=RESULT_MAP[raw]||'résolu';}
     let duration=0;
     if(mDur&&row[mDur]){const n=parseInt(String(row[mDur]).replace(/[^0-9]/g,''));if(!isNaN(n))duration=n;}
-
-    existing.push({
-      id:uid(),
-      date,
-      timestamp:new Date(date).toISOString(),
-      trainNum:trainNum||'—',
-      category:mCat&&row[mCat]?String(row[mCat]).trim():'Import',
-      description:description||'—',
-      result,
-      duration
-    });
-    imported++;
+    items.push({id:uid(),date,timestamp:new Date(date).toISOString(),trainNum:trainNum||'—',
+      category:mCat&&row[mCat]?String(row[mCat]).trim():'Import',description:description||'—',result,duration});
   });
 
-  set('iv',existing);
+  if(!items.length){toast('⚠ Aucune ligne valide à importer','#ef4444');return;}
+
+  // Show progress
+  const btn=document.querySelector('#ivMapModal .btn-primary');
+  btn.disabled=true;
+  const countEl=document.getElementById('ivMapCount');
+
+  await dbAddMany(items,(done,total)=>{
+    const pct=Math.round(done/total*100);
+    countEl.textContent=`⏳ Import... ${done.toLocaleString('fr-FR')} / ${total.toLocaleString('fr-FR')} (${pct}%)`;
+  });
+
   closeIvMap();
+  await updateHistoryCount();
   renderBriefing();
-  toast(`✓ ${imported} intervention(s) importée(s)${skipped?` (${skipped} ignorées)`:''}`);
+  toast(`✓ ${items.length.toLocaleString('fr-FR')} intervention(s) importée(s)${skipped?` (${skipped} ignorées)`:''}`);
+  btn.disabled=false;
 }
 
 // API KEY & PROVIDER
@@ -987,6 +1040,7 @@ async function importFile(file){
 
 // INIT
 renderBriefing();
+updateHistoryCount();
 const cachedSP=get('spData',null);
 if(cachedSP?.text){
   document.getElementById('spPaste').value=cachedSP.text;
