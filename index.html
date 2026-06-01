@@ -544,6 +544,7 @@
       <button class="btn btn-primary" id="btnSave" onclick="gSaveData()" style="padding:6px 14px;font-size:11px;display:none">☁️ Sauvegarder</button>
       <button class="btn btn-ghost" id="btnLoad" onclick="gLoadData()" style="padding:6px 14px;font-size:11px;display:none">⬇ Charger</button>
     </div>
+        <button onclick="syncExcalibur()" style="padding:6px 14px;font-size:11px;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid #f59e0b;border-radius:6px;cursor:pointer;font-family:'OpenDyslexic',Arial,sans-serif;font-weight:700;display:flex;align-items:center;gap:6px">🗡 EXCALIBUR</button>
     <span class="sync-status" id="syncStatus">Non connecté</span>
   </div>
 
@@ -3000,6 +3001,23 @@ function updateSyncStatus() {
 // ---- INITIAL RENDER ----
 renderDashboard();
 updateSyncStatus();
+// ======================================================
+// ---- BRIDGE EXCALIBUR ----
+// ======================================================
+function syncExcalibur() {
+  try {
+    // Les deux apps partagent le même localStorage sur zyndear.github.io
+    // EXCALIBUR lit directement localStorage['interventions']
+    // On notifie EXCALIBUR via BroadcastChannel (si les deux onglets sont ouverts)
+    const bc = new BroadcastChannel('excalibur_bridge');
+    bc.postMessage('suivi_updated');
+    bc.close();
+    setSyncStatus('🗡 EXCALIBUR synchronisé — ' + getData().length + ' interventions disponibles', true);
+  } catch(e) {
+    setSyncStatus('🗡 Données prêtes — rechargez EXCALIBUR pour les voir');
+  }
+  setTimeout(updateSyncStatus, 4000);
+}
 
 // ---- SERVICE WORKER ----
 if ('serviceWorker' in navigator) {
