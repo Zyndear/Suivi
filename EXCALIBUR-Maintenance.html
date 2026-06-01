@@ -636,14 +636,64 @@ async function genBriefing(){
   const p=get('parc',{});
   const spD=get('spData',null);
 
-  // Lire l'historique depuis IndexedDB
+  // Récupérer tout l'historique depuis IndexedDB
   let dbIV=[];
   try{ dbIV=await dbGetAll(); }catch(e){}
-
-  // Combiner localStorage + IndexedDB pour l'historique (hors aujourd'hui/hier)
   const allHist=[...lsIV,...dbIV].filter(i=>i.date!==today()&&i.date!==yesterday());
 
-  // Regrouper par matériel
+  // Trains actifs aujourd'hui + hier (pour la recherche de pannes similaires)
+  const activeTrains=[...new Set([...tL,...yL].map(i=>i.trainNum).filter(t=>t&&t!=='—'))];
+
+  // Pour chaque train actif, chercher les pannes similaires dans l'historique
+  let similarFaultsSection='';
+  if(activeTrains.length>0 && allHist.length>0){
+    const similarFaults=activeTrains.map(train=>{
+      const trainHistory=allHist.filter(i=>i.trainNum===train);
+      if(!trainHistory.length) return null;
+
+      // Regrouper par catégorie
+      const byCat={};
+      trainHistory.forEach(i=>{
+        if(!byCat[i.category])byCat[i.category]={count:0,results:[],dates:[],descriptions:[]};
+        byCat[i.category].count++;
+        byCat[i.category].results.push(i.result);
+        byCat[i.category].dates.push(i.date);
+        if(i.description)byCat[i.category].descriptions.push(i.description.substring(0,80));
+      });
+
+      // Trier par fréquence
+      const sortedCats=Object.entries(byCat).sort((a,b)=>b[1].count-a[1].count);
+      const recidives=trainHistory.filter(i=>i.recidive).length;
+      const lastDate=trainHistory.map(i=>i.date).sort().reverse()[0];
+
+      return {
+        train,
+        totalInterventions:trainHistory.length,
+        recidives,
+        lastIntervention:lastDate,
+        topFaults:sortedCats.slice(0,4).map(([cat,d])=>({
+          cat,
+          count:d.count,
+          lastDate:d.dates.sort().reverse()[0],
+          resolved:d.results.filter(r=>r==='résolu').length,
+          examples:d.descriptions.slice(0,2)
+        }))
+      };
+    }).filter(Boolean);
+
+    if(similarFaults.length>0){
+      similarFaultsSection='\n\nANALYSE PANNES SIMILAIRES PAR TRAIN:\n'+
+        similarFaults.map(sf=>
+          `\n🚆 ${sf.train} — ${sf.totalInterventions} interventions historiques${sf.recidives>0?` dont ${sf.recidives} récidive(s)`:''} (dernière: ${sf.lastIntervention})\n`+
+          sf.topFaults.map(f=>
+            `  📌 ${f.cat}: ${f.count}x — résolu ${f.resolved}/${f.count} fois — dernière: ${f.lastDate}`+
+            (f.examples.length?`\n     Exemples: "${f.examples.join('" / "')}"`:'')
+          ).join('\n')
+        ).join('\n');
+    }
+  }
+
+  // Résumé historique global
   const byTrain={};
   allHist.forEach(i=>{
     if(!byTrain[i.trainNum])byTrain[i.trainNum]={count:0,cats:[],results:[],last:''};
@@ -652,31 +702,25 @@ async function genBriefing(){
     if(!byTrain[i.trainNum].results.includes(i.result))byTrain[i.trainNum].results.push(i.result);
     if(i.date>byTrain[i.trainNum].last)byTrain[i.trainNum].last=i.date;
   });
-
-  // Top pannes récurrentes
-  const topTrains=Object.entries(byTrain).sort((a,b)=>b[1].count-a[1].count).slice(0,15);
-
+  const topTrains=Object.entries(byTrain).sort((a,b)=>b[1].count-a[1].count).slice(0,10);
   const histSec=allHist.length>0
-    ?`\nHISTORIQUE (${allHist.length.toLocaleString('fr-FR')} interventions — ${Object.keys(byTrain).length} matériels):\n`+
-      topTrains.map(([t,d])=>`- ${t}: ${d.count}x — ${d.cats.join('/')} — ${d.results.join('/')} — dernière: ${d.last}`).join('\n')+
-      `\n\nDERNIÈRES INTERVENTIONS:\n`+
-      [...allHist].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,12)
-        .map(i=>`- [${i.date}] [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}${i.duration?` (${i.duration}min)`:''}`).join('\n')
+    ?`\nHISTORIQUE GLOBAL (${allHist.length.toLocaleString('fr-FR')} interventions):\n`+
+      topTrains.map(([t,d])=>`- ${t}: ${d.count}x — ${d.cats.slice(0,3).join('/')} — ${d.results.join('/')} — dernière: ${d.last}`).join('\n')
     :'\nHISTORIQUE: Aucune donnée.';
 
   const spSec=spD?.text
-    ?`\nSHAREPOINT (${new Date(spD.at).toLocaleString('fr-FR')}):\n${spD.text.substring(0,2000)}`
+    ?`\nSHAREPOINT (${new Date(spD.at).toLocaleString('fr-FR')}):\n${spD.text.substring(0,1500)}`
     :'\nSHAREPOINT: Aucune donnée.';
 
   const ctx=
     `INTERVENTIONS VEILLE (${yesterday()}):\n${yL.length?yL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}${i.duration?` (${i.duration}min)`:''}`).join('\n'):'Aucune.'}\n\n`+
     `INTERVENTIONS AUJOURD'HUI (${today()}):\n${tL.length?tL.map(i=>`- [${i.result.toUpperCase()}] ${i.trainNum} — ${i.category}: ${i.description}`).join('\n'):'Aucune.'}\n\n`+
     `ÉTAT DU PARC:\n${Object.entries(p).length?Object.entries(p).map(([t,d])=>`- ${t}: ${d.status.toUpperCase()}${d.note?` — ${d.note}`:''}`).join('\n'):'Aucun.'}`+
-    histSec+spSec;
+    similarFaultsSection+histSec+spSec;
 
   const txt=await callAI(
-    'Tu es un assistant de maintenance ferroviaire SNCF. Génère des briefings de prise de poste concis, clairs et professionnels. Analyse l\'historique pour détecter récidives et pannes fréquentes. Intègre les données SharePoint. Priorité aux points critiques.',
-    `Briefing prise de poste:\n${ctx}\n\nStructure:\n1) ⚠️ POINTS CRITIQUES\n2) 🔁 RÉCIDIVES & PANNES FRÉQUENTES (analyse historique)\n3) 🔗 DONNÉES SHAREPOINT\n4) 🚆 ÉTAT DU PARC\n5) 📁 SYNTHÈSE VEILLE\n6) ✅ RECOMMANDATIONS`
+    'Tu es un expert en maintenance ferroviaire SNCF. Tu génères des briefings de prise de poste précis et professionnels. Tu excelles dans l\'analyse des pannes récurrentes : pour chaque train en cours d\'intervention, tu croises avec l\'historique pour identifier si la panne actuelle est une récidive connue, si ce type de défaut est fréquent sur ce train, et tu donnes des pistes de résolution basées sur l\'historique.',
+    `Briefing prise de poste:\n${ctx}\n\nStructure OBLIGATOIRE:\n1) ⚠️ POINTS CRITIQUES DU JOUR\n2) 🔍 ANALYSE PANNES SIMILAIRES — Pour chaque train actif, croise la panne actuelle avec son historique : est-ce une récidive ? Quelle est la fréquence de ce type de panne sur ce train ? Que disent les interventions précédentes ?\n3) 🔗 DONNÉES SHAREPOINT\n4) 🚆 ÉTAT DU PARC\n5) 📁 SYNTHÈSE VEILLE\n6) ✅ RECOMMANDATIONS basées sur l'historique`
   );
   if(txt){document.getElementById('briefingTxt').textContent=txt;document.getElementById('briefingOut').style.display='block';}
   btn.disabled=false;btn.innerHTML='<span>✦</span> Générer le briefing IA';
