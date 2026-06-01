@@ -177,6 +177,22 @@ select option{background:#181c24}
   <!-- BRIEFING -->
   <div class="tab active" id="tab-briefing">
 
+    <!-- App de Suivi Bridge -->
+    <div class="sp-card" style="border-color:rgba(0,229,160,.3);margin-bottom:12px">
+      <div class="sp-row">
+        <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:#00e5a0;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:8px">
+          <div class="sp-dot" id="suiviDot"></div>
+          🗡 App de Suivi
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span id="suiviBadge" class="badge bp" style="font-size:9px">NON CONNECTÉ</span>
+          <button id="suiviSyncBtn" onclick="syncSuivi()" style="background:rgba(0,229,160,.1);color:#00e5a0;border:1px solid rgba(0,229,160,.3);padding:7px 12px;font-size:11px;border-radius:6px;cursor:pointer;font-family:var(--sans);font-weight:600;display:flex;align-items:center;gap:5px">↻ Sync</button>
+        </div>
+      </div>
+      <div id="suiviMeta" class="sp-meta" style="display:none;margin-bottom:6px"></div>
+      <div id="suiviPreview" style="font-size:12px;color:var(--text3)">Cliquez Sync pour importer les interventions de l'app de suivi.<br>Fonctionne automatiquement quand les deux apps sont sur le même domaine GitHub.</div>
+    </div>
+
     <!-- SharePoint Card -->
     <div class="sp-card">
       <div class="sp-row">
@@ -1038,6 +1054,101 @@ async function importFile(file){
   }catch(e){toast('⚠ Erreur : '+e.message,'#ef4444');}
 }
 
+// =================== BRIDGE APP DE SUIVI ===================
+// Les deux apps partagent le même localStorage sur zyndear.github.io
+
+const _BC = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('excalibur_bridge') : null;
+
+function mapSuiviResult(r){
+  return({'Réussi':'résolu','Partiel':'en cours','Échoué':'hors service','En cours':'en cours'})[r]||'résolu';
+}
+
+function getSuiviRaw(){
+  try{const r=localStorage.getItem('interventions');return r?JSON.parse(r):[];}catch{return[];}
+}
+
+async function syncSuivi(){
+  const btn=document.getElementById('suiviSyncBtn');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner" style="border-top-color:#00e5a0;border-color:rgba(0,229,160,.2)"></span>';}
+
+  const raw=getSuiviRaw();
+  if(!raw.length){
+    toast('⚠ Aucune donnée dans l\'app de suivi — chargez d\'abord depuis Drive','#ef4444');
+    if(btn){btn.disabled=false;btn.textContent='↻ Sync';}
+    updateSuiviStatus();return;
+  }
+
+  // Mapper au format EXCALIBUR
+  const mapped=raw.map(item=>({
+    id:'suivi_'+item.id,
+    date:item.date||today(),
+    timestamp:item.date?new Date(item.date+'T'+(item.heure||'00:00')).toISOString():new Date().toISOString(),
+    trainNum:item.train||'—',
+    category:item.cat||'Autre',
+    description:[item.title,item.desc].filter(Boolean).join(' — ').substring(0,400),
+    result:mapSuiviResult(item.result),
+    duration:item.duration||0,
+    recidive:item.recidive||false,
+    reprise:item.reprise||false,
+    colleague:item.colleague||'',
+    serie:item.serie||''
+  }));
+
+  await dbAddMany(mapped,null);
+  set('suivi_sync_at',new Date().toISOString());
+  set('suivi_sync_count',String(mapped.length));
+  await updateHistoryCount();
+  updateSuiviStatus();
+  renderBriefing();
+  toast(`✓ ${mapped.length} interventions synchronisées depuis l'app de suivi`);
+  if(btn){btn.disabled=false;btn.textContent='↻ Sync';}
+}
+
+function updateSuiviStatus(){
+  const raw=getSuiviRaw();
+  const syncAt=localStorage.getItem('suivi_sync_at');
+  const count=localStorage.getItem('suivi_sync_count')||'0';
+  const dot=document.getElementById('suiviDot');
+  const badge=document.getElementById('suiviBadge');
+  const meta=document.getElementById('suiviMeta');
+  const preview=document.getElementById('suiviPreview');
+  if(!dot)return;
+
+  if(raw.length>0){
+    dot.className='sp-dot ok';
+    badge.textContent=raw.length+' INTERVENTIONS';
+    badge.className='badge bg';
+    if(syncAt){
+      meta.style.display='block';
+      meta.textContent=`Dernière sync : ${new Date(syncAt).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})} · ${count} importées`;
+    }
+    // Aperçu des 3 dernières
+    const recent=raw.slice(0,3);
+    preview.innerHTML=recent.map(i=>`
+      <div style="padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;display:flex;justify-content:space-between">
+        <span style="color:var(--text)">${i.title||'—'}</span>
+        <span style="color:#00e5a0;font-family:var(--mono)">${i.train||''}</span>
+      </div>`).join('')+
+      (raw.length>3?`<div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono)">... et ${raw.length-3} autres</div>`:'');
+  } else {
+    dot.className='sp-dot';
+    badge.textContent='NON CONNECTÉ';
+    badge.className='badge bp';
+    meta.style.display='none';
+    preview.innerHTML='<span style="font-size:12px;color:var(--text3)">Chargez vos données dans l\'app de suivi puis cliquez Sync.</span>';
+  }
+}
+
+// BroadcastChannel : sync auto quand l'app de suivi notifie
+if(_BC){
+  _BC.onmessage=async(e)=>{
+    if(e.data==='suivi_updated'){
+      await syncSuivi();
+      toast('🗡 App de suivi mise à jour — sync automatique');
+    }
+  };
+}
+
 // INIT
 renderBriefing();
 updateHistoryCount();
@@ -1050,6 +1161,10 @@ if(cachedSP?.text){
   const el=document.getElementById('spMeta');el.style.display='block';
   el.textContent=`Dernière sauvegarde : ${new Date(cachedSP.at).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
 }
+renderBriefing();
+updateHistoryCount();
+updateSuiviStatus();
+if(getSuiviRaw().length>0){syncSuivi();}
 </script>
 <!-- MODAL IMPORT MAPPING -->
 <div class="modal-overlay" id="ivMapModal" style="display:none" onclick="closeIvMap(event)">
