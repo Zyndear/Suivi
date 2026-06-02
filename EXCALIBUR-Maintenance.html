@@ -642,54 +642,76 @@ async function genBriefing(){
   const allHist=[...lsIV,...dbIV].filter(i=>i.date!==today()&&i.date!==yesterday());
 
   // Trains actifs aujourd'hui + hier (pour la recherche de pannes similaires)
-  const activeTrains=[...new Set([...tL,...yL].map(i=>i.trainNum).filter(t=>t&&t!=='—'))];
+  const activeInterventions=[...tL,...yL].filter(i=>i.trainNum&&i.trainNum!=='—');
+  const activeTrains=[...new Set(activeInterventions.map(i=>i.trainNum))];
 
-  // Pour chaque train actif, chercher les pannes similaires dans l'historique
+  // Pour chaque intervention active, analyse profonde de l'historique
   let similarFaultsSection='';
-  if(activeTrains.length>0 && allHist.length>0){
-    const similarFaults=activeTrains.map(train=>{
-      const trainHistory=allHist.filter(i=>i.trainNum===train);
-      if(!trainHistory.length) return null;
+  if(activeInterventions.length>0 && allHist.length>0){
 
-      // Regrouper par catégorie
-      const byCat={};
-      trainHistory.forEach(i=>{
-        if(!byCat[i.category])byCat[i.category]={count:0,results:[],dates:[],descriptions:[]};
-        byCat[i.category].count++;
-        byCat[i.category].results.push(i.result);
-        byCat[i.category].dates.push(i.date);
-        if(i.description)byCat[i.category].descriptions.push(i.description.substring(0,80));
+    const analyses=activeInterventions.map(current=>{
+      // Trouver toutes les interventions historiques sur ce train
+      const sameTrainAll=allHist.filter(i=>i.trainNum===current.trainNum);
+      if(!sameTrainAll.length) return null;
+
+      // Trouver les pannes de même catégorie ou description similaire
+      const sameCat=sameTrainAll.filter(i=>i.category===current.category);
+
+      // Solutions qui ont fonctionné (résolu)
+      const worked=sameCat.filter(i=>i.result==='résolu'||i.result==='Réussi')
+        .sort((a,b)=>b.date.localeCompare(a.date))
+        .slice(0,4)
+        .map(i=>`[${i.date}] ${i.description}`.substring(0,120));
+
+      // Solutions qui n'ont pas fonctionné ou récidivé
+      const failed=sameCat.filter(i=>i.result==='récidive'||i.result==='hors service'||i.result==='Échoué'||i.result==='Partiel')
+        .sort((a,b)=>b.date.localeCompare(a.date))
+        .slice(0,3)
+        .map(i=>`[${i.date}] ${i.result.toUpperCase()} — ${i.description}`.substring(0,100));
+
+      // Chronologie complète de cette catégorie de panne
+      const timeline=sameCat.sort((a,b)=>b.date.localeCompare(a.date));
+
+      // Analyse globale du train
+      const byCatTrain={};
+      sameTrainAll.forEach(i=>{
+        if(!byCatTrain[i.category])byCatTrain[i.category]={count:0,resolved:0};
+        byCatTrain[i.category].count++;
+        if(i.result==='résolu'||i.result==='Réussi')byCatTrain[i.category].resolved++;
       });
 
-      // Trier par fréquence
-      const sortedCats=Object.entries(byCat).sort((a,b)=>b[1].count-a[1].count);
-      const recidives=trainHistory.filter(i=>i.recidive).length;
-      const lastDate=trainHistory.map(i=>i.date).sort().reverse()[0];
-
       return {
-        train,
-        totalInterventions:trainHistory.length,
-        recidives,
-        lastIntervention:lastDate,
-        topFaults:sortedCats.slice(0,4).map(([cat,d])=>({
-          cat,
-          count:d.count,
-          lastDate:d.dates.sort().reverse()[0],
-          resolved:d.results.filter(r=>r==='résolu').length,
-          examples:d.descriptions.slice(0,2)
-        }))
+        train:current.trainNum,
+        category:current.category,
+        currentDesc:current.description,
+        totalOnTrain:sameTrainAll.length,
+        sameCategoryCount:sameCat.length,
+        occurrence:sameCat.length+1, // numéro de cette occurrence
+        workedSolutions:worked,
+        failedAttempts:failed,
+        lastDate:timeline[0]?.date||'',
+        txResolution:sameCat.length?Math.round((sameCat.filter(i=>i.result==='résolu'||i.result==='Réussi').length/sameCat.length)*100):0,
+        allCatsOnTrain:Object.entries(byCatTrain).sort((a,b)=>b[1].count-a[1].count).slice(0,5)
       };
     }).filter(Boolean);
 
-    if(similarFaults.length>0){
-      similarFaultsSection='\n\nANALYSE PANNES SIMILAIRES PAR TRAIN:\n'+
-        similarFaults.map(sf=>
-          `\n🚆 ${sf.train} — ${sf.totalInterventions} interventions historiques${sf.recidives>0?` dont ${sf.recidives} récidive(s)`:''} (dernière: ${sf.lastIntervention})\n`+
-          sf.topFaults.map(f=>
-            `  📌 ${f.cat}: ${f.count}x — résolu ${f.resolved}/${f.count} fois — dernière: ${f.lastDate}`+
-            (f.examples.length?`\n     Exemples: "${f.examples.join('" / "')}"`:'')
-          ).join('\n')
-        ).join('\n');
+    if(analyses.length>0){
+      similarFaultsSection='\n\nANALYSE HISTORIQUE PAR INTERVENTION ACTIVE:\n'+
+        analyses.map(a=>`
+🚆 TRAIN ${a.train} — PANNE ACTUELLE : ${a.category}
+   Panne actuelle: "${a.currentDesc}"
+   Occurrence n°${a.occurrence} de ce type de panne sur ce train (${a.sameCategoryCount} fois dans l'historique)
+   Taux de résolution historique : ${a.txResolution}% | Dernière occurrence : ${a.lastDate}
+   
+   ✅ CE QUI A FONCTIONNÉ PAR LE PASSÉ (${a.workedSolutions.length} cas résolus):
+${a.workedSolutions.length?a.workedSolutions.map(s=>`   → ${s}`).join('\n'):'   Aucune résolution complète enregistrée pour cette catégorie'}
+   
+   ❌ CE QUI N'A PAS FONCTIONNÉ / RÉCIDIVES (${a.failedAttempts.length} cas):
+${a.failedAttempts.length?a.failedAttempts.map(s=>`   → ${s}`).join('\n'):'   Aucune récidive enregistrée'}
+   
+   📊 TOUTES LES PANNES DE CE TRAIN (${a.totalOnTrain} au total):
+${a.allCatsOnTrain.map(([cat,d])=>`   • ${cat}: ${d.count}x (résolu ${d.resolved}/${d.count})`).join('\n')}
+`).join('\n---\n');
     }
   }
 
