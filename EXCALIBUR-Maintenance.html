@@ -741,8 +741,41 @@ ${a.allCatsOnTrain.map(([cat,d])=>`   • ${cat}: ${d.count}x (résolu ${d.resol
     similarFaultsSection+histSec+spSec;
 
   const txt=await callAI(
-    'Tu es un expert en maintenance ferroviaire SNCF. Tu génères des briefings de prise de poste précis et professionnels. Tu excelles dans l\'analyse des pannes récurrentes : pour chaque train en cours d\'intervention, tu croises avec l\'historique pour identifier si la panne actuelle est une récidive connue, si ce type de défaut est fréquent sur ce train, et tu donnes des pistes de résolution basées sur l\'historique.',
-    `Briefing prise de poste:\n${ctx}\n\nStructure OBLIGATOIRE:\n1) ⚠️ POINTS CRITIQUES DU JOUR\n2) 🔍 ANALYSE PANNES SIMILAIRES — Pour chaque train actif, croise la panne actuelle avec son historique : est-ce une récidive ? Quelle est la fréquence de ce type de panne sur ce train ? Que disent les interventions précédentes ?\n3) 🔗 DONNÉES SHAREPOINT\n4) 🚆 ÉTAT DU PARC\n5) 📁 SYNTHÈSE VEILLE\n6) ✅ RECOMMANDATIONS basées sur l'historique`
+    `Tu es un expert technicien de maintenance ferroviaire SNCF avec 20 ans d'expérience. 
+Tu analyses les historiques d'interventions pour aider les techniciens à dépanner efficacement.
+Pour chaque panne active, tu dois :
+1. Identifier si c'est une récidive connue
+2. Extraire les actions concrètes qui ont résolu ce problème dans le passé (basées sur les descriptions)
+3. Signaler ce qui n'a PAS fonctionné pour éviter de perdre du temps
+4. Donner des pistes de dépannage ordonnées du plus probable au moins probable
+5. Estimer la durée probable basée sur les durées historiques
+Sois précis, concret et opérationnel. Utilise un langage technique ferroviaire.`,
+    `Briefing prise de poste:\n${ctx}\n\nPour chaque intervention active, génère une fiche de dépannage structurée ainsi :
+
+1) ⚠️ POINTS CRITIQUES & URGENCES
+
+2) 🔧 FICHES DE DÉPANNAGE PAR TRAIN
+Pour chaque train avec une panne active :
+   🚆 Train [numéro] — [catégorie de panne]
+   📊 Récurrence : Xème occurrence — résolu Y/Z fois (TX%)
+   ⏱ Durée estimée : basée sur l'historique
+   
+   ✅ ACTIONS QUI ONT RÉSOLU CE PROBLÈME (du plus récent au plus efficace) :
+   Extrais les actions concrètes mentionnées dans les descriptions des interventions réussies
+   
+   ⚡ PISTES DE DÉPANNAGE SUGGÉRÉES (ordre de priorité) :
+   Donne 3-5 pistes concrètes basées sur l'historique des résolutions
+   
+   🚫 À ÉVITER (ce qui n'a pas fonctionné) :
+   Basé sur les récidives et échecs historiques
+
+3) 🔗 DONNÉES SHAREPOINT
+
+4) 🚆 ÉTAT DU PARC
+
+5) 📁 SYNTHÈSE VEILLE
+
+6) ✅ RECOMMANDATIONS JOURNÉE`
   );
   if(txt){document.getElementById('briefingTxt').textContent=txt;document.getElementById('briefingOut').style.display='block';}
   btn.disabled=false;btn.innerHTML='<span>✦</span> Générer le briefing IA';
