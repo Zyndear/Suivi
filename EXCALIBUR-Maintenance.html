@@ -956,8 +956,8 @@ async function confirmImport(){
 }
 
 // API KEY & PROVIDER
-function getProvider(){return sessionStorage.getItem('excalibur_provider')||'groq';}
-function getApiKey(){return sessionStorage.getItem('excalibur_key')||'';}
+function getProvider(){return localStorage.getItem('excalibur_provider')||'groq';}
+function getApiKey(){return localStorage.getItem('excalibur_key')||'';}
 
 function updateProviderUI(){
   const p=document.getElementById('aiProvider').value;
@@ -990,8 +990,8 @@ function saveApiKey(){
   if(p==='anthropic'&&!v.startsWith('sk-ant-')){toast('⚠ La clé Anthropic doit commencer par sk-ant-','#ef4444');return;}
   if(p==='gemini'&&!v.startsWith('AIza')){toast('⚠ La clé Gemini doit commencer par AIza','#ef4444');return;}
   if(p==='groq'&&!v.startsWith('gsk_')){toast('⚠ La clé Groq doit commencer par gsk_','#ef4444');return;}
-  sessionStorage.setItem('excalibur_key',v);
-  sessionStorage.setItem('excalibur_provider',p);
+  localStorage.setItem('excalibur_key',v);
+  localStorage.setItem('excalibur_provider',p);
   document.getElementById('keyBtn').style.color='var(--green)';
   closeKeyModal();
   const names={groq:'Groq (gratuit)',gemini:'Gemini (gratuit)',anthropic:'Anthropic'};
@@ -1042,7 +1042,7 @@ async function testConnection(){
 }
 
 function clearApiKey(){
-  sessionStorage.removeItem('excalibur_key');sessionStorage.removeItem('excalibur_provider');
+  localStorage.removeItem('excalibur_key');localStorage.removeItem('excalibur_provider');
   document.getElementById('keyBtn').style.color='';
   closeKeyModal();toast('Clé effacée','#ef4444');
 }
@@ -1093,7 +1093,7 @@ async function callAI(system,userMsg){
   }catch(e){
     if(e.message.includes('401')||e.message.includes('invalid_api_key')||e.message.includes('API_KEY')){
       toast('⚠ Clé invalide — vérifiez votre clé 🔑','#ef4444');
-      sessionStorage.removeItem('excalibur_key');
+      localStorage.removeItem('excalibur_key');
     } else {
       toast('⚠ '+e.message.substring(0,80),'#ef4444');
     }
