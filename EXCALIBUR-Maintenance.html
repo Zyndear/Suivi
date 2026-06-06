@@ -184,13 +184,27 @@ select option{background:#181c24}
           <div class="sp-dot" id="suiviDot"></div>
           🗡 App de Suivi
         </div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span id="suiviBadge" class="badge bp" style="font-size:9px">NON CONNECTÉ</span>
-          <button id="suiviSyncBtn" onclick="syncSuivi()" style="background:rgba(0,229,160,.1);color:#00e5a0;border:1px solid rgba(0,229,160,.3);padding:7px 12px;font-size:11px;border-radius:6px;cursor:pointer;font-family:var(--sans);font-weight:600;display:flex;align-items:center;gap:5px">↻ Sync</button>
+        <span id="suiviBadge" class="badge bp" style="font-size:9px">EN ATTENTE</span>
+      </div>
+      <div id="suiviMeta" class="sp-meta" style="display:none;margin-bottom:8px"></div>
+
+      <!-- Option 1 : Presse-papiers (iOS PWA) -->
+      <div style="margin-bottom:10px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;margin-bottom:7px">📱 DEPUIS L'APP DE SUIVI → COPIER → COLLER ICI</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="syncFromClipboard()" style="flex:1;background:rgba(0,229,160,.1);color:#00e5a0;border:1px solid rgba(0,229,160,.3);padding:11px;font-size:13px;border-radius:8px;cursor:pointer;font-family:var(--sans);font-weight:600">📋 Coller depuis l'app de suivi</button>
         </div>
       </div>
-      <div id="suiviMeta" class="sp-meta" style="display:none;margin-bottom:6px"></div>
-      <div id="suiviPreview" style="font-size:12px;color:var(--text3)">Cliquez Sync pour importer les interventions de l'app de suivi.<br>Fonctionne automatiquement quand les deux apps sont sur le même domaine GitHub.</div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
+
+      <!-- Option 2 : Même domaine (desktop / Safari) -->
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;margin-bottom:7px">💻 MÊME NAVIGATEUR (PC / Safari non-PWA)</div>
+        <button id="suiviSyncBtn" onclick="syncFromLocalStorage()" style="width:100%;background:rgba(0,229,160,.06);color:#00e5a0;border:1px solid rgba(0,229,160,.2);padding:10px;font-size:12px;border-radius:8px;cursor:pointer;font-family:var(--sans);font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px">↻ Sync localStorage (même domaine)</button>
+      </div>
+
+      <div id="suiviPreview" style="font-size:11px;color:var(--text3);margin-top:8px"></div>
     </div>
 
     <!-- SharePoint Card -->
@@ -1154,31 +1168,17 @@ async function importFile(file){
 }
 
 // =================== BRIDGE APP DE SUIVI ===================
-// Les deux apps partagent le même localStorage sur zyndear.github.io
-
 const _BC = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('excalibur_bridge') : null;
 
 function mapSuiviResult(r){
   return({'Réussi':'résolu','Partiel':'en cours','Échoué':'hors service','En cours':'en cours'})[r]||'résolu';
 }
-
 function getSuiviRaw(){
   try{const r=localStorage.getItem('interventions');return r?JSON.parse(r):[];}catch{return[];}
 }
 
-async function syncSuivi(){
-  const btn=document.getElementById('suiviSyncBtn');
-  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner" style="border-top-color:#00e5a0;border-color:rgba(0,229,160,.2)"></span>';}
-
-  const raw=getSuiviRaw();
-  if(!raw.length){
-    toast('⚠ Aucune donnée dans l\'app de suivi — chargez d\'abord depuis Drive','#ef4444');
-    if(btn){btn.disabled=false;btn.textContent='↻ Sync';}
-    updateSuiviStatus();return;
-  }
-
-  // Mapper au format EXCALIBUR
-  const mapped=raw.map(item=>({
+function mapSuiviItems(raw){
+  return raw.map(item=>({
     id:'suivi_'+item.id,
     date:item.date||today(),
     timestamp:item.date?new Date(item.date+'T'+(item.heure||'00:00')).toISOString():new Date().toISOString(),
@@ -1192,61 +1192,74 @@ async function syncSuivi(){
     colleague:item.colleague||'',
     serie:item.serie||''
   }));
-
-  await dbAddMany(mapped,null);
-  set('suivi_sync_at',new Date().toISOString());
-  set('suivi_sync_count',String(mapped.length));
-  await updateHistoryCount();
-  updateSuiviStatus();
-  renderBriefing();
-  toast(`✓ ${mapped.length} interventions synchronisées depuis l'app de suivi`);
-  if(btn){btn.disabled=false;btn.textContent='↻ Sync';}
 }
 
-function updateSuiviStatus(){
+async function importSuiviItems(raw, source){
+  if(!raw.length){toast('⚠ Aucune intervention à importer','#ef4444');return;}
+  const mapped=mapSuiviItems(raw);
+  const btn=document.getElementById('suiviSyncBtn');
+  if(btn){btn.disabled=true;}
+  await dbAddMany(mapped,null);
+  localStorage.setItem('suivi_sync_at',new Date().toISOString());
+  localStorage.setItem('suivi_sync_count',String(mapped.length));
+  await updateHistoryCount();
+  updateSuiviStatus(mapped.length, source);
+  renderBriefing();
+  toast(`✓ ${mapped.length} interventions importées depuis l'app de suivi`);
+  if(btn){btn.disabled=false;}
+}
+
+// 📱 iOS PWA : sync via presse-papiers
+async function syncFromClipboard(){
+  try{
+    const text=await navigator.clipboard.readText();
+    if(!text){toast('⚠ Presse-papiers vide','#ef4444');return;}
+    let data;
+    try{data=JSON.parse(text);}catch{toast('⚠ Le presse-papiers ne contient pas de données valides','#ef4444');return;}
+    const interventions=data.interventions||data;
+    if(!Array.isArray(interventions)||!interventions.length){toast('⚠ Aucune intervention dans les données copiées','#ef4444');return;}
+    await importSuiviItems(interventions,'presse-papiers');
+  }catch(e){
+    // Fallback si permission refusée
+    toast('⚠ Autorisation presse-papiers refusée — utilisez le bouton Coller dans Safari','#ef4444');
+  }
+}
+
+// 💻 Desktop / Safari : sync via localStorage partagé
+async function syncFromLocalStorage(){
   const raw=getSuiviRaw();
-  const syncAt=localStorage.getItem('suivi_sync_at');
-  const count=localStorage.getItem('suivi_sync_count')||'0';
+  if(!raw.length){toast('⚠ Aucune donnée — chargez d\'abord depuis Drive dans l\'app de suivi','#ef4444');return;}
+  await importSuiviItems(raw,'localStorage');
+}
+
+// Alias pour BroadcastChannel
+async function syncSuivi(){ await syncFromLocalStorage(); }
+
+function updateSuiviStatus(count, source){
   const dot=document.getElementById('suiviDot');
   const badge=document.getElementById('suiviBadge');
   const meta=document.getElementById('suiviMeta');
   const preview=document.getElementById('suiviPreview');
   if(!dot)return;
-
-  if(raw.length>0){
+  const syncAt=localStorage.getItem('suivi_sync_at');
+  const syncCount=localStorage.getItem('suivi_sync_count')||'0';
+  if(syncAt){
     dot.className='sp-dot ok';
-    badge.textContent=raw.length+' INTERVENTIONS';
+    badge.textContent=syncCount+' IMPORTÉES';
     badge.className='badge bg';
-    if(syncAt){
-      meta.style.display='block';
-      meta.textContent=`Dernière sync : ${new Date(syncAt).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})} · ${count} importées`;
-    }
-    // Aperçu des 3 dernières
-    const recent=raw.slice(0,3);
-    preview.innerHTML=recent.map(i=>`
-      <div style="padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;display:flex;justify-content:space-between">
-        <span style="color:var(--text)">${i.title||'—'}</span>
-        <span style="color:#00e5a0;font-family:var(--mono)">${i.train||''}</span>
-      </div>`).join('')+
-      (raw.length>3?`<div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono)">... et ${raw.length-3} autres</div>`:'');
+    meta.style.display='block';
+    meta.textContent=`Sync ${source||''} : ${new Date(syncAt).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
+    preview.textContent='';
   } else {
     dot.className='sp-dot';
-    badge.textContent='NON CONNECTÉ';
+    badge.textContent='EN ATTENTE';
     badge.className='badge bp';
     meta.style.display='none';
-    preview.innerHTML='<span style="font-size:12px;color:var(--text3)">Chargez vos données dans l\'app de suivi puis cliquez Sync.</span>';
+    preview.textContent='Aucune sync effectuée.';
   }
 }
 
-// BroadcastChannel : sync auto quand l'app de suivi notifie
-if(_BC){
-  _BC.onmessage=async(e)=>{
-    if(e.data==='suivi_updated'){
-      await syncSuivi();
-      toast('🗡 App de suivi mise à jour — sync automatique');
-    }
-  };
-}
+if(_BC){_BC.onmessage=async(e)=>{if(e.data==='suivi_updated'){await syncFromLocalStorage();toast('🗡 App de suivi — sync auto');}};}
 
 // INIT
 renderBriefing();
@@ -1262,7 +1275,7 @@ if(cachedSP?.text){
 }
 renderBriefing();
 updateHistoryCount();
-updateSuiviStatus();
+updateSuiviStatus(null, null);
 if(getSuiviRaw().length>0){syncSuivi();}
 </script>
 <!-- MODAL IMPORT MAPPING -->
