@@ -655,40 +655,61 @@ async function genBriefing(){
   try{ dbIV=await dbGetAll(); }catch(e){}
   const allHist=[...lsIV,...dbIV].filter(i=>i.date!==today()&&i.date!==yesterday());
 
-  // Trains actifs aujourd'hui + hier (pour la recherche de pannes similaires)
+  // ---- RECHERCHE PAR MOTS-CLÉS ----
+  const STOPWORDS=new Set(['le','la','les','de','du','des','un','une','est','et','en','au','aux','par','sur','dans','avec','pour','que','qui','ou','à','ce','se','ne','pas','il','elle','ils','elles','nous','vous','je','tu','on','y','a','l','d','n','s','m','c','j','qu','car','mais','donc','or','ni','si','plus','très','bien','tout','même','aussi','comme','puis','lors','depuis','après','avant','entre','sous','vers','dont','où','quand','avoir','être','faire','ses','mon','ma','mes','son','sa','leurs','leur','cette','cet','ces','une','été','sans','lors','hs','ok','ras','bon','test']);
+
+  function extractKW(text){
+    if(!text)return[];
+    return text.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // enlève accents
+      .replace(/[^a-z0-9\s]/g,' ')
+      .split(/\s+/)
+      .filter(w=>w.length>2&&!STOPWORDS.has(w));
+  }
+
+  function scoreMatch(kwList, item){
+    const itemText=(item.description||'')+' '+(item.category||'')+' '+(item.trainNum||'');
+    const itemKW=new Set(extractKW(itemText));
+    let score=0;
+    kwList.forEach(kw=>{
+      // Match exact ou partiel (ex: "frein" match "freinage", "freins")
+      for(const iw of itemKW){
+        if(iw===kw){score+=2;break;}
+        else if(iw.startsWith(kw)||kw.startsWith(iw)){score+=1;break;}
+      }
+    });
+    return score;
+  }
+
+  // Trains actifs aujourd'hui + hier
   const activeInterventions=[...tL,...yL].filter(i=>i.trainNum&&i.trainNum!=='—');
-  const activeTrains=[...new Set(activeInterventions.map(i=>i.trainNum))];
 
-  // Pour chaque intervention active, analyse profonde de l'historique
   let similarFaultsSection='';
-  if(activeInterventions.length>0 && allHist.length>0){
-
+  if(activeInterventions.length>0&&allHist.length>0){
     const analyses=activeInterventions.map(current=>{
-      // Trouver toutes les interventions historiques sur ce train
-      const sameTrainAll=allHist.filter(i=>i.trainNum===current.trainNum);
-      if(!sameTrainAll.length) return null;
+      // Extraire les mots-clés de l'intervention actuelle
+      const kwSource=(current.description||'')+' '+(current.category||'');
+      const keywords=extractKW(kwSource);
+      if(!keywords.length)return null;
 
-      // Trouver les pannes de même catégorie ou description similaire
-      const sameCat=sameTrainAll.filter(i=>i.category===current.category);
+      // Scorer TOUTES les interventions historiques
+      const scored=allHist.map(i=>({...i,score:scoreMatch(keywords,i)}))
+        .filter(i=>i.score>=2)
+        .sort((a,b)=>b.score-a.score);
 
-      // Solutions qui ont fonctionné (résolu)
-      const worked=sameCat.filter(i=>i.result==='résolu'||i.result==='Réussi')
-        .sort((a,b)=>b.date.localeCompare(a.date))
-        .slice(0,4)
-        .map(i=>`[${i.date}] ${i.description}`.substring(0,120));
+      // Séparer : même train vs autres trains
+      const sameTrain=scored.filter(i=>i.trainNum===current.trainNum);
+      const otherTrains=scored.filter(i=>i.trainNum!==current.trainNum).slice(0,6);
 
-      // Solutions qui n'ont pas fonctionné ou récidivé
-      const failed=sameCat.filter(i=>i.result==='récidive'||i.result==='hors service'||i.result==='Échoué'||i.result==='Partiel')
-        .sort((a,b)=>b.date.localeCompare(a.date))
-        .slice(0,3)
-        .map(i=>`[${i.date}] ${i.result.toUpperCase()} — ${i.description}`.substring(0,100));
+      if(!sameTrain.length&&!otherTrains.length)return null;
 
-      // Chronologie complète de cette catégorie de panne
-      const timeline=sameCat.sort((a,b)=>b.date.localeCompare(a.date));
+      // Parmi les similaires résolus, extraire les actions
+      const resolved=scored.filter(i=>i.result==='résolu'||i.result==='Réussi').slice(0,5);
+      const failed=scored.filter(i=>i.result==='récidive'||i.result==='hors service'||i.result==='Échoué').slice(0,3);
 
-      // Analyse globale du train
+      // Stats par catégorie sur ce train
       const byCatTrain={};
-      sameTrainAll.forEach(i=>{
+      allHist.filter(i=>i.trainNum===current.trainNum).forEach(i=>{
         if(!byCatTrain[i.category])byCatTrain[i.category]={count:0,resolved:0};
         byCatTrain[i.category].count++;
         if(i.result==='résolu'||i.result==='Réussi')byCatTrain[i.category].resolved++;
@@ -698,32 +719,39 @@ async function genBriefing(){
         train:current.trainNum,
         category:current.category,
         currentDesc:current.description,
-        totalOnTrain:sameTrainAll.length,
-        sameCategoryCount:sameCat.length,
-        occurrence:sameCat.length+1, // numéro de cette occurrence
-        workedSolutions:worked,
-        failedAttempts:failed,
-        lastDate:timeline[0]?.date||'',
-        txResolution:sameCat.length?Math.round((sameCat.filter(i=>i.result==='résolu'||i.result==='Réussi').length/sameCat.length)*100):0,
-        allCatsOnTrain:Object.entries(byCatTrain).sort((a,b)=>b[1].count-a[1].count).slice(0,5)
+        keywords:keywords.slice(0,8),
+        sameTrainCount:sameTrain.length,
+        totalSimilar:scored.length,
+        sameTrain:sameTrain.slice(0,5),
+        otherTrains,
+        resolved,
+        failed,
+        allCatsOnTrain:Object.entries(byCatTrain).sort((a,b)=>b[1].count-a[1].count).slice(0,5),
+        txResolution:resolved.length&&scored.length?Math.round((resolved.length/scored.length)*100):0
       };
     }).filter(Boolean);
 
     if(analyses.length>0){
-      similarFaultsSection='\n\nANALYSE HISTORIQUE PAR INTERVENTION ACTIVE:\n'+
+      similarFaultsSection='\n\nANALYSE INTERVENTIONS SIMILAIRES PAR MOTS-CLÉS:\n'+
         analyses.map(a=>`
-🚆 TRAIN ${a.train} — PANNE ACTUELLE : ${a.category}
-   Panne actuelle: "${a.currentDesc}"
-   Occurrence n°${a.occurrence} de ce type de panne sur ce train (${a.sameCategoryCount} fois dans l'historique)
-   Taux de résolution historique : ${a.txResolution}% | Dernière occurrence : ${a.lastDate}
-   
-   ✅ CE QUI A FONCTIONNÉ PAR LE PASSÉ (${a.workedSolutions.length} cas résolus):
-${a.workedSolutions.length?a.workedSolutions.map(s=>`   → ${s}`).join('\n'):'   Aucune résolution complète enregistrée pour cette catégorie'}
-   
-   ❌ CE QUI N'A PAS FONCTIONNÉ / RÉCIDIVES (${a.failedAttempts.length} cas):
-${a.failedAttempts.length?a.failedAttempts.map(s=>`   → ${s}`).join('\n'):'   Aucune récidive enregistrée'}
-   
-   📊 TOUTES LES PANNES DE CE TRAIN (${a.totalOnTrain} au total):
+🚆 TRAIN ${a.train} — "${a.currentDesc}"
+   Mots-clés recherchés: [${a.keywords.join(', ')}]
+   ${a.sameTrainCount} intervention(s) similaire(s) sur CE TRAIN | ${a.otherTrains.length} sur d'autres trains
+   Taux de résolution des cas similaires: ${a.txResolution}%
+
+   📋 INTERVENTIONS SIMILAIRES SUR CE TRAIN (${a.sameTrainCount}):
+${a.sameTrain.length?a.sameTrain.map(i=>`   [${i.date}][score:${i.score}][${i.result.toUpperCase()}] ${i.category}: ${i.description}`.substring(0,130)).join('\n'):'   Aucune sur ce train'}
+
+   🔍 INTERVENTIONS SIMILAIRES SUR AUTRES TRAINS:
+${a.otherTrains.length?a.otherTrains.map(i=>`   [${i.date}][${i.trainNum}][${i.result.toUpperCase()}] ${i.category}: ${i.description}`.substring(0,130)).join('\n'):'   Aucune'}
+
+   ✅ CE QUI A RÉSOLU DES PANNES SIMILAIRES (${a.resolved.length} cas):
+${a.resolved.length?a.resolved.map(i=>`   → [${i.date}][${i.trainNum}] ${i.description}`.substring(0,130)).join('\n'):'   Aucune résolution enregistrée'}
+
+   ❌ CE QUI A ÉCHOUÉ OU RÉCIDIVÉ (${a.failed.length} cas):
+${a.failed.length?a.failed.map(i=>`   → [${i.date}][${i.trainNum}][${i.result}] ${i.description}`.substring(0,120)).join('\n'):'   Aucun échec enregistré'}
+
+   📊 HISTORIQUE COMPLET DU TRAIN (toutes pannes):
 ${a.allCatsOnTrain.map(([cat,d])=>`   • ${cat}: ${d.count}x (résolu ${d.resolved}/${d.count})`).join('\n')}
 `).join('\n---\n');
     }
