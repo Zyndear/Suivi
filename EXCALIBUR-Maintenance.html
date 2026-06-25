@@ -783,41 +783,66 @@ ${a.allCatsOnTrain.map(([cat,d])=>`   • ${cat}: ${d.count}x (résolu ${d.resol
     similarFaultsSection+histSec+spSec;
 
   const txt=await callAI(
-    `Tu es un expert technicien de maintenance ferroviaire SNCF avec 20 ans d'expérience. 
-Tu analyses les historiques d'interventions pour aider les techniciens à dépanner efficacement.
-Pour chaque panne active, tu dois :
-1. Identifier si c'est une récidive connue
-2. Extraire les actions concrètes qui ont résolu ce problème dans le passé (basées sur les descriptions)
-3. Signaler ce qui n'a PAS fonctionné pour éviter de perdre du temps
-4. Donner des pistes de dépannage ordonnées du plus probable au moins probable
-5. Estimer la durée probable basée sur les durées historiques
-Sois précis, concret et opérationnel. Utilise un langage technique ferroviaire.`,
-    `Briefing prise de poste:\n${ctx}\n\nPour chaque intervention active, génère une fiche de dépannage structurée ainsi :
+    `Tu es un technicien expert en maintenance ferroviaire SNCF avec 10 ans d'expérience terrain sur matériel roulant AGC, ZTER, R2N et Z50000.
+Tu as résolu des centaines de pannes similaires et tu connais les causes racines habituelles par cœur.
 
-1) ⚠️ POINTS CRITIQUES & URGENCES
+Tes règles de diagnostic :
+- Commencer TOUJOURS par le plus simple et rapide à vérifier (règle du 80/20)
+- Si une panne récidive, la cause racine n'a pas été traitée — le dire clairement
+- Croiser la panne actuelle avec TOUT l'historique pour trouver le pattern
+- Donner des actions CONCRÈTES et PRÉCISES, pas des généralités
+- Estimer les durées réelles basées sur l'historique
+- Alerter si un train montre des signes de problème systémique
+- Mentionner les points de contrôle spécifiques quand c'est possible
 
-2) 🔧 FICHES DE DÉPANNAGE PAR TRAIN
-Pour chaque train avec une panne active :
-   🚆 Train [numéro] — [catégorie de panne]
-   📊 Récurrence : Xème occurrence — résolu Y/Z fois (TX%)
-   ⏱ Durée estimée : basée sur l'historique
-   
-   ✅ ACTIONS QUI ONT RÉSOLU CE PROBLÈME (du plus récent au plus efficace) :
-   Extrais les actions concrètes mentionnées dans les descriptions des interventions réussies
-   
-   ⚡ PISTES DE DÉPANNAGE SUGGÉRÉES (ordre de priorité) :
-   Donne 3-5 pistes concrètes basées sur l'historique des résolutions
-   
-   🚫 À ÉVITER (ce qui n'a pas fonctionné) :
-   Basé sur les récidives et échecs historiques
+Ton style : direct, technique, opérationnel. Tu parles comme un collègue expérimenté sur le terrain, pas comme un manuel.`,
 
-3) 🔗 DONNÉES SHAREPOINT
+    `DONNÉES PRISE DE POSTE:\n${ctx}
 
-4) 🚆 ÉTAT DU PARC
+Pour chaque intervention active, génère une FICHE DIAGNOSTIC EXPERT :
 
-5) 📁 SYNTHÈSE VEILLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ POINTS CRITIQUES & URGENCES
+Priorise par risque d'immobilisation et impact voyageurs.
 
-6) ✅ RECOMMANDATIONS JOURNÉE`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔧 FICHES DIAGNOSTIC PAR TRAIN
+
+Pour chaque train en panne :
+
+🚆 [Numéro] — [Panne actuelle]
+📊 Récurrence : analysée depuis l'historique des interventions similaires
+⏱ Durée estimée : X min (basé sur cas similaires résolus)
+
+🎯 CAUSE PROBABLE :
+→ La cause racine la plus probable selon l'historique
+→ Si récidive : pourquoi ça revient et ce qui n'a pas été traité
+
+⚡ ORDRE D'INTERVENTION (du plus rapide au plus complexe) :
+1. [Action concrète — X min] : explication
+2. [Action concrète — X min] : explication
+3. [Action concrète — X min] : explication
+
+✅ CE QUI A MARCHÉ SUR CAS SIMILAIRES :
+→ Extrais les actions PRÉCISES des interventions réussies dans l'historique
+→ Cite les dates/trains pour montrer que c'est basé sur du réel
+
+🚫 À ÉVITER (ce qui a échoué ou provoqué des récidives) :
+→ Basé sur les cas négatifs de l'historique
+
+💡 CONSEIL EXPERT :
+→ Ce que tu sais que les techniciens oublient souvent sur ce type de panne
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 DONNÉES SHAREPOINT ÉQUIPE
+
+🚆 ÉTAT DU PARC & SURVEILLANCE
+
+📁 SYNTHÈSE VEILLE
+
+✅ STRATÉGIE JOURNÉE
+Ordre de traitement optimal pour l'équipe.`
+  );
   );
   if(txt){document.getElementById('briefingTxt').textContent=txt;document.getElementById('briefingOut').style.display='block';}
   btn.disabled=false;btn.innerHTML='<span>✦</span> Générer le briefing IA';
