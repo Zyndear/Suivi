@@ -91,7 +91,7 @@ select option{background:#181c24}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(245,158,11,.25);border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 .tab{display:none}.tab.active{display:block}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:flex-end;justify-content:center}
 .modal{background:var(--surface);border-top:2px solid var(--amber);border-radius:14px 14px 0 0;padding:18px 16px calc(32px + env(safe-area-inset-bottom,0));width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:slideUp .25s ease}
 @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
@@ -1317,6 +1317,7 @@ if(_BC){_BC.onmessage=async(e)=>{if(e.data==='suivi_updated'){await syncFromLoca
 // INIT
 renderBriefing();
 updateHistoryCount();
+updateSuiviStatus(null,null);
 const cachedSP=get('spData',null);
 if(cachedSP?.text){
   document.getElementById('spPaste').value=cachedSP.text;
@@ -1326,9 +1327,6 @@ if(cachedSP?.text){
   const el=document.getElementById('spMeta');el.style.display='block';
   el.textContent=`Dernière sauvegarde : ${new Date(cachedSP.at).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
 }
-renderBriefing();
-updateHistoryCount();
-updateSuiviStatus(null, null);
 if(getSuiviRaw().length>0){syncSuivi();}
 </script>
 <!-- MODAL IMPORT MAPPING -->
