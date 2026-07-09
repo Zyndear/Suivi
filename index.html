@@ -545,6 +545,50 @@
       <button class="btn btn-ghost" id="btnLoad" onclick="gLoadData()" style="padding:6px 14px;font-size:11px;display:none">⬇ Charger</button>
     </div>
         <button onclick="syncExcalibur()" style="padding:6px 14px;font-size:11px;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid #f59e0b;border-radius:6px;cursor:pointer;font-family:'OpenDyslexic',Arial,sans-serif;font-weight:700;display:flex;align-items:center;gap:6px">🗡 EXCALIBUR</button>
+       <button onclick="copyForExcalibur()" style="padding:6px 14px;font-size:11px;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid #f59e0b;border-radius:6px;cursor:pointer;font-family:'OpenDyslexic',Arial,sans-serif;font-weight:700">📋 EXCALIBUR</button>    <button onclick="copyForExcalibur()" style="padding:6px 14px;font-size:11px;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid #f59e0b;border-radius:6px;cursor:pointer;font-family:'OpenDyslexic',Arial,sans-serif;font-weight:700">📋 EXCALIBUR</button>
+   // ======================================================
+// ---- BRIDGE EXCALIBUR (iOS PWA) ----
+// ======================================================
+async function copyForExcalibur() {
+  const data = getData();
+  if (!data.length) {
+    setSyncStatus('⚠ Aucune donnée à copier — chargez depuis Drive d\'abord');
+    return;
+  }
+  const payload = JSON.stringify({
+    version: 1,
+    source: 'suivi',
+    exportedAt: new Date().toISOString(),
+    interventions: data
+  });
+  try {
+    await navigator.clipboard.writeText(payload);
+    setSyncStatus('📋 ' + data.length + ' interventions copiées — collez dans EXCALIBUR', true);
+    setTimeout(updateSyncStatus, 5000);
+  } catch(e) {
+    // Fallback si clipboard refusé : afficher dans une zone texte
+    const ta = document.createElement('textarea');
+    ta.value = payload;
+    ta.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:90vw;height:40vh;z-index:9999;font-size:10px;padding:10px;background:#111;color:#fff;border:2px solid #f59e0b;border-radius:8px';
+    document.body.appendChild(ta);
+    ta.select();
+    const close = document.createElement('button');
+    close.textContent = '✕ Fermer';
+    close.style.cssText = 'position:fixed;top:calc(50% - 22vh - 40px);left:50%;transform:translateX(-50%);z-index:9999;background:#f59e0b;color:#000;border:none;padding:10px 20px;border-radius:6px;font-weight:700;cursor:pointer';
+    close.onclick = () => { ta.remove(); close.remove(); };
+    document.body.appendChild(close);
+    setSyncStatus('📋 Copiez le texte affiché puis collez dans EXCALIBUR', true);
+  }
+}
+
+// Notifie EXCALIBUR si les deux apps sont dans le même navigateur (non-PWA)
+function syncExcalibur() {
+  try {
+    const bc = new BroadcastChannel('excalibur_bridge');
+    bc.postMessage('suivi_updated');
+    bc.close();
+  } catch(e) {}
+}
     <span class="sync-status" id="syncStatus">Non connecté</span>
   </div>
 
