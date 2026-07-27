@@ -544,52 +544,7 @@
       <button class="btn btn-primary" id="btnSave" onclick="gSaveData()" style="padding:6px 14px;font-size:11px;display:none">☁️ Sauvegarder</button>
       <button class="btn btn-ghost" id="btnLoad" onclick="gLoadData()" style="padding:6px 14px;font-size:11px;display:none">⬇ Charger</button>
     </div>
-        <button onclick="syncExcalibur()" style="padding:6px 14px;font-size:11px;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid #f59e0b;border-radius:6px;cursor:pointer;font-family:'OpenDyslexic',Arial,sans-serif;font-weight:700;display:flex;align-items:center;gap:6px">🗡 EXCALIBUR</button>
-       <button onclick="copyForExcalibur()" style="padding:6px 14px;font-size:11px;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid #f59e0b;border-radius:6px;cursor:pointer;font-family:'OpenDyslexic',Arial,sans-serif;font-weight:700">📋 EXCALIBUR</button>    <button onclick="copyForExcalibur()" style="padding:6px 14px;font-size:11px;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid #f59e0b;border-radius:6px;cursor:pointer;font-family:'OpenDyslexic',Arial,sans-serif;font-weight:700">📋 EXCALIBUR</button>
-   // ======================================================
-// ---- BRIDGE EXCALIBUR (iOS PWA) ----
-// ======================================================
-async function copyForExcalibur() {
-  const data = getData();
-  if (!data.length) {
-    setSyncStatus('⚠ Aucune donnée à copier — chargez depuis Drive d\'abord');
-    return;
-  }
-  const payload = JSON.stringify({
-    version: 1,
-    source: 'suivi',
-    exportedAt: new Date().toISOString(),
-    interventions: data
-  });
-  try {
-    await navigator.clipboard.writeText(payload);
-    setSyncStatus('📋 ' + data.length + ' interventions copiées — collez dans EXCALIBUR', true);
-    setTimeout(updateSyncStatus, 5000);
-  } catch(e) {
-    // Fallback si clipboard refusé : afficher dans une zone texte
-    const ta = document.createElement('textarea');
-    ta.value = payload;
-    ta.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:90vw;height:40vh;z-index:9999;font-size:10px;padding:10px;background:#111;color:#fff;border:2px solid #f59e0b;border-radius:8px';
-    document.body.appendChild(ta);
-    ta.select();
-    const close = document.createElement('button');
-    close.textContent = '✕ Fermer';
-    close.style.cssText = 'position:fixed;top:calc(50% - 22vh - 40px);left:50%;transform:translateX(-50%);z-index:9999;background:#f59e0b;color:#000;border:none;padding:10px 20px;border-radius:6px;font-weight:700;cursor:pointer';
-    close.onclick = () => { ta.remove(); close.remove(); };
-    document.body.appendChild(close);
-    setSyncStatus('📋 Copiez le texte affiché puis collez dans EXCALIBUR', true);
-  }
-}
-
-// Notifie EXCALIBUR si les deux apps sont dans le même navigateur (non-PWA)
-function syncExcalibur() {
-  try {
-    const bc = new BroadcastChannel('excalibur_bridge');
-    bc.postMessage('suivi_updated');
-    bc.close();
-  } catch(e) {}
-}
-    <span class="sync-status" id="syncStatus">Non connecté</span>
+    <span class="sync-status" id="suivi-syncStatus">Non connecté</span>
   </div>
 
   <!-- DASHBOARD -->
@@ -1404,79 +1359,86 @@ function reutiliserDerniere() {
 }
 
 // ======================================================
-// ---- IMPORT IA DEPUIS TEXTE SHAREPOINT ----
+// ---- IMPORT IA DEPUIS TEXTE SHAREPOINT (GROQ) ----
 // ======================================================
+
+// ⚙️ Mets ici l'URL de ton Cloudflare Worker après déploiement
+const WORKER_URL = 'https://anthropic-proxy.moskovahisoka.workers.dev';
+
+const SYSTEM_PROMPT = `Tu es un assistant qui extrait des informations d'interventions ferroviaires SNCF depuis des textes copiés d'un SharePoint.
+Réponds UNIQUEMENT en JSON valide, sans balises markdown, sans texte avant ou après.
+Format exact :
+{
+  "titre": "titre court de l'intervention",
+  "train": "numéro de train ou rame (ex: Z55531)",
+  "serie": "série parmi : AGC, R2N, ZTER, Autre — déduis du numéro si possible",
+  "cat": "catégorie parmi : Technique, Conseil, Formation, Urgence, Projet, Autre",
+  "desc": "description complète fusionnant S: C: D:",
+  "result": "parmi : Réussi, Partiel, Échoué, En cours",
+  "duration": nombre_minutes_ou_null,
+  "skills": ["compétence1","compétence2"],
+  "impact": "résultat final",
+  "reprise": true_ou_false,
+  "clp": true_ou_false,
+  "date": "YYYY-MM-DD ou null",
+  "heure": "HH:MM ou null"
+}
+Règles :
+- S: = Symptôme, C: = Cause, D: = Dépannage → fusionner dans desc
+- R: = Résultat → impact + result (ok/RAS = Réussi)
+- J+1 5H = heure intervention
+- DDS, panto, pantographe, essais → skills
+- Durée en mn mentionnée → duration`;
+
 async function analyserTexte() {
   const texte = document.getElementById('pasteInput').value.trim();
   if (!texte) { setIAMsg('⚠ Colle d\'abord un texte à analyser.', 'warn'); return; }
 
+  if (WORKER_URL.includes('TON-WORKER')) {
+    setIAMsg('⚙️ Configure d\'abord l\'URL du Worker Cloudflare dans le code (WORKER_URL).', 'warn');
+    return;
+  }
+
   const btn = document.getElementById('btnAnalyser');
   btn.disabled = true;
   btn.textContent = '⏳ Analyse en cours…';
-  setIAMsg('⏳ L\'IA analyse ton texte…', 'info');
+  setIAMsg('⏳ Groq analyse ton texte…', 'info');
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: `Tu es un assistant qui extrait des informations d'interventions ferroviaires SNCF depuis des textes copiés d'un SharePoint.
-Réponds UNIQUEMENT en JSON valide, sans balises markdown, sans texte avant ou après.
-Voici le format exact à retourner :
-{
-  "titre": "titre court de l'intervention",
-  "train": "numéro de train ou rame (ex: Z55531)",
-  "serie": "série du matériel parmi : AGC, R2N, ZTER, Autre — déduis-la du numéro si possible (Z5xxxx = ZTER, B8xxxx = AGC, etc.)",
-  "cat": "catégorie parmi : Technique, Conseil, Formation, Urgence, Projet, Autre",
-  "desc": "description complète de l'intervention",
-  "result": "résultat parmi : Réussi, Partiel, Échoué, En cours — déduis-le du contexte",
-  "duration": nombre_en_minutes_ou_null,
-  "skills": ["compétence1", "compétence2"],
-  "impact": "résultat final ou constat",
-  "reprise": true_ou_false,
-  "clp": true_ou_false,
-  "date": "YYYY-MM-DD si trouvée sinon null",
-  "heure": "HH:MM si trouvée sinon null"
-}
-Interprète les champs du format SNCF :
-- S: = Symptôme → utilise pour desc
-- C: = Cause → ajoute à desc
-- D: = Dépannage effectué → ajoute à desc
-- R: = Résultat → utilise pour impact et result
-- J+1 5H = heure d'intervention
-- Les noms en majuscule au début = agent concerné, ignore-les
-- DDS, essais, panto, pantographe → skills techniques
-- Si R: contient "ok" ou "RAS" → result = Réussi
-- Si durée en mn est mentionnée → duration = cette valeur`,
-        messages: [{ role: 'user', content: texte }]
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: texte }
+        ]
       })
     });
 
     const data = await response.json();
-    const raw = data.content?.[0]?.text || '';
+    const raw = data.choices?.[0]?.message?.content || '';
 
     let parsed;
     try {
       parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
     } catch(e) {
-      setIAMsg('❌ L\'IA n\'a pas pu structurer la réponse. Réessaie.', 'error');
+      setIAMsg('❌ Réponse non structurée. Réessaie.', 'error');
       return;
     }
 
-    // Applique les données extraites au formulaire
-    if (parsed.titre)  document.getElementById('f-title').value    = parsed.titre;
-    if (parsed.train)  document.getElementById('f-train').value    = parsed.train;
-    if (parsed.serie)  document.getElementById('f-serie').value    = parsed.serie || '';
-    if (parsed.cat)    document.getElementById('f-cat').value      = parsed.cat;
-    if (parsed.desc)   document.getElementById('f-desc').value     = parsed.desc;
-    if (parsed.result) document.getElementById('f-result').value   = parsed.result;
+    // Applique au formulaire
+    if (parsed.titre)    document.getElementById('f-title').value    = parsed.titre;
+    if (parsed.train)    document.getElementById('f-train').value    = parsed.train;
+    if (parsed.serie)    document.getElementById('f-serie').value    = parsed.serie || '';
+    if (parsed.cat)      document.getElementById('f-cat').value      = parsed.cat;
+    if (parsed.desc)     document.getElementById('f-desc').value     = parsed.desc;
+    if (parsed.result)   document.getElementById('f-result').value   = parsed.result;
     if (parsed.duration) document.getElementById('f-duration').value = parsed.duration;
-    if (parsed.skills) document.getElementById('f-skills').value   = (parsed.skills || []).join(', ');
-    if (parsed.impact) document.getElementById('f-impact').value   = parsed.impact;
-    if (parsed.date)   document.getElementById('f-date').value     = parsed.date;
-    if (parsed.heure)  document.getElementById('f-time').value     = parsed.heure;
+    if (parsed.skills)   document.getElementById('f-skills').value   = (parsed.skills||[]).join(', ');
+    if (parsed.impact)   document.getElementById('f-impact').value   = parsed.impact;
+    if (parsed.date)     document.getElementById('f-date').value     = parsed.date;
+    if (parsed.heure)    document.getElementById('f-time').value     = parsed.heure;
     if (parsed.clp) {
       document.getElementById('f-clp').checked = true;
       document.getElementById('clpBox').style.borderColor = 'var(--accent)';
@@ -1488,13 +1450,11 @@ Interprète les champs du format SNCF :
     }
     toggleNonTermineMotif();
 
-    // Vide la zone de collage
     document.getElementById('pasteInput').value = '';
-
     setIAMsg('✅ Formulaire pré-rempli ! Vérifie et complète si besoin.', 'ok');
 
   } catch(e) {
-    setIAMsg('❌ Erreur réseau : ' + e.message, 'error');
+    setIAMsg('❌ Erreur : ' + e.message, 'error');
   } finally {
     btn.disabled = false;
     btn.textContent = '🤖 Analyser et remplir';
@@ -3031,7 +2991,7 @@ async function gLoadData() {
 }
 
 function setSyncStatus(msg, ok=false) {
-  const el = document.getElementById('syncStatus');
+  const el = document.getElementById('suivi-syncStatus');
   el.textContent = msg;
   el.className = 'sync-status' + (ok ? ' ok' : '');
 }
@@ -3045,23 +3005,6 @@ function updateSyncStatus() {
 // ---- INITIAL RENDER ----
 renderDashboard();
 updateSyncStatus();
-// ======================================================
-// ---- BRIDGE EXCALIBUR ----
-// ======================================================
-function syncExcalibur() {
-  try {
-    // Les deux apps partagent le même localStorage sur zyndear.github.io
-    // EXCALIBUR lit directement localStorage['interventions']
-    // On notifie EXCALIBUR via BroadcastChannel (si les deux onglets sont ouverts)
-    const bc = new BroadcastChannel('excalibur_bridge');
-    bc.postMessage('suivi_updated');
-    bc.close();
-    setSyncStatus('🗡 EXCALIBUR synchronisé — ' + getData().length + ' interventions disponibles', true);
-  } catch(e) {
-    setSyncStatus('🗡 Données prêtes — rechargez EXCALIBUR pour les voir');
-  }
-  setTimeout(updateSyncStatus, 4000);
-}
 
 // ---- SERVICE WORKER ----
 if ('serviceWorker' in navigator) {
