@@ -820,9 +820,32 @@ ${a.byCat.map(([cat,d])=>`${cat}: ${d.count}x (resolu ${d.resolved}/${d.count})`
     `ÉTAT DU PARC:\n${Object.entries(p).length?Object.entries(p).map(([t,d])=>`- ${t}: ${d.status.toUpperCase()}${d.note?` — ${d.note}`:''}`).join('\n'):'Aucun.'}`+
     similarFaultsSection+histSec+spSec;
 
-  const systemPrompt='Tu es un technicien expert en maintenance ferroviaire SNCF avec 10 ans d\'experience terrain sur materiel roulant AGC, ZTER, R2N et Z50000. Tu as resolu des centaines de pannes similaires et tu connais les causes racines habituelles par coeur. Tes regles : commencer par le plus simple et rapide, identifier la cause racine pas juste le symptome, donner des actions concretes et precises, estimer les durees basees sur l\'historique, alerter si probleme systemique. Style : direct, technique, operationnel, comme un collegue experimente sur le terrain.';
+  const systemPrompt='Tu es un assistant de maintenance ferroviaire. Tu dois analyser UNIQUEMENT les donnees historiques fournies pour repondre. '+'Ne fais AUCUNE proposition generique. Chaque proposition doit etre directement extraite ou deduite des interventions historiques passees. '+'Si une action a resolu une panne similaire dans l historique, cite-la exactement avec la date et le train. '+'Si tu ne trouves pas de cas similaire dans l historique, dis-le clairement plutot que d inventer une reponse. '+'Sois ultra-concis et direct : une fiche de diagnostic par panne active, basee sur les faits de l historique.';
 
-  const userPrompt='DONNEES PRISE DE POSTE:\n'+ctx+'\n\nPour chaque intervention active, genere une FICHE DIAGNOSTIC structuree :\n\n'+'=== POINTS CRITIQUES & URGENCES ===\n'+'Priorise par risque immobilisation et impact voyageurs.\n\n'+'=== FICHES DIAGNOSTIC PAR TRAIN ===\n\n'+'Pour chaque train en panne :\n'+'Train [Numero] -- [Panne actuelle]\n'+'Recurrence : analysee depuis l\'historique des interventions similaires\n'+'Duree estimee : X min (base sur cas similaires resolus)\n\n'+'CAUSE PROBABLE :\n'+'-> La cause racine la plus probable selon l\'historique\n'+'-> Si recidive : pourquoi ca revient et ce qui n\'a pas ete traite\n\n'+'ORDRE D\'INTERVENTION (du plus rapide au plus complexe) :\n'+'1. [Action concrete - X min] : explication\n'+'2. [Action concrete - X min] : explication\n'+'3. [Action concrete - X min] : explication\n\n'+'CE QUI A MARCHE SUR CAS SIMILAIRES :\n'+'-> Extrais les actions PRECISES des interventions reussies dans l\'historique\n'+'-> Cite les dates/trains pour montrer que c\'est base sur du reel\n\n'+'A EVITER (ce qui a echoue ou provoque des recidives) :\n'+'-> Base sur les cas negatifs de l\'historique\n\n'+'CONSEIL EXPERT :\n'+'-> Ce que les techniciens oublient souvent sur ce type de panne\n\n'+'=== DONNEES SHAREPOINT ===\n\n'+'=== ETAT DU PARC ===\n\n'+'=== SYNTHESE VEILLE ===\n\n'+'=== STRATEGIE JOURNEE ===\n'+'Ordre de traitement optimal pour optimiser le temps de l\'equipe.';
+  const userPrompt='PANNE(S) ACTIVE(S) AUJOURD\'HUI:\n'+
+    [...tL,...yL].map(i=>'- Train '+i.trainNum+' | '+i.category+' | '+i.description).join('\n')+
+    '\n\n'+similarFaultsSection+
+    '\n\nETAT DU PARC:\n'+Object.entries(p).map(([t,d])=>t+': '+d.status+(d.note?' - '+d.note:'')).join('\n')+
+    '\n\nSHAREPOINT:\n'+(spD?.text?spD.text.substring(0,1000):'Aucune donnee')+
+    '\n\nVEILLE:\n'+yL.map(i=>'- ['+i.result+'] '+i.trainNum+' | '+i.category+' | '+i.description).join('\n')+
+    '\n\n---\n'+
+    'CONSIGNE: Pour chaque panne active, genere une fiche en suivant STRICTEMENT ce format:\n\n'+
+    'TRAIN [numero] - [panne]\n'+
+    'RECURRENCE: [X fois dans l historique sur ce train / X fois sur autres trains]\n'+
+    'CAUSE PROBABLE: [basee sur les cas historiques similaires, pas sur une connaissance generale]\n\n'+
+    'INTERVENTIONS SIMILAIRES TROUVEES:\n'+
+    '[liste les vraies interventions historiques trouvees avec date, train, description exacte]\n\n'+
+    'CE QUI A MARCHE (tire de l historique):\n'+
+    '[actions exactes qui ont resolu des pannes similaires - basees sur les descriptions des cas resolus]\n\n'+
+    'CE QUI A ECHOUE (tire de l historique):\n'+
+    '[actions qui ont echoue ou cause des recidives - basees sur les cas negatifs]\n\n'+
+    'PROPOSITION DE DIAGNOSTIC:\n'+
+    '[ordre d intervention base UNIQUEMENT sur ce qui a marche dans l historique, pas de generalites]\n\n'+
+    'Si aucun cas similaire dans l historique: indique-le clairement et dis pourquoi (historique insuffisant, panne nouvelle, etc.)\n\n'+
+    'Termine par:\n'+
+    'STRATEGIE JOURNEE: ordre de traitement des pannes par priorite\n'+
+    'SHAREPOINT: informations utiles de l equipe\n'+
+    'PARC: trains a surveiller';
 
   const txt=await callAI(systemPrompt, userPrompt);
   if(txt){document.getElementById('briefingTxt').textContent=txt;document.getElementById('briefingOut').style.display='block';}
